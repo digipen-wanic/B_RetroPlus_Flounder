@@ -41,7 +41,7 @@ public:
 	Color operator*(float scalar) const; // Scales a color by the given value.
 
 	// Other functions
-	void Clamp(); // Adjusts RGBA values so they lie between 0 and 1.
+	Color Clamp() const; // Returns a new color with RGBA values adjusted so they lie between 0 and 1.
 
 	//------------------------------------------------------------------------------
 	// Pubic Variables:

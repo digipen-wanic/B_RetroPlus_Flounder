@@ -22,6 +22,7 @@
 //------------------------------------------------------------------------------
 
 class Vector2D;
+struct GLFWwindow;
 
 //------------------------------------------------------------------------------
 // Public Structures:
@@ -50,10 +51,16 @@ public:
 	// Get the current location of the mouse in screen coordinates
 	Vector2D GetCursorPosition() const;
 
+	// Get the amount that the mouse has scrolled this frame
+	float GetMouseScrollAmount() const;
+
 	// Set the number of frames to store past the current frame.
 	// Params:
 	//   size = Number of previous frames to store (should be > 1).
 	void SetBufferSize(unsigned size);
+
+	// Mouse scroll callback function
+	friend void MouseScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 	// Retrieve the instance of the Input singleton.
 	static Input& GetInstance();
@@ -77,6 +84,9 @@ private:
 
 	long cursorDeltaX;
 	long cursorDeltaY;
+
+	float scrollAmountCurrent;
+	float scrollAmountPrevious;
 
 	// Keys data from current and previous frames.
 	static const unsigned inputKeyNum;

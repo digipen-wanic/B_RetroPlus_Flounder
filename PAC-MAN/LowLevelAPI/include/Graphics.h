@@ -12,6 +12,12 @@
 #pragma once
 
 //------------------------------------------------------------------------------
+// Include Libraries:
+//------------------------------------------------------------------------------
+
+#pragma comment(lib, "opengl32.lib")
+
+//------------------------------------------------------------------------------
 // Include Files:
 //------------------------------------------------------------------------------
 
@@ -50,6 +56,7 @@ enum RenderMode
 {
 	RM_None = -1,
 	RM_Forward,
+	//RM_Deferred,
 
 	// Keep this one last
 	RM_Num,
@@ -104,7 +111,7 @@ public:
 	void SetCurrentCamera(Camera& camera);
 
 	// Screen to world
-	const BoundingRectangle GetScreenWorldDimensions() const;
+	const BoundingRectangle GetScreenWorldDimensions(const Camera* camera = nullptr) const;
 	Vector2D ScreenToWorldPosition(const Vector2D& screenPosition, const Camera* camera = nullptr) const;
 
 	////////////////////

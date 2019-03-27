@@ -29,7 +29,7 @@ public:
 	//------------------------------------------------------------------------------
 
 	// Ctors/Dtors
-	Renderer(unsigned width, unsigned height, const std::string& shaderFileName);
+	Renderer(const std::string& shaderFileName);
 	virtual ~Renderer();
 
 	// Methods

@@ -26,6 +26,10 @@
 class ForwardRenderer : public Renderer
 {
 public:
+	//------------------------------------------------------------------------------
+	// Public Functions:
+	//------------------------------------------------------------------------------
+
 	ForwardRenderer(unsigned width, unsigned height);
 	void FrameStart();
 	void FrameEnd(bool syncOperations = false);

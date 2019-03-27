@@ -207,18 +207,6 @@ namespace Behaviors
 		// If there are more than 2 directions we could move, let the child class handle the intersection.
 		if (adjacentTilesSize > 2)
 			OnIntersection(adjacentTiles, adjacentTilesSize);
-
-		// FIXME: THIS CODE IS HERE FOR DEMONSTRATION PURPOSES ONLY - REMOVE IT ONCE PLAYERCONTROLLER/AI IS IMPLEMENTED!
-		if (adjacentTilesSize < 4)
-		{
-			// Choose a new direction that isn't backwards.
-			AdjacentTile adjacentTile;
-			do
-			{
-				adjacentTile = adjacentTiles[rand() % adjacentTilesSize];
-			} while (AlmostEqual(adjacentTile.pos, oldTile));
-			direction = adjacentTile.direction;
-		}
 	}
 
 	// Called when met with an intersection after finishing moving to the next tile.

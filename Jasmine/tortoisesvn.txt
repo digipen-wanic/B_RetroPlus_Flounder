@@ -1,0 +1,1 @@
+TortoiseSVN doesn't like empty folders apparently

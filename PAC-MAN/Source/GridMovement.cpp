@@ -76,11 +76,11 @@ namespace Behaviors
 		if (tileProgress > 1.0f)
 		{
 			AdjacentTile adjacentTiles[4];
-			size_t adjacentTilesSize;
-			GetAdjacentEmptyTiles(adjacentTiles, adjacentTilesSize);
+			size_t emptyCount;
+			GetAdjacentTiles(adjacentTiles, emptyCount);
 
 			// Give child class a chance to update direction when we have reached the end of a move.
-			OnTileMove(adjacentTiles, adjacentTilesSize);
+			OnTileMove(adjacentTiles, emptyCount);
 
 			oldTile = newTile;
 
@@ -156,67 +156,71 @@ namespace Behaviors
 	// Fills out a Vector2D array with all adjacent tile coordinates.
 	// Params:
 	//   tiles = The array of tiles. Must have a size of 4!
-	//   tilesSize = How many tiles were written.
-	void GridMovement::GetAdjacentTiles(AdjacentTile tiles[4], size_t& tilesSize)
+	//   emptyCount = How many empty tiles were found.
+	void GridMovement::GetAdjacentTiles(AdjacentTile tiles[4], size_t& emptyCount)
 	{
-		tilesSize = 0;
+		emptyCount = 0;
+
+		tiles[0] = { Vector2D(newTile.x, newTile.y - 1), true, true, UP };
 
 		// Check tile above.
-		if (newTile.y - 1 >= 0)
-			tiles[tilesSize++] = { Vector2D(newTile.x, newTile.y - 1), UP };
+		GetAdjacentTile(tiles[0]);
+		if (tiles[0].empty)
+			++emptyCount;
+
+		tiles[1] = { Vector2D(newTile.x - 1, newTile.y), true, true, LEFT };
 
 		// Check tile to the left.
-		if (newTile.x - 1 >= 0)
-			tiles[tilesSize++] = { Vector2D(newTile.x - 1, newTile.y), LEFT };
+		GetAdjacentTile(tiles[1]);
+		if (tiles[1].empty)
+			++emptyCount;
+
+		tiles[2] = { Vector2D(newTile.x, newTile.y + 1), true, true, DOWN };
 
 		// Check tile below.
-		if (newTile.y + 1 < tilemap->GetHeight())
-			tiles[tilesSize++] = { Vector2D(newTile.x, newTile.y + 1), DOWN };
+		GetAdjacentTile(tiles[2]);
+		if (tiles[2].empty)
+			++emptyCount;
+
+		tiles[3] = { Vector2D(newTile.x + 1, newTile.y), true, true, RIGHT };
 
 		// Check tile to the right.
-		if (newTile.x + 1 < tilemap->GetWidth())
-			tiles[tilesSize++] = { Vector2D(newTile.x + 1, newTile.y), RIGHT };
+		GetAdjacentTile(tiles[3]);
+		if (tiles[3].empty)
+			++emptyCount;
 	}
 
-	// Fills out a Vector2D array with all adjacent empty tile coordinates.
+	// Fills out an AdjacentTile struct.
 	// Params:
-	//   tiles = The array of tiles. Must have a size of 4!
-	//   tilesSize = How many tiles were written.
-	void GridMovement::GetAdjacentEmptyTiles(AdjacentTile tiles[4], size_t& tilesSize)
+	//   tile = The tile to fill out.
+	void GridMovement::GetAdjacentTile(AdjacentTile& tile)
 	{
-		tilesSize = 0;
-
-		AdjacentTile adjacentTiles[4];
-		size_t adjacentTilesSize;
-
-		// Get all valid adjacent tiles.
-		GetAdjacentTiles(adjacentTiles, adjacentTilesSize);
-
-		// Check if each adjacent tile is empty, and if so add it to the array.
-		for (size_t i = 0; i < adjacentTilesSize; i++)
-			if (tilemap->GetCellValue(static_cast<unsigned>(adjacentTiles[i].pos.x), static_cast<unsigned>(adjacentTiles[i].pos.y)) == 0)
-				tiles[tilesSize++] = adjacentTiles[i];
+		if (tile.pos.x >= 0 && tile.pos.y >= 0 && tile.pos.x < tilemap->GetWidth() && tile.pos.y < tilemap->GetHeight())
+		{
+			tile.edge = false;
+			tile.empty = tilemap->GetCellValue(static_cast<unsigned>(tile.pos.x), static_cast<unsigned>(tile.pos.y)) == 0;
+		}
 	}
 
 	// Called when finished moving to the next tile.
 	// Params:
-	//   adjacentTiles = An array of adjacent empty tiles.
-	//   adjacentTilesSize = The number of elements in the array of adjacent empty tiles.
-	void GridMovement::OnTileMove(AdjacentTile adjacentTiles[4], size_t adjacentTilesSize)
+	//   adjacentTiles = An array of adjacent tiles.
+	//   emptyCount = How many empty tiles were found.
+	void GridMovement::OnTileMove(AdjacentTile adjacentTiles[4], size_t emptyCount)
 	{
 		// If there are more than 2 directions we could move, let the child class handle the intersection.
-		if (adjacentTilesSize > 2)
-			OnIntersection(adjacentTiles, adjacentTilesSize);
+		if (emptyCount > 2)
+			OnIntersection(adjacentTiles, emptyCount);
 	}
 
 	// Called when met with an intersection after finishing moving to the next tile.
 	// Params:
 	//   adjacentTiles = An array of adjacent empty tiles.
-	//   adjacentTilesSize = The number of elements in the array of adjacent empty tiles.
-	void GridMovement::OnIntersection(AdjacentTile adjacentTiles[4], size_t adjacentTilesSize)
+		//   emptyCount = How many empty tiles were found.
+	void GridMovement::OnIntersection(AdjacentTile adjacentTiles[4], size_t emptyCount)
 	{
 		UNREFERENCED_PARAMETER(adjacentTiles);
-		UNREFERENCED_PARAMETER(adjacentTilesSize);
+		UNREFERENCED_PARAMETER(emptyCount);
 	}
 }
 

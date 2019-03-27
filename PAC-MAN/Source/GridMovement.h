@@ -2,7 +2,7 @@
 //
 // File Name:	GridMovement.h
 // Author(s):	David Cohen (david.cohen)
-// Project:		BetaFramework
+// Project:		PAC-MAN
 // Course:		WANIC VGP2 2018-2019
 //
 // Copyright © 2018 DigiPen (USA) Corporation.
@@ -101,6 +101,12 @@ namespace Behaviors
 			// The tile's coordinate.
 			Vector2D pos;
 
+			// Whether this tile is off the edge of the screen.
+			bool edge;
+
+			// Whether this tile is empty.
+			bool empty;
+
 			// The direction to move to get to this tile.
 			Direction direction;
 		};
@@ -112,26 +118,25 @@ namespace Behaviors
 		// Fills out a Vector2D array with all adjacent tile coordinates.
 		// Params:
 		//   tiles = The array of tiles. Must have a size of 4!
-		//   tilesSize = How many tiles were written.
-		void GetAdjacentTiles(AdjacentTile tiles[4], size_t& tilesSize);
+		//   emptyCount = How many empty tiles were found.
+		void GetAdjacentTiles(AdjacentTile tiles[4], size_t& emptyCount);
 
-		// Fills out a Vector2D array with all adjacent empty tile coordinates.
+		// Fills out an AdjacentTile struct.
 		// Params:
-		//   tiles = The array of tiles. Must have a size of 4!
-		//   tilesSize = How many tiles were written.
-		void GetAdjacentEmptyTiles(AdjacentTile tiles[4], size_t& tilesSize);
+		//   tile = The tile to fill out.
+		void GetAdjacentTile(AdjacentTile& tile);
 
 		// Called when finished moving to the next tile.
 		// Params:
-		//   adjacentTiles = An array of adjacent empty tiles.
-		//   adjacentTilesSize = The number of elements in the array of adjacent empty tiles.
-		virtual void OnTileMove(AdjacentTile adjacentTiles[4], size_t adjacentTilesSize);
+		//   adjacentTiles = An array of adjacent tiles.
+		//   emptyCount = How many empty tiles were found.
+		virtual void OnTileMove(AdjacentTile adjacentTiles[4], size_t emptyCount);
 
 		// Called when met with an intersection after finishing moving to the next tile.
 		// Params:
 		//   adjacentTiles = An array of adjacent empty tiles.
-		//   adjacentTilesSize = The number of elements in the array of adjacent empty tiles.
-		virtual void OnIntersection(AdjacentTile adjacentTiles[4], size_t adjacentTilesSize);
+		//   emptyCount = How many empty tiles were found.
+		virtual void OnIntersection(AdjacentTile adjacentTiles[4], size_t emptyCount);
 
 	private:
 		//------------------------------------------------------------------------------

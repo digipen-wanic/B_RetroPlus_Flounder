@@ -75,8 +75,12 @@ namespace Behaviors
 		// Check if we have reached the end of this movement.
 		if (tileProgress > 1.0f)
 		{
+			AdjacentTile adjacentTiles[4];
+			size_t adjacentTilesSize;
+			GetAdjacentEmptyTiles(adjacentTiles, adjacentTilesSize);
+
 			// Give child class a chance to update direction when we have reached the end of a move.
-			OnTileMove();
+			OnTileMove(adjacentTiles, adjacentTilesSize);
 
 			oldTile = newTile;
 
@@ -195,12 +199,11 @@ namespace Behaviors
 	}
 
 	// Called when finished moving to the next tile.
-	void GridMovement::OnTileMove()
+	// Params:
+	//   adjacentTiles = An array of adjacent empty tiles.
+	//   adjacentTilesSize = The number of elements in the array of adjacent empty tiles.
+	void GridMovement::OnTileMove(AdjacentTile adjacentTiles[4], size_t adjacentTilesSize)
 	{
-		AdjacentTile adjacentTiles[4];
-		size_t adjacentTilesSize;
-		GetAdjacentEmptyTiles(adjacentTiles, adjacentTilesSize);
-
 		// If there are more than 2 directions we could move, let the child class handle the intersection.
 		if (adjacentTilesSize > 2)
 			OnIntersection(adjacentTiles, adjacentTilesSize);
@@ -220,7 +223,8 @@ namespace Behaviors
 
 	// Called when met with an intersection after finishing moving to the next tile.
 	// Params:
-	//   adjacentTiles = An array of adjacent tile coordinates.
+	//   adjacentTiles = An array of adjacent empty tiles.
+	//   adjacentTilesSize = The number of elements in the array of adjacent empty tiles.
 	void GridMovement::OnIntersection(AdjacentTile adjacentTiles[4], size_t adjacentTilesSize)
 	{
 		UNREFERENCED_PARAMETER(adjacentTiles);

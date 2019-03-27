@@ -122,11 +122,15 @@ namespace Behaviors
 		void GetAdjacentEmptyTiles(AdjacentTile tiles[4], size_t& tilesSize);
 
 		// Called when finished moving to the next tile.
-		virtual void OnTileMove();
+		// Params:
+		//   adjacentTiles = An array of adjacent empty tiles.
+		//   adjacentTilesSize = The number of elements in the array of adjacent empty tiles.
+		virtual void OnTileMove(AdjacentTile adjacentTiles[4], size_t adjacentTilesSize);
 
 		// Called when met with an intersection after finishing moving to the next tile.
 		// Params:
-		//   adjacentTiles = An array of adjacent tiles.
+		//   adjacentTiles = An array of adjacent empty tiles.
+		//   adjacentTilesSize = The number of elements in the array of adjacent empty tiles.
 		virtual void OnIntersection(AdjacentTile adjacentTiles[4], size_t adjacentTilesSize);
 
 	private:

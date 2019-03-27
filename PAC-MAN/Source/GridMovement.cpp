@@ -2,7 +2,7 @@
 //
 // File Name:	GridMovement.cpp
 // Author(s):	David Cohen (david.cohen)
-// Project:		BetaFramework
+// Project:		PAC-MAN
 // Course:		WANIC VGP2 2018-2019
 //
 // Copyright © 2018 DigiPen (USA) Corporation.

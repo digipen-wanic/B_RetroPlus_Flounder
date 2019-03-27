@@ -37,6 +37,7 @@
 #include "PlayerProjectile.h"
 #include "Asteroid.h"
 #include "MouseFollow.h"
+#include "GridMovement.h"
 
 //------------------------------------------------------------------------------
 
@@ -69,6 +70,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prevInstance, _In
 	objectFactory.RegisterComponent<Behaviors::PlayerProjectile>();
 	objectFactory.RegisterComponent<Behaviors::Asteroid>();
 	objectFactory.RegisterComponent<Behaviors::MouseFollow>();
+	objectFactory.RegisterComponent<Behaviors::GridMovement>();
 
 	// Create a new space called "GameSpace"
 	Space* space = new Space("GameSpace");

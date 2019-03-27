@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
 // File Name:	Level1.h
-// Author(s):	Jeremy Kings (j.kings)
+// Author(s):	David Cohen (david.cohen)
 // Project:		BetaFramework
 // Course:		WANIC VGP2 2018-2019
 //
@@ -28,6 +28,7 @@ class SpriteSource;
 class Mesh;
 class SpriteSource;
 class GameObject;
+class Tilemap;
 
 //------------------------------------------------------------------------------
 // Public Structures:
@@ -60,14 +61,14 @@ namespace Levels
 		void Unload() override;
 
 	private:
-
 		//------------------------------------------------------------------------------
 		// Private Variables:
 		//------------------------------------------------------------------------------
 
-		// Properties
-		float circleSpeed;
-		float pointSpeed;
+		// Tilemap
+		Tilemap* dataMap;
+		unsigned columnsMap;
+		unsigned rowsMap;
 	};
 }
 

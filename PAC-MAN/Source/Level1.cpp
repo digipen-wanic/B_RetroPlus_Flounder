@@ -19,27 +19,25 @@
 
 // Systems
 #include <Texture.h>
-#include "SpriteSource.h"
-#include "GameObject.h"
-#include "MeshHelper.h"
-#include "Space.h"
-#include "GameObjectManager.h"
+#include <SpriteSource.h>
+#include <GameObject.h>
+#include <MeshHelper.h>
+#include <Space.h>
+#include <GameObjectManager.h>
 #include <Input.h>
 #include <Mesh.h>
 #include <GameObjectFactory.h>
+#include <Tilemap.h>
 
 // Components
-#include "MeshHelper.h"
-#include "Transform.h"
-#include "Physics.h"
-#include <SpriteText.h>
+#include <MeshHelper.h>
+#include <Transform.h>
+#include <Physics.h>
+#include <SpriteTilemap.h>
+#include "GridMovement.h"
 
 // Levels
-#include "Level2.h"
-// David Wong: Added the third level
-#include "Level3.h"
-#include "Level4.h"
-#include "Level5.h"
+#include "MainMenu.h"
 
 //------------------------------------------------------------------------------
 
@@ -54,8 +52,7 @@ namespace Levels
 	//------------------------------------------------------------------------------
 
 	// Creates an instance of Level 1.
-	Level1::Level1() : Level("Level1"),
-		circleSpeed(0.0f), pointSpeed(0.0f)
+	Level1::Level1() : Level("Level1"), columnsMap(4), rowsMap(3)
 	{
 	}
 
@@ -68,12 +65,35 @@ namespace Levels
 
 		// Create a new quad mesh for the sprite.
 		resourceManager.GetMesh("Quad");
-		resourceManager.GetSpriteSource("Code New Roman.png", 12, 8);
-		resourceManager.GetMesh("FontAtlas", 12, 8);
+
+		// Load the circle texture and sprite source.
+		resourceManager.GetSpriteSource("Circle.png");
 
 		// Load the archetypes from their files.
-		objectManager.AddArchetype(*objectFactory.CreateObject("Rectangle", resourceManager.GetMesh("Quad")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("ControllableRectangle", resourceManager.GetMesh("FontAtlas"), resourceManager.GetSpriteSource("Code New Roman.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Circle", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Point", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("ControllableRectangle", resourceManager.GetMesh("Quad")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("PAC-MAN", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
+
+		// Load the tilemap.
+		dataMap = Tilemap::CreateTilemapFromFile("Assets/Levels/Level2.txt");
+		if (dataMap == nullptr)
+		{
+			std::cout << "Error loading map!" << std::endl;
+		}
+		else
+		{
+			// Create a new quad mesh for the sprite tilemap.
+			resourceManager.GetMesh("Map", columnsMap, rowsMap);
+
+			// Load the tilemap texture and sprite source.
+			resourceManager.GetSpriteSource("Tilemap.png", columnsMap, rowsMap);
+
+			// Create the tilemap and add it to the object manager.
+			GameObject* tilemap = objectFactory.CreateObject("Tilemap", resourceManager.GetMesh("Map"), resourceManager.GetSpriteSource("Tilemap.png"));
+			tilemap->GetComponent<SpriteTilemap>()->SetTilemap(dataMap);
+			objectManager.AddArchetype(*tilemap);
+		}
 	}
 
 	// Initialize the memory associated with Level 1.
@@ -83,24 +103,15 @@ namespace Levels
 
 		// Add various physics objects to the scene.
 
-		// Rectangles.
-		GameObject* rectangle = new GameObject(*objectManager.GetArchetypeByName("Rectangle"));
-		rectangle->GetComponent<Transform>()->SetTranslation(Vector2D(-200.0f, 250.0f));
-		rectangle->GetComponent<Transform>()->SetRotation(-M_PI_F / 8.0f);
-		rectangle->GetComponent<Physics>()->SetVelocity(Vector2D(50.0f, -75.0f));
-		rectangle->GetComponent<Physics>()->SetAngularVelocity(M_PI_F / 2.0f);
-		objectManager.AddObject(*rectangle);
+		// Tilemap.
+		GameObject* tilemap = new GameObject(*objectManager.GetArchetypeByName("Tilemap"));
+		objectManager.AddObject(*tilemap);
 
-		rectangle = new GameObject(*objectManager.GetArchetypeByName("Rectangle"));
-		rectangle->GetComponent<Transform>()->SetTranslation(Vector2D(50.0f, -150.0f));
-		rectangle->GetComponent<Transform>()->SetRotation(M_PI_F / 8.0f);
-		rectangle->GetComponent<Physics>()->SetVelocity(Vector2D(0.0f, 0.0f));
-		objectManager.AddObject(*rectangle);
-
-		// Controllable rectangles.
-		GameObject* controllableRectangle = new GameObject(*objectManager.GetArchetypeByName("ControllableRectangle"));
-		controllableRectangle->GetComponent<SpriteText>()->SetText("ok\nnerd");
-		objectManager.AddObject(*controllableRectangle);
+		// PAC-MAN.
+		GameObject* pacMan = new GameObject(*objectManager.GetArchetypeByName("PAC-MAN"));
+		pacMan->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
+		pacMan->GetComponent<Transform>()->SetTranslation(Vector2D(100.0f, 100.0f));
+		objectManager.AddObject(*pacMan);
 	}
 
 	// Update Level 1.
@@ -115,30 +126,19 @@ namespace Levels
 		// Handle level switching.
 		if (input.CheckTriggered('1'))
 		{
-			GetSpace()->RestartLevel();
+			GetSpace()->SetLevel<MainMenu>();
 		}
 		else if (input.CheckTriggered('2'))
 		{
-			GetSpace()->SetLevel<Level2>();
-		}
-		// David Wong: Added the third level
-		else if (input.CheckTriggered('3'))
-		{
-			GetSpace()->SetLevel<Level3>();
-		}
-		else if (input.CheckTriggered('4'))
-		{
-			GetSpace()->SetLevel<Level4>();
-		}
-		else if (input.CheckTriggered('5'))
-		{
-			GetSpace()->SetLevel<Level5>();
+			GetSpace()->RestartLevel();
 		}
 	}
 
 	// Unload the resources associated with Level 1.
 	void Level1::Unload()
 	{
+		// Free all allocated memory.
+		delete dataMap;
 	}
 }
 

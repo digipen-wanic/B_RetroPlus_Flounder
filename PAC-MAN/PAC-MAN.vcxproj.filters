@@ -46,23 +46,17 @@
     <ClCompile Include="Source\PlayerProjectile.cpp">
       <Filter>Game\Behaviors</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Level1.cpp">
-      <Filter>Game\Levels</Filter>
-    </ClCompile>
     <ClCompile Include="Source\MouseFollow.cpp">
       <Filter>Game\Behaviors</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Level2.cpp">
+    <ClCompile Include="Source\MainMenu.cpp">
       <Filter>Game\Levels</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Level3.cpp">
+    <ClCompile Include="Source\Level1.cpp">
       <Filter>Game\Levels</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Level4.cpp">
-      <Filter>Game\Levels</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Level5.cpp">
-      <Filter>Game\Levels</Filter>
+    <ClCompile Include="Source\GridMovement.cpp">
+      <Filter>Game\Behaviors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -96,23 +90,17 @@
     <ClInclude Include="Source\PlayerProjectile.h">
       <Filter>Game\Behaviors</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Level1.h">
-      <Filter>Game\Levels</Filter>
-    </ClInclude>
     <ClInclude Include="Source\MouseFollow.h">
       <Filter>Game\Behaviors</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Level2.h">
+    <ClInclude Include="Source\MainMenu.h">
       <Filter>Game\Levels</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Level3.h">
+    <ClInclude Include="Source\Level1.h">
       <Filter>Game\Levels</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Level4.h">
-      <Filter>Game\Levels</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Level5.h">
-      <Filter>Game\Levels</Filter>
+    <ClInclude Include="Source\GridMovement.h">
+      <Filter>Game\Behaviors</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

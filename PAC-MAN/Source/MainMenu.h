@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	Level3.h
-// Author(s):	David Wong (david.wongcascante)
+// File Name:	MainMenu.h
+// Author(s):	Davids Cohen (david.cohen)
 // Project:		BetaFramework
 // Course:		WANIC VGP2 2018-2019
 //
@@ -35,35 +35,29 @@ class GameObject;
 
 namespace Levels
 {
-	class Level3 : public Level
+	class MainMenu : public Level
 	{
 	public:
 		//------------------------------------------------------------------------------
 		// Public Functions:
 		//------------------------------------------------------------------------------
 
-		// Creates an instance of Level 3.
-		Level3();
+		// Creates an instance of Main Menu.
+		MainMenu();
 
-		// Load the resources associated with Level 3.
+		// Load the resources associated with Main Menu.
 		void Load() override;
 
-		// Initialize the memory associated with Level 3.
+		// Initialize the memory associated with Main Menu.
 		void Initialize() override;
 
-		// Update Level 3.
+		// Update Main Menu.
 		// Params:
 		//	 dt = Change in time (in seconds) since the last game loop.
 		void Update(float dt) override;
 
-		// Unload the resources associated with Level 3.
+		// Unload the resources associated with Main Menu.
 		void Unload() override;
-
-	private:
-
-		//------------------------------------------------------------------------------
-		// Private Variables:
-		//------------------------------------------------------------------------------
 	};
 }
 

@@ -1,0 +1,15 @@
+Tilemap
+{
+  numComponents : 2
+  Transform
+  {
+    translation : { -350, 250 }
+    rotation : 0
+    scale : { 100, 100 }
+  }
+  SpriteTilemap
+  {
+    frameIndex : 0
+    color : { 1 , 1 , 1 , 1 }
+  }
+}

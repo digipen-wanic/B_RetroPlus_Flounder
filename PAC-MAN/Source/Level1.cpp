@@ -116,7 +116,7 @@ namespace Levels
 
 		// Ghost.
 		GameObject* ghost = new GameObject(*objectManager.GetArchetypeByName("Ghost"));
-		ghost->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
+		//ghost->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
 		ghost->GetComponent<Transform>()->SetTranslation(Vector2D(400.0f, 100.0f));
 		objectManager.AddObject(*ghost);
 	}

@@ -2,7 +2,7 @@
 //
 // File Name:	GridMovement.cpp
 // Author(s):	David Cohen (david.cohen)
-// Project:		BetaFramework
+// Project:		PAC-MAN
 // Course:		WANIC VGP2 2018-2019
 //
 // Copyright © 2018 DigiPen (USA) Corporation.
@@ -43,16 +43,8 @@ namespace Behaviors
 	// Params:
 	//   speed = How fast the game object moves between tiles.
 	GridMovement::GridMovement(float speed) : Component("GridMovement"), speed(speed),
-		tilemap(nullptr), spriteTilemap(nullptr), transform(nullptr), tileProgress(0.0f), direction(UP), oldTile(), newTile()
+		tilemap(nullptr), spriteTilemap(nullptr), transform(nullptr), tileProgress(0.0f), direction(RIGHT), oldTile(), newTile()
 	{
-	}
-
-	// Clone a component and return a pointer to the cloned component.
-	// Returns:
-	//   A pointer to a dynamically allocated clone of the component.
-	Component* GridMovement::Clone() const
-	{
-		return new GridMovement(*this);
 	}
 
 	// Initialize this component (happens at object creation).
@@ -75,41 +67,82 @@ namespace Behaviors
 		// Check if we have reached the end of this movement.
 		if (tileProgress > 1.0f)
 		{
-			// Give child class a chance to update direction when we have reached the end of a move.
-			OnTileMove();
-
-			oldTile = newTile;
-
-			// Calculate the new tile based on the target direction.
-			switch (direction)
+			bool currentTileValid;
+			GetCellValue(newTile, currentTileValid);
+			if (currentTileValid)
 			{
-			case UP:
-				newTile = oldTile + Vector2D(0.0f, -1.0f);
-				break;
-			case LEFT:
-				newTile = oldTile + Vector2D(-1.0f, 0.0f);
-				break;
-			case DOWN:
-				newTile = oldTile + Vector2D(0.0f, 1.0f);
-				break;
-			case RIGHT:
-				newTile = oldTile + Vector2D(1.0f, 0.0f);
-				break;
-			}
+				AdjacentTile adjacentTiles[4];
+				size_t emptyCount;
+				GetAdjacentTiles(adjacentTiles, emptyCount);
 
-			// If the tile in the target direction is not empty, cancel the movement.
-			if (tilemap->GetCellValue(static_cast<unsigned>(newTile.x), static_cast<unsigned>(newTile.y)) > 0)
-				newTile = oldTile;
+				// If there are more than 2 directions we could move, let the child class handle the intersection.
+				if (emptyCount > 2)
+					OnIntersection(adjacentTiles, emptyCount);
 
-			// If a new tile has been chosen, subtract 1 from tile movement progress so that we interpolate the correct amount.
-			if (!AlmostEqual(oldTile, newTile))
-			{
-				tileProgress -= 1.0f;
+				// Give child class a chance to update direction when we have reached the end of a move.
+				OnTileMove(adjacentTiles, emptyCount);
+
+				oldTile = newTile;
+
+				// Calculate the new tile based on the target direction.
+				switch (direction)
+				{
+				case UP:
+					newTile = oldTile + Vector2D(0.0f, -1.0f);
+					break;
+				case LEFT:
+					newTile = oldTile + Vector2D(-1.0f, 0.0f);
+					break;
+				case DOWN:
+					newTile = oldTile + Vector2D(0.0f, 1.0f);
+					break;
+				case RIGHT:
+					newTile = oldTile + Vector2D(1.0f, 0.0f);
+					break;
+				}
+
+				// If the tile in the target direction is not empty, cancel the movement.
+				bool newTileValid;
+				if (GetCellValue(newTile, newTileValid) > 0)
+					newTile = oldTile;
+
+				// If a new tile has been chosen, subtract 1 from tile movement progress so that we interpolate the correct amount.
+				if (!AlmostEqual(oldTile, newTile))
+				{
+					tileProgress -= 1.0f;
+				}
+				// If the tile is the same (nowhere to go) clamp tile movement progress to 1.
+				else
+				{
+					tileProgress = 1.0f;
+				}
 			}
-			// If the tile is the same (nowhere to go) clamp tile movement progress to 1.
+			// If the current coordinate is outside the map, wrap around.
 			else
 			{
-				tileProgress = 1.0f;
+				// The old tile is closer to the center and the new tile is off the screen.
+				// We want to have the game object appear from off-screen, so we swap the
+				// old tile and new tile first (so the old tile is off the screen and new
+				// tile is closer to the center)
+
+				std::swap(oldTile, newTile);
+				
+				// Mirror the coordinates around the axis we are moving.
+				switch (direction)
+				{
+				case UP:
+				case DOWN:
+					newTile = Vector2D(newTile.x, tilemap->GetHeight() - newTile.y - 1);
+					oldTile = Vector2D(oldTile.x, tilemap->GetHeight() - oldTile.y - 1);
+					break;
+				case LEFT:
+				case RIGHT:
+					newTile = Vector2D(tilemap->GetWidth() - newTile.x - 1, newTile.y);
+					oldTile = Vector2D(tilemap->GetWidth() - oldTile.x - 1, oldTile.y);
+					break;
+				}
+
+				tileProgress -= 1.0f;
 			}
 		}
 
@@ -135,6 +168,18 @@ namespace Behaviors
 		parser.ReadVariable("speed", speed);
 	}
 
+	// Sets the speed of the game object.
+	void GridMovement::SetSpeed(float speed_)
+	{
+		speed = speed_;
+	}
+
+	// Gets the speed of the game object.
+	float GridMovement::GetSpeed() const
+	{
+		return speed;
+	}
+
 	// Sets the tilemap used for the grid.
 	// Params:
 	//   tilemap = The tilemap.
@@ -149,82 +194,82 @@ namespace Behaviors
 	// Protected Functions:
 	//------------------------------------------------------------------------------
 
+	// Gets the old tile.
+	Vector2D GridMovement::GetOldTile() const
+	{
+		return oldTile;
+	}
+
+	// Gets the tilemap (constant).
+	const Tilemap* GridMovement::GetTilemap() const
+	{
+		return tilemap;
+	}
+
+	// Gets the sprite tilemap (constant).
+	const SpriteTilemap* GridMovement::GetSpriteTilemap() const
+	{
+		return spriteTilemap;
+	}
+
 	// Fills out a Vector2D array with all adjacent tile coordinates.
 	// Params:
 	//   tiles = The array of tiles. Must have a size of 4!
-	//   tilesSize = How many tiles were written.
-	void GridMovement::GetAdjacentTiles(AdjacentTile tiles[4], size_t& tilesSize)
+	//   emptyCount = How many empty tiles were found.
+	void GridMovement::GetAdjacentTiles(AdjacentTile tiles[4], size_t& emptyCount)
 	{
-		tilesSize = 0;
-
 		// Check tile above.
-		if (newTile.y - 1 >= 0)
-			tiles[tilesSize++] = { Vector2D(newTile.x, newTile.y - 1), UP };
+		tiles[0] = GetAdjacentTile(Vector2D(newTile.x, newTile.y - 1), UP);
 
 		// Check tile to the left.
-		if (newTile.x - 1 >= 0)
-			tiles[tilesSize++] = { Vector2D(newTile.x - 1, newTile.y), LEFT };
+		tiles[1] = GetAdjacentTile(Vector2D(newTile.x - 1, newTile.y), LEFT);
 
 		// Check tile below.
-		if (newTile.y + 1 < tilemap->GetHeight())
-			tiles[tilesSize++] = { Vector2D(newTile.x, newTile.y + 1), DOWN };
+		tiles[2] = GetAdjacentTile(Vector2D(newTile.x, newTile.y + 1), DOWN);
 
 		// Check tile to the right.
-		if (newTile.x + 1 < tilemap->GetWidth())
-			tiles[tilesSize++] = { Vector2D(newTile.x + 1, newTile.y), RIGHT };
+		tiles[3] = GetAdjacentTile(Vector2D(newTile.x + 1, newTile.y), RIGHT);
+
+		// Count the number of empty tiles.
+		emptyCount = 0;
+		for (size_t i = 0; i < 4; i++)
+			if (tiles[i].empty)
+				++emptyCount;
 	}
 
-	// Fills out a Vector2D array with all adjacent empty tile coordinates.
+	// Creates an AdjacentTile struct.
 	// Params:
-	//   tiles = The array of tiles. Must have a size of 4!
-	//   tilesSize = How many tiles were written.
-	void GridMovement::GetAdjacentEmptyTiles(AdjacentTile tiles[4], size_t& tilesSize)
+	//   pos = The tile's coordinate.
+	//   direction = The direction to move to get to this tile.
+	// Returns:
+	//   The filled out AdjacentTile struct.
+	GridMovement::AdjacentTile GridMovement::GetAdjacentTile(Vector2D pos, Direction direction_)
 	{
-		tilesSize = 0;
-
-		AdjacentTile adjacentTiles[4];
-		size_t adjacentTilesSize;
-
-		// Get all valid adjacent tiles.
-		GetAdjacentTiles(adjacentTiles, adjacentTilesSize);
-
-		// Check if each adjacent tile is empty, and if so add it to the array.
-		for (size_t i = 0; i < adjacentTilesSize; i++)
-			if (tilemap->GetCellValue(static_cast<unsigned>(adjacentTiles[i].pos.x), static_cast<unsigned>(adjacentTiles[i].pos.y)) == 0)
-				tiles[tilesSize++] = adjacentTiles[i];
+		AdjacentTile tile = { pos, true, true, direction_ };
+		bool valid;
+		tile.empty = GetCellValue(tile.pos, valid) == 0;
+		tile.edge = !valid;
+		return tile;
 	}
 
-	// Called when finished moving to the next tile.
-	void GridMovement::OnTileMove()
+	// Helper function to get the cell value at the specified coordinate. If the coordinate was not valid, it returns 0.
+	// Params:
+	//   pos = The coordinate to get the cell value at.
+	//   valid = Whether the coordinate was valid or not.
+	// Returns:
+	//   The cell value at the specified coordinate. If the coordinate was not valid, returns 0.
+	int GridMovement::GetCellValue(Vector2D pos, bool& valid)
 	{
-		AdjacentTile adjacentTiles[4];
-		size_t adjacentTilesSize;
-		GetAdjacentEmptyTiles(adjacentTiles, adjacentTilesSize);
-
-		// If there are more than 2 directions we could move, let the child class handle the intersection.
-		if (adjacentTilesSize > 2)
-			OnIntersection(adjacentTiles, adjacentTilesSize);
-
-		// FIXME: THIS CODE IS HERE FOR DEMONSTRATION PURPOSES ONLY - REMOVE IT ONCE PLAYERCONTROLLER/AI IS IMPLEMENTED!
-		if (adjacentTilesSize < 4)
+		if (pos.x >= 0 && pos.y >= 0 && pos.x < tilemap->GetWidth() && pos.y < tilemap->GetHeight())
 		{
-			// Choose a new direction that isn't backwards.
-			AdjacentTile adjacentTile;
-			do
-			{
-				adjacentTile = adjacentTiles[rand() % adjacentTilesSize];
-			} while (AlmostEqual(adjacentTile.pos, oldTile));
-			direction = adjacentTile.direction;
+			valid = true;
+			return tilemap->GetCellValue(static_cast<unsigned>(pos.x), static_cast<unsigned>(pos.y));
 		}
-	}
-
-	// Called when met with an intersection after finishing moving to the next tile.
-	// Params:
-	//   adjacentTiles = An array of adjacent tile coordinates.
-	void GridMovement::OnIntersection(AdjacentTile adjacentTiles[4], size_t adjacentTilesSize)
-	{
-		UNREFERENCED_PARAMETER(adjacentTiles);
-		UNREFERENCED_PARAMETER(adjacentTilesSize);
+		else
+		{
+			valid = 0;
+			return 0;
+		}
 	}
 }
 

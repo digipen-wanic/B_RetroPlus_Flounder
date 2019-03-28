@@ -2,7 +2,7 @@
 //
 // File Name:	GridMovement.h
 // Author(s):	David Cohen (david.cohen)
-// Project:		BetaFramework
+// Project:		PAC-MAN
 // Course:		WANIC VGP2 2018-2019
 //
 // Copyright © 2018 DigiPen (USA) Corporation.
@@ -45,12 +45,7 @@ namespace Behaviors
 		// Constructor
 		// Params:
 		//   speed = How fast the game object moves between tiles.
-		GridMovement(float speed = 64.0f);
-
-		// Clone a component and return a pointer to the cloned component.
-		// Returns:
-		//   A pointer to a dynamically allocated clone of the component.
-		Component* Clone() const override;
+		GridMovement(float speed = 4.0f);
 
 		// Initialize this component (happens at object creation).
 		void Initialize() override;
@@ -69,6 +64,12 @@ namespace Behaviors
 		// Params:
 		//   parser = The parser that is reading this object's data from a file.
 		void Deserialize(Parser& parser) override;
+
+		// Sets the speed of the game object.
+		void SetSpeed(float speed);
+
+		// Gets the speed of the game object.
+		float GetSpeed() const;
 
 		// Sets the tilemap used for the grid.
 		// Params:
@@ -101,6 +102,12 @@ namespace Behaviors
 			// The tile's coordinate.
 			Vector2D pos;
 
+			// Whether this tile is off the edge of the screen.
+			bool edge;
+
+			// Whether this tile is empty.
+			bool empty;
+
 			// The direction to move to get to this tile.
 			Direction direction;
 		};
@@ -109,25 +116,55 @@ namespace Behaviors
 		// Protected Functions:
 		//------------------------------------------------------------------------------
 
+		// Gets the old tile.
+		Vector2D GetOldTile() const;
+
+		// Gets the tilemap (constant).
+		const Tilemap* GetTilemap() const;
+
+		// Gets the sprite tilemap (constant).
+		const SpriteTilemap* GetSpriteTilemap() const;
+
 		// Fills out a Vector2D array with all adjacent tile coordinates.
 		// Params:
 		//   tiles = The array of tiles. Must have a size of 4!
-		//   tilesSize = How many tiles were written.
-		void GetAdjacentTiles(AdjacentTile tiles[4], size_t& tilesSize);
+		//   emptyCount = How many empty tiles were found.
+		void GetAdjacentTiles(AdjacentTile tiles[4], size_t& emptyCount);
 
-		// Fills out a Vector2D array with all adjacent empty tile coordinates.
+		// Creates an AdjacentTile struct.
 		// Params:
-		//   tiles = The array of tiles. Must have a size of 4!
-		//   tilesSize = How many tiles were written.
-		void GetAdjacentEmptyTiles(AdjacentTile tiles[4], size_t& tilesSize);
+		//   pos = The tile's coordinate.
+		//   direction = The direction to move to get to this tile.
+		// Returns:
+		//   The filled out AdjacentTile struct.
+		AdjacentTile GetAdjacentTile(Vector2D pos, Direction direction);
+
+		// Helper function to get the cell value at the specified coordinate. If the coordinate was not valid, it returns 0.
+		// Params:
+		//   pos = The coordinate to get the cell value at.
+		//   valid = Whether the coordinate was valid or not.
+		// Returns:
+		//   The cell value at the specified coordinate. If the coordinate was not valid, returns 0.
+		int GetCellValue(Vector2D pos, bool& valid);
 
 		// Called when finished moving to the next tile.
-		virtual void OnTileMove();
+		// Params:
+		//   adjacentTiles = An array of adjacent tiles.
+		//   emptyCount = How many empty tiles were found.
+		virtual void OnTileMove(AdjacentTile adjacentTiles[4], size_t emptyCount) = 0;
 
 		// Called when met with an intersection after finishing moving to the next tile.
 		// Params:
-		//   adjacentTiles = An array of adjacent tiles.
-		virtual void OnIntersection(AdjacentTile adjacentTiles[4], size_t adjacentTilesSize);
+		//   adjacentTiles = An array of adjacent empty tiles.
+		//   emptyCount = How many empty tiles were found.
+		virtual void OnIntersection(AdjacentTile adjacentTiles[4], size_t emptyCount) = 0;
+
+		//------------------------------------------------------------------------------
+		// Protected Variables:
+		//------------------------------------------------------------------------------
+
+		// Other variables
+		Direction direction;
 
 	private:
 		//------------------------------------------------------------------------------
@@ -146,7 +183,6 @@ namespace Behaviors
 
 		// Other variables
 		float tileProgress;
-		Direction direction;
 		Vector2D oldTile;
 		Vector2D newTile;
 	};

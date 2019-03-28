@@ -1,6 +1,6 @@
 PAC-MAN
 {
-  numComponents : 4
+  numComponents : 3
   Transform
   {
     translation : { 0, 0 }
@@ -17,9 +17,5 @@ PAC-MAN
     group : 0
     mask : 18446744073709551615
     radius : 50
-  }
-  Behaviors::GridMovement
-  {
-    speed : 4
   }
 }

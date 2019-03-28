@@ -35,7 +35,7 @@ class SpriteTilemap;
 namespace Behaviors
 {
 
-	class GridMovement : public Component
+	class GridMovement : public virtual Component
 	{
 	public:
 		//------------------------------------------------------------------------------
@@ -45,12 +45,7 @@ namespace Behaviors
 		// Constructor
 		// Params:
 		//   speed = How fast the game object moves between tiles.
-		GridMovement(float speed = 64.0f);
-
-		// Clone a component and return a pointer to the cloned component.
-		// Returns:
-		//   A pointer to a dynamically allocated clone of the component.
-		Component* Clone() const override;
+		GridMovement(float speed = 4.0f);
 
 		// Initialize this component (happens at object creation).
 		void Initialize() override;
@@ -121,22 +116,33 @@ namespace Behaviors
 		//   emptyCount = How many empty tiles were found.
 		void GetAdjacentTiles(AdjacentTile tiles[4], size_t& emptyCount);
 
-		// Fills out an AdjacentTile struct.
+		// Creates an AdjacentTile struct.
 		// Params:
-		//   tile = The tile to fill out.
-		void GetAdjacentTile(AdjacentTile& tile);
+		//   pos = The tile's coordinate.
+		//   direction = The direction to move to get to this tile.
+		// Returns:
+		//   The filled out AdjacentTile struct.
+		AdjacentTile GetAdjacentTile(Vector2D pos, Direction direction);
+
+		// Helper function to get the cell value at the specified coordinate. If the coordinate was not valid, it returns 0.
+		// Params:
+		//   pos = The coordinate to get the cell value at.
+		//   valid = Whether the coordinate was valid or not.
+		// Returns:
+		//   The cell value at the specified coordinate. If the coordinate was not valid, returns 0.
+		int GetCellValue(Vector2D pos, bool& valid);
 
 		// Called when finished moving to the next tile.
 		// Params:
 		//   adjacentTiles = An array of adjacent tiles.
 		//   emptyCount = How many empty tiles were found.
-		virtual void OnTileMove(AdjacentTile adjacentTiles[4], size_t emptyCount);
+		virtual void OnTileMove(AdjacentTile adjacentTiles[4], size_t emptyCount) = 0;
 
 		// Called when met with an intersection after finishing moving to the next tile.
 		// Params:
 		//   adjacentTiles = An array of adjacent empty tiles.
 		//   emptyCount = How many empty tiles were found.
-		virtual void OnIntersection(AdjacentTile adjacentTiles[4], size_t emptyCount);
+		virtual void OnIntersection(AdjacentTile adjacentTiles[4], size_t emptyCount) = 0;
 
 	private:
 		//------------------------------------------------------------------------------

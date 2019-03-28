@@ -119,6 +119,7 @@ xcopy fmod\lib\fmodstudio64.dll "$(OutDir)" /Y</Command>
     <ClCompile Include="Source\MouseFollow.cpp" />
     <ClCompile Include="Source\PlayerController.cpp" />
     <ClCompile Include="Source\PlayerProjectile.cpp" />
+    <ClCompile Include="Source\PlayerScore.cpp" />
     <ClCompile Include="Source\PlayerShip.cpp" />
     <ClCompile Include="Source\ScreenWrap.cpp" />
     <ClCompile Include="Source\stdafx.cpp">
@@ -140,6 +141,7 @@ xcopy fmod\lib\fmodstudio64.dll "$(OutDir)" /Y</Command>
     <ClInclude Include="Source\MouseFollow.h" />
     <ClInclude Include="Source\PlayerController.h" />
     <ClInclude Include="Source\PlayerProjectile.h" />
+    <ClInclude Include="Source\PlayerScore.h" />
     <ClInclude Include="Source\PlayerShip.h" />
     <ClInclude Include="Source\ScreenWrap.h" />
     <ClInclude Include="Source\stdafx.h" />

@@ -42,7 +42,7 @@ namespace Behaviors
 	// Constructor
 	// Params:
 	//   speed = How fast the game object moves between tiles.
-	GridMovement::GridMovement(float speed) : speed(speed),
+	GridMovement::GridMovement(float speed) : Component("GridMovement"), speed(speed),
 		tilemap(nullptr), spriteTilemap(nullptr), transform(nullptr), tileProgress(0.0f), direction(RIGHT), oldTile(), newTile()
 	{
 	}
@@ -168,6 +168,18 @@ namespace Behaviors
 		parser.ReadVariable("speed", speed);
 	}
 
+	// Sets the speed of the game object.
+	void GridMovement::SetSpeed(float speed_)
+	{
+		speed = speed_;
+	}
+
+	// Gets the speed of the game object.
+	float GridMovement::GetSpeed() const
+	{
+		return speed;
+	}
+
 	// Sets the tilemap used for the grid.
 	// Params:
 	//   tilemap = The tilemap.
@@ -181,6 +193,24 @@ namespace Behaviors
 	//------------------------------------------------------------------------------
 	// Protected Functions:
 	//------------------------------------------------------------------------------
+
+	// Gets the old tile.
+	Vector2D GridMovement::GetOldTile() const
+	{
+		return oldTile;
+	}
+
+	// Gets the tilemap (constant).
+	const Tilemap* GridMovement::GetTilemap() const
+	{
+		return tilemap;
+	}
+
+	// Gets the sprite tilemap (constant).
+	const SpriteTilemap* GridMovement::GetSpriteTilemap() const
+	{
+		return spriteTilemap;
+	}
 
 	// Fills out a Vector2D array with all adjacent tile coordinates.
 	// Params:

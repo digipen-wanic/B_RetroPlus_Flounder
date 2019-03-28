@@ -57,14 +57,14 @@ public:
 	//   tilePos = The coordinate in tile space.
 	// Returns:
 	//   The coordinate in world space.
-	Vector2D TileToWorld(Vector2D tilePos);
+	Vector2D TileToWorld(Vector2D tilePos) const;
 
 	// Converts a coordinate in world space to tile space.
 	// Params:
 	//   worldPos = The coordinate in world space.
 	// Returns:
 	//   The coordinate in tile space.
-	Vector2D WorldToTile(Vector2D worldPos);
+	Vector2D WorldToTile(Vector2D worldPos) const;
 
 private:
 	//------------------------------------------------------------------------------

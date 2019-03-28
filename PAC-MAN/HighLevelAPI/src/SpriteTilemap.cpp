@@ -96,7 +96,7 @@ void SpriteTilemap::SetTilemap(const Tilemap* map_)
 //   tilePos = The coordinate in tile space.
 // Returns:
 //   The coordinate in world space.
-Vector2D SpriteTilemap::TileToWorld(Vector2D tilePos)
+Vector2D SpriteTilemap::TileToWorld(Vector2D tilePos) const
 {
 	return transform->GetMatrix() * Vector2D(tilePos.x, -tilePos.y);
 }
@@ -106,7 +106,7 @@ Vector2D SpriteTilemap::TileToWorld(Vector2D tilePos)
 //   worldPos = The coordinate in world space.
 // Returns:
 //   The coordinate in tile space.
-Vector2D SpriteTilemap::WorldToTile(Vector2D worldPos)
+Vector2D SpriteTilemap::WorldToTile(Vector2D worldPos) const
 {
 	Vector2D transformed = transform->GetInverseMatrix() * Vector2D(worldPos.x, worldPos.y);
 	return Vector2D(transformed.x, -transformed.y);

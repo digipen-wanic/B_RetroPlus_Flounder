@@ -58,6 +58,12 @@
     <ClCompile Include="Source\GridMovement.cpp">
       <Filter>Game\Behaviors</Filter>
     </ClCompile>
+    <ClCompile Include="Source\BaseAI.cpp">
+      <Filter>Game\Behaviors</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PlayerController.cpp">
+      <Filter>Game\Behaviors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\stdafx.h">
@@ -100,6 +106,12 @@
       <Filter>Game\Levels</Filter>
     </ClInclude>
     <ClInclude Include="Source\GridMovement.h">
+      <Filter>Game\Behaviors</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BaseAI.h">
+      <Filter>Game\Behaviors</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PlayerController.h">
       <Filter>Game\Behaviors</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,6 +1,6 @@
-PAC-MAN
+Ghost
 {
-  numComponents : 4
+  numComponents : 3
   Transform
   {
     translation : { 0, 0 }
@@ -17,13 +17,5 @@ PAC-MAN
     group : 0
     mask : 18446744073709551615
     radius : 50
-  }
-  Behaviors::PlayerController
-  {
-    speed : 4
-    upKey : 87
-    leftKey : 65
-    downKey : 83
-    rightKey : 68
   }
 }

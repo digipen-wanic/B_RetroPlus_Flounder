@@ -74,6 +74,7 @@ namespace Levels
 		objectManager.AddArchetype(*objectFactory.CreateObject("Point", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("ControllableRectangle", resourceManager.GetMesh("Quad")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("PAC-MAN", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Ghost", resourceManager.GetMesh("Quad")));
 
 		// Load the tilemap.
 		dataMap = Tilemap::CreateTilemapFromFile("Assets/Levels/Level2.txt");
@@ -112,6 +113,12 @@ namespace Levels
 		pacMan->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
 		pacMan->GetComponent<Transform>()->SetTranslation(Vector2D(100.0f, 100.0f));
 		objectManager.AddObject(*pacMan);
+
+		// Ghost.
+		GameObject* ghost = new GameObject(*objectManager.GetArchetypeByName("Ghost"));
+		ghost->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
+		ghost->GetComponent<Transform>()->SetTranslation(Vector2D(400.0f, 100.0f));
+		objectManager.AddObject(*ghost);
 	}
 
 	// Update Level 1.

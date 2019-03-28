@@ -35,7 +35,7 @@ class SpriteTilemap;
 namespace Behaviors
 {
 
-	class GridMovement : public virtual Component
+	class GridMovement : public Component
 	{
 	public:
 		//------------------------------------------------------------------------------
@@ -64,6 +64,12 @@ namespace Behaviors
 		// Params:
 		//   parser = The parser that is reading this object's data from a file.
 		void Deserialize(Parser& parser) override;
+
+		// Sets the speed of the game object.
+		void SetSpeed(float speed);
+
+		// Gets the speed of the game object.
+		float GetSpeed() const;
 
 		// Sets the tilemap used for the grid.
 		// Params:
@@ -110,6 +116,15 @@ namespace Behaviors
 		// Protected Functions:
 		//------------------------------------------------------------------------------
 
+		// Gets the old tile.
+		Vector2D GetOldTile() const;
+
+		// Gets the tilemap (constant).
+		const Tilemap* GetTilemap() const;
+
+		// Gets the sprite tilemap (constant).
+		const SpriteTilemap* GetSpriteTilemap() const;
+
 		// Fills out a Vector2D array with all adjacent tile coordinates.
 		// Params:
 		//   tiles = The array of tiles. Must have a size of 4!
@@ -144,6 +159,13 @@ namespace Behaviors
 		//   emptyCount = How many empty tiles were found.
 		virtual void OnIntersection(AdjacentTile adjacentTiles[4], size_t emptyCount) = 0;
 
+		//------------------------------------------------------------------------------
+		// Protected Variables:
+		//------------------------------------------------------------------------------
+
+		// Other variables
+		Direction direction;
+
 	private:
 		//------------------------------------------------------------------------------
 		// Private Variables:
@@ -161,7 +183,6 @@ namespace Behaviors
 
 		// Other variables
 		float tileProgress;
-		Direction direction;
 		Vector2D oldTile;
 		Vector2D newTile;
 	};

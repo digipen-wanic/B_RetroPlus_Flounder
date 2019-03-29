@@ -49,6 +49,9 @@ namespace Behaviors
 		// Sets the ghost to the frightened state.
 		void SetFrightened();
 
+		// Returns whether the ghost is in the frightened state.
+		bool IsFrightened() const;
+
 	protected:
 		//------------------------------------------------------------------------------
 		// Protected Enums:

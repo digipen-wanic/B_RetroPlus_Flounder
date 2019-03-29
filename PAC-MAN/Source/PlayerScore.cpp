@@ -63,11 +63,9 @@ namespace Behaviors
 	}
 
 	// Increases dots by the given amount.
-	// Params:
-	//   amount = The amount to increase the dots by.
-	void PlayerScore::IncreaseDots(unsigned amount)
+	void PlayerScore::IncreaseDots()
 	{
-		dots += amount;
+		++dots;
 	}
 
 	// Gets the number of dots.

@@ -78,6 +78,12 @@ namespace Behaviors
 		mode = FRIGHTENED;
 	}
 
+	// Returns whether the ghost is in the frightened state.
+	bool BaseAI::IsFrightened() const
+	{
+		return mode == FRIGHTENED;
+	}
+
 	//------------------------------------------------------------------------------
 	// Protected Functions:
 	//------------------------------------------------------------------------------

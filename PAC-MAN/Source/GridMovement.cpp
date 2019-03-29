@@ -180,6 +180,18 @@ namespace Behaviors
 		return speed;
 	}
 
+	// Sets whether the game object is frozen.
+	void GridMovement::SetFrozen(bool frozen_)
+	{
+		frozen = frozen_;
+	}
+
+	// Gets whether the game object is frozen.
+	bool GridMovement::IsFrozen() const
+	{
+		return frozen;
+	}
+
 	// Sets the tilemap used for the grid.
 	// Params:
 	//   tilemap = The tilemap.

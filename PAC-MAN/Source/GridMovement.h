@@ -71,6 +71,12 @@ namespace Behaviors
 		// Gets the speed of the game object.
 		float GetSpeed() const;
 
+		// Sets whether the game object is frozen.
+		void SetFrozen(bool frozen);
+
+		// Gets whether the game object is frozen.
+		bool IsFrozen() const;
+
 		// Sets the tilemap used for the grid.
 		// Params:
 		//   tilemap = The tilemap.
@@ -183,6 +189,7 @@ namespace Behaviors
 
 		// Other variables
 		float tileProgress;
+		bool frozen;
 		Vector2D oldTile;
 		Vector2D newTile;
 	};

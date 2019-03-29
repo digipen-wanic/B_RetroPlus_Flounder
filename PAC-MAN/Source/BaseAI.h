@@ -34,7 +34,17 @@ namespace Behaviors
 		//------------------------------------------------------------------------------
 
 		// Constructor
-		BaseAI();
+		// Params:
+		//   dotsLeftToLeave = How many dots the player must eat before the ghost moves.
+		BaseAI(unsigned dotsLeftToLeave);
+
+		// Initialize this component (happens at object creation).
+		void Initialize() override;
+
+		// Updates components using a fixed timestep (usually just physics)
+		// Params:
+		//	 dt = A fixed change in time, usually 1/60th of a second.
+		virtual void FixedUpdate(float dt) override;
 
 		// Sets the ghost to the frightened state.
 		void SetFrightened();
@@ -80,7 +90,12 @@ namespace Behaviors
 		// Private Variables:
 		//------------------------------------------------------------------------------
 
+		// The player game object.
+		GameObject* player;
+
 		// Other variables
+		bool hasMoved;
+		unsigned dotsLeftToLeave;
 		bool forceReverse;
 		Vector2D target;
 		Mode mode;

@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
 // File Name:	PlayerController.h
-// Author(s):	Tyler Miller (miller.t)
+// Author(s):	Tyler Miller (miller.t), A.J. Bussman (anthony.bussman)
 // Project:		PAC-MAN
 // Course:		WANIC VGP2 2018-2019
 //
@@ -81,6 +81,28 @@ namespace Behaviors
 		leftKey = left;
 		downKey = down;
 		rightKey = right;
+	}
+
+	// Returns the desired speed variable
+	// Params:
+	//	 SpeedIndex = which speed variable is desired
+	// 0 = NormalSpeed, 1 = NormDotSpeed, 2 = FrightenedSpeed, 3 = FrightDotSpeed
+	float PlayerController::GetSpeed(unsigned speedIndex)
+	{
+		// Return the desired speed
+		switch (speedIndex)
+		{
+		case 0:
+			return NormalSpeed;
+		case 1:
+			return NormDotSpeed;
+		case 2:
+			return FrightendSpeed;
+		case 3:
+			return FrightDotSpeed;
+		default:
+			return 0;
+		}
 	}
 
 	// Called when finished moving to the next tile.

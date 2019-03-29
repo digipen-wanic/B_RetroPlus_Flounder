@@ -22,6 +22,7 @@
 #include <Space.h>
 #include <GameObjectManager.h>
 #include <SpriteTilemap.h>
+#include "PlayerScore.h"
 
 // Components
 #include <Transform.h>
@@ -39,8 +40,36 @@ namespace Behaviors
 	//------------------------------------------------------------------------------
 
 	// Constructor
-	BaseAI::BaseAI() : forceReverse(false), target(), mode(SCATTER), wave(1)
+	// Params:
+	//   dotsLeftToLeave = How many dots the player must eat before the ghost moves.
+	BaseAI::BaseAI(unsigned dotsLeftToLeave) : hasMoved(false), dotsLeftToLeave(dotsLeftToLeave), forceReverse(false), target(), mode(SCATTER), wave(1)
 	{
+	}
+
+	// Initialize this component (happens at object creation).
+	void BaseAI::Initialize()
+	{
+		GridMovement::Initialize();
+		SetFrozen(true);
+
+		player = GetOwner()->GetSpace()->GetObjectManager().GetObjectByName("PAC-MAN");
+	}
+
+	// Updates components using a fixed timestep (usually just physics)
+	// Params:
+	//	 dt = A fixed change in time, usually 1/60th of a second.
+	void BaseAI::FixedUpdate(float dt)
+	{
+		if (!hasMoved)
+		{
+			if (player->GetComponent<PlayerScore>()->GetDots() >= dotsLeftToLeave)
+			{
+				SetFrozen(false);
+				hasMoved = true;
+			}
+		}
+
+		GridMovement::FixedUpdate(dt);
 	}
 
 	// Sets the ghost to the frightened state.

@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
 // File Name:	PlayerController.h
-// Author(s):	Tyler Miller (miller.t)
+// Author(s):	Tyler Miller (miller.t), A.J. Bussman (anthony.bussman)
 // Project:		PAC-MAN
 // Course:		WANIC VGP2 2018-2019
 //
@@ -63,6 +63,12 @@ namespace Behaviors
 		//   right = Virtual keycode for the right keybind.
 		void SetKeyBinds(unsigned up, unsigned left, unsigned down, unsigned right);
 
+		// Returns the desired speed variable
+		// Params:
+		//	 speedIndex = which speed variable is desired
+		// 0 = NormalSpeed, 1 = NormDotSpeed, 2 = FrightenedSpeed, 3 = FrightDotSpeed
+		float GetSpeed(unsigned speedIndex);
+
 	protected:
 
 		//------------------------------------------------------------------------------
@@ -91,6 +97,11 @@ namespace Behaviors
 		unsigned leftKey;
 		unsigned downKey;
 		unsigned rightKey;
+
+		float NormalSpeed;
+		float NormDotSpeed;
+		float FrightendSpeed;
+		float FrightDotSpeed;
 	};
 }
 

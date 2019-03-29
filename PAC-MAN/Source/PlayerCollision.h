@@ -78,6 +78,9 @@ namespace Behaviors
 		// Components
 		Transform* transform;
 		PlayerScore* playerScore;
+
+		// Other variables
+		int ghostStreak;
 	};
 }
 

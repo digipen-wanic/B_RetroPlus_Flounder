@@ -52,7 +52,7 @@ namespace Levels
 	//------------------------------------------------------------------------------
 
 	// Creates an instance of Level 1.
-	Level1::Level1() : Level("Level1"), columnsMap(4), rowsMap(3)
+	Level1::Level1() : Level("Level1"), columnsMap(8), rowsMap(5)
 	{
 	}
 
@@ -77,7 +77,7 @@ namespace Levels
 		objectManager.AddArchetype(*objectFactory.CreateObject("Ghost", resourceManager.GetMesh("Quad")));
 
 		// Load the tilemap.
-		dataMap = Tilemap::CreateTilemapFromFile("Assets/Levels/Level2.txt");
+		dataMap = Tilemap::CreateTilemapFromFile("Assets/Levels/Level1.txt");
 		if (dataMap == nullptr)
 		{
 			std::cout << "Error loading map!" << std::endl;
@@ -88,10 +88,10 @@ namespace Levels
 			resourceManager.GetMesh("Map", columnsMap, rowsMap);
 
 			// Load the tilemap texture and sprite source.
-			resourceManager.GetSpriteSource("Tilemap.png", columnsMap, rowsMap);
+			resourceManager.GetSpriteSource("ArtTileSet.png", columnsMap, rowsMap);
 
 			// Create the tilemap and add it to the object manager.
-			GameObject* tilemap = objectFactory.CreateObject("Tilemap", resourceManager.GetMesh("Map"), resourceManager.GetSpriteSource("Tilemap.png"));
+			GameObject* tilemap = objectFactory.CreateObject("Tilemap", resourceManager.GetMesh("Map"), resourceManager.GetSpriteSource("ArtTileSet.png"));
 			tilemap->GetComponent<SpriteTilemap>()->SetTilemap(dataMap);
 			objectManager.AddArchetype(*tilemap);
 		}

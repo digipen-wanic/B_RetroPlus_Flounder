@@ -88,6 +88,12 @@ namespace Behaviors
 		//   emptyCount = How many empty tiles were found.
 		virtual void OnTarget(AdjacentTile adjacentTiles[4], size_t emptyCount) = 0;
 
+		//------------------------------------------------------------------------------
+		// Protected Variables:
+		//------------------------------------------------------------------------------
+
+		Vector2D target;
+
 	private:
 		//------------------------------------------------------------------------------
 		// Private Variables:
@@ -100,7 +106,6 @@ namespace Behaviors
 		bool hasMoved;
 		unsigned dotsLeftToLeave;
 		bool forceReverse;
-		Vector2D target;
 		Mode mode;
 		unsigned wave;
 	};

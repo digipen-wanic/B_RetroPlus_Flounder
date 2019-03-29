@@ -42,7 +42,7 @@ namespace Behaviors
 	// Constructor
 	// Params:
 	//   dotsLeftToLeave = How many dots the player must eat before the ghost moves.
-	BaseAI::BaseAI(unsigned dotsLeftToLeave) : hasMoved(false), dotsLeftToLeave(dotsLeftToLeave), forceReverse(false), target(), mode(SCATTER), wave(1)
+	BaseAI::BaseAI(unsigned dotsLeftToLeave) : target(), hasMoved(false), dotsLeftToLeave(dotsLeftToLeave), forceReverse(false), mode(SCATTER), wave(1)
 	{
 	}
 

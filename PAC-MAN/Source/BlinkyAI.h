@@ -1,79 +1,66 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	Level1.h
-// Author(s):	David Cohen (david.cohen)
-// Project:		BetaFramework
+// File Name:	BlinkyAI.h
+// Author(s):	A.J. Bussman (anthony.bussman)
+// Project:		PAC-MAN
 // Course:		WANIC VGP2 2018-2019
 //
 // Copyright © 2018 DigiPen (USA) Corporation.
 //
 //------------------------------------------------------------------------------
-
 #pragma once
 
 //------------------------------------------------------------------------------
 // Include Files:
 //------------------------------------------------------------------------------
 
-#include <Level.h>
+#include "BaseAI.h"
 
 //------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Forward References:
-//------------------------------------------------------------------------------
-
-class Texture;
-class SpriteSource;
-class Mesh;
-class SpriteSource;
-class GameObject;
-class Tilemap;
-class SoundManager;
 
 //------------------------------------------------------------------------------
 // Public Structures:
 //------------------------------------------------------------------------------
 
-namespace Levels
+namespace Behaviors
 {
-	class Level1 : public Level
+
+	class BlinkyAI : public BaseAI
 	{
 	public:
 		//------------------------------------------------------------------------------
 		// Public Functions:
 		//------------------------------------------------------------------------------
 
-		// Creates an instance of Level 1.
-		Level1();
+		// Default constructor.
+		BlinkyAI();
 
-		// Load the resources associated with Level 1.
-		void Load() override;
+		// Clone a component and return a pointer to the cloned component.
+		// Returns:
+		//   A pointer to a dynamically allocated clone of the component.
+		Component* Clone() const override;
 
-		// Initialize the memory associated with Level 1.
-		void Initialize() override;
-
-		// Update Level 1.
+		// Updates components using a fixed timestep (usually just physics)
 		// Params:
-		//	 dt = Change in time (in seconds) since the last game loop.
-		void Update(float dt) override;
+		//     dt = A fixed change in time, usually 1/60th of a second.
+		void FixedUpdate(float dt);
 
-		// Unload the resources associated with Level 1.
-		void Unload() override;
+	protected:
+		//------------------------------------------------------------------------------
+		// Protected Functions:
+		//------------------------------------------------------------------------------
+
+		// Called when the AI should choose a target.
+		// Params:
+		//   adjacentTiles = An array of adjacent empty tiles.
+		//   emptyCount = How many empty tiles were found.
+		virtual void OnTarget(AdjacentTile adjacentTiles[4], size_t emptyCount) override;
 
 	private:
 		//------------------------------------------------------------------------------
 		// Private Variables:
 		//------------------------------------------------------------------------------
 
-		// Tilemap
-		Tilemap* dataMap;
-		unsigned columnsMap;
-		unsigned rowsMap;
-
-		// Other variables.
-		SoundManager* soundManager;
+		bool isElroy;
 	};
 }
-
-//----------------------------------------------------------------------------

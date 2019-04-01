@@ -1,0 +1,20 @@
+Blinky
+{
+  numComponents : 3
+  Transform
+  {
+    translation : { 0, 0 }
+    rotation : 0
+    scale : { 16, 16 }
+  }
+  Sprite
+  {
+    frameIndex : 0
+    color : { 1 , 1 , 1 , 1 }
+  }
+  Behaviors::BlinkyAI
+  {
+    speed : 8.25
+    scatterTarget : { 25, -2 }
+  }
+}

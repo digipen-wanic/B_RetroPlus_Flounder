@@ -1,79 +1,49 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	Level1.h
-// Author(s):	David Cohen (david.cohen)
-// Project:		BetaFramework
+// File Name:	PinkyAI.h
+// Author(s):	A.J. Bussman (anthony.bussman)
+// Project:		PAC-MAN
 // Course:		WANIC VGP2 2018-2019
 //
 // Copyright © 2018 DigiPen (USA) Corporation.
 //
 //------------------------------------------------------------------------------
-
 #pragma once
 
 //------------------------------------------------------------------------------
 // Include Files:
 //------------------------------------------------------------------------------
 
-#include <Level.h>
+#include "BaseAI.h"
 
 //------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Forward References:
-//------------------------------------------------------------------------------
-
-class Texture;
-class SpriteSource;
-class Mesh;
-class SpriteSource;
-class GameObject;
-class Tilemap;
-class SoundManager;
 
 //------------------------------------------------------------------------------
 // Public Structures:
 //------------------------------------------------------------------------------
 
-namespace Levels
+namespace Behaviors
 {
-	class Level1 : public Level
+
+	class PinkyAI : public BaseAI
 	{
 	public:
 		//------------------------------------------------------------------------------
 		// Public Functions:
 		//------------------------------------------------------------------------------
 
-		// Creates an instance of Level 1.
-		Level1();
-
-		// Load the resources associated with Level 1.
-		void Load() override;
-
-		// Initialize the memory associated with Level 1.
+		// Initialize this component (happens at object creation).
 		void Initialize() override;
 
-		// Update Level 1.
+	protected:
+		//------------------------------------------------------------------------------
+		// Protected Functions:
+		//------------------------------------------------------------------------------
+
+		// Called when the AI should choose a target.
 		// Params:
-		//	 dt = Change in time (in seconds) since the last game loop.
-		void Update(float dt) override;
-
-		// Unload the resources associated with Level 1.
-		void Unload() override;
-
-	private:
-		//------------------------------------------------------------------------------
-		// Private Variables:
-		//------------------------------------------------------------------------------
-
-		// Tilemap
-		Tilemap* dataMap;
-		unsigned columnsMap;
-		unsigned rowsMap;
-
-		// Other variables.
-		SoundManager* soundManager;
+		//   adjacentTiles = An array of adjacent empty tiles.
+		//   emptyCount = How many empty tiles were found.
+		virtual void OnTarget(AdjacentTile adjacentTiles[4], size_t emptyCount);
 	};
 }
-
-//----------------------------------------------------------------------------

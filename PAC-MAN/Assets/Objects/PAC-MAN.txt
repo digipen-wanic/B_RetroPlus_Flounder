@@ -1,6 +1,6 @@
 PAC-MAN
 {
-  numComponents : 3
+  numComponents : 5
   Transform
   {
     translation : { 0, 0 }
@@ -19,5 +19,11 @@ PAC-MAN
     leftKey : 65
     downKey : 83
     rightKey : 68
+  }
+  Behaviors::PlayerScore
+  {
+  }
+  Behaviors::PlayerCollision
+  {
   }
 }

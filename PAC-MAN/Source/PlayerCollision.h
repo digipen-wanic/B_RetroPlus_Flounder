@@ -51,6 +51,11 @@ namespace Behaviors
 		// Initialize this component (happens at object creation).
 		void Initialize() override;
 
+		// Clone a component and return a pointer to the cloned component.
+		// Returns:
+		//   A pointer to a dynamically allocated clone of the component.
+		Component* Clone() const override;
+
 		// Updates components using a fixed timestep (usually just physics)
 		// Params:
 		//	 dt = A fixed change in time, usually 1/60th of a second.

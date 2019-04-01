@@ -100,7 +100,7 @@ void SoundManager::Shutdown(void)
 //	 filename = Name of the sound file (WAV).
 void SoundManager::AddEffect(const std::string& filename)
 {
-	AddSound(filename, FMOD_DEFAULT);
+	AddSound(filename, FMOD_DEFAULT | FMOD_LOOP_OFF);
 }
 
 // Creates an FMOD stream for a music file.
@@ -108,7 +108,7 @@ void SoundManager::AddEffect(const std::string& filename)
 //	 filename = Name of the music file (MP3).
 void SoundManager::AddMusic(const std::string& filename)
 {
-	AddSound(filename, FMOD_DEFAULT | FMOD_LOOP_NORMAL);
+	AddSound(filename, FMOD_DEFAULT | FMOD_CREATESTREAM | FMOD_LOOP_NORMAL);
 }
 
 // Creates an FMOD sound bank

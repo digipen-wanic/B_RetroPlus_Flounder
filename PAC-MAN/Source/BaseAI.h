@@ -46,6 +46,16 @@ namespace Behaviors
 		//	 dt = A fixed change in time, usually 1/60th of a second.
 		virtual void FixedUpdate(float dt) override;
 
+		// Write object data to file
+		// Params:
+		//   parser = The parser that is writing this object to a file.
+		void Serialize(Parser& parser) const override;
+
+		// Read object data from a file
+		// Params:
+		//   parser = The parser that is reading this object's data from a file.
+		void Deserialize(Parser& parser) override;
+
 		// Sets the ghost to the frightened state.
 		void SetFrightened();
 
@@ -53,7 +63,7 @@ namespace Behaviors
 		bool IsFrightened() const;
 
 		// Adds an overridden direction for a specific tile.
-		void AddOverrideTile(Vector2D tile, Direction direction);
+		//void AddOverrideTile(Vector2D tile, Direction direction);
 
 	protected:
 		//------------------------------------------------------------------------------
@@ -100,6 +110,8 @@ namespace Behaviors
 
 		// Other variables
 		Vector2D target;
+		Vector2D scatterTarget;
+		Mode mode;
 
 	private:
 		//------------------------------------------------------------------------------
@@ -110,7 +122,6 @@ namespace Behaviors
 		bool hasMoved;
 		unsigned dotsLeftToLeave;
 		bool forceReverse;
-		Mode mode;
 		unsigned wave;
 	};
 }

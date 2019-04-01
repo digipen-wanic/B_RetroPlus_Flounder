@@ -39,6 +39,11 @@
 #include "Asteroid.h"
 #include "MouseFollow.h"
 #include "PlayerController.h"
+#include "PlayerScore.h"
+#include "PlayerCollision.h"
+#include "BlinkyAI.h"
+#include "InkyAI.h"
+#include "PinkyAI.h"
 
 //------------------------------------------------------------------------------
 
@@ -72,6 +77,11 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prevInstance, _In
 	objectFactory.RegisterComponent<Behaviors::Asteroid>();
 	objectFactory.RegisterComponent<Behaviors::MouseFollow>();
 	objectFactory.RegisterComponent<Behaviors::PlayerController>();
+	objectFactory.RegisterComponent<Behaviors::PlayerScore>();
+	objectFactory.RegisterComponent<Behaviors::PlayerCollision>();
+	objectFactory.RegisterComponent<Behaviors::BlinkyAI>();
+	//objectFactory.RegisterComponent<Behaviors::InkyAI>();
+	//objectFactory.RegisterComponent<Behaviors::PinkyAI>();
 
 	// Create a new space called "GameSpace"
 	Space* space = new Space("GameSpace");

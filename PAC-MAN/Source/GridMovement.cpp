@@ -42,8 +42,8 @@ namespace Behaviors
 	// Constructor
 	// Params:
 	//   speed = How fast the game object moves between tiles.
-	GridMovement::GridMovement(float speed) : Component("GridMovement"), speed(speed),
-		tilemap(nullptr), spriteTilemap(nullptr), transform(nullptr), tileProgress(0.0f), direction(RIGHT), oldTile(), newTile()
+	GridMovement::GridMovement(float speed) : Component("GridMovement"), transform(nullptr), tilemap(nullptr), spriteTilemap(nullptr), direction(UP),
+		speed(speed), tileProgress(0.0f), frozen(false), oldTile(), newTile()
 	{
 	}
 
@@ -54,7 +54,7 @@ namespace Behaviors
 		transform = GetOwner()->GetComponent<Transform>();
 
 		Vector2D tileSpace = spriteTilemap->WorldToTile(transform->GetTranslation());
-		oldTile = newTile = Vector2D(floor(tileSpace.x), floor(tileSpace.y));
+		oldTile = newTile = Vector2D(tileSpace.x, tileSpace.y);
 	}
 
 	// Updates components using a fixed timestep (usually just physics)
@@ -62,6 +62,9 @@ namespace Behaviors
 	//	 dt = A fixed change in time, usually 1/60th of a second.
 	void GridMovement::FixedUpdate(float dt)
 	{
+		if (frozen)
+			return;
+
 		tileProgress += dt * speed;
 
 		// Check if we have reached the end of this movement.
@@ -82,7 +85,7 @@ namespace Behaviors
 				// Give child class a chance to update direction when we have reached the end of a move.
 				OnTileMove(adjacentTiles, emptyCount);
 
-				oldTile = newTile;
+				oldTile = Vector2D(floor(newTile.x), floor(newTile.y));
 
 				// Calculate the new tile based on the target direction.
 				switch (direction)

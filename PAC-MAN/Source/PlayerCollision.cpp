@@ -18,6 +18,8 @@
 #include "PlayerCollision.h"
 
 // Systems
+#include <Engine.h>
+#include <SoundManager.h>
 #include <Space.h>
 #include <GameObjectManager.h>
 #include <GameObject.h>
@@ -45,7 +47,7 @@ namespace
 	//   The rounded vector.
 	Vector2D FloorVector2D(Vector2D vec)
 	{
-		return Vector2D(floor(vec.x), floor(vec.y));
+		return Vector2D(floor(vec.x + 0.5f), floor(vec.y + 0.5f));
 	}
 }
 
@@ -65,6 +67,14 @@ namespace Behaviors
 	{
 		transform = GetOwner()->GetComponent<Transform>();
 		playerScore = GetOwner()->GetComponent<PlayerScore>();
+	}
+
+	// Clone a component and return a pointer to the cloned component.
+	// Returns:
+	//   A pointer to a dynamically allocated clone of the component.
+	Component* PlayerCollision::Clone() const
+	{
+		return new PlayerCollision(*this);
 	}
 
 	// Updates components using a fixed timestep (usually just physics)
@@ -177,7 +187,11 @@ namespace Behaviors
 			(*it)->GetComponent<GridMovement>()->SetFrozen(true);
 		}
 
+		// Play death sound.
+		Engine::GetInstance().GetModule<SoundManager>()->PlaySound("deathofpacfinal.wav");
+
 		// Play death animation.
+
 
 		// Restart level when animation is done.
 		GetOwner()->GetSpace()->RestartLevel();

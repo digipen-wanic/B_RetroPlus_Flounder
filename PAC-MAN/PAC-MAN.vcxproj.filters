@@ -13,6 +13,9 @@
     <Filter Include="Game\Behaviors">
       <UniqueIdentifier>{30b4313e-2f34-40ba-9613-d250bab122eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Behaviors\Ghosts">
+      <UniqueIdentifier>{f866047d-039d-4cd3-bda2-570e8730a466}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.cpp" />
@@ -58,9 +61,6 @@
     <ClCompile Include="Source\GridMovement.cpp">
       <Filter>Game\Behaviors</Filter>
     </ClCompile>
-    <ClCompile Include="Source\BaseAI.cpp">
-      <Filter>Game\Behaviors</Filter>
-    </ClCompile>
     <ClCompile Include="Source\PlayerController.cpp">
       <Filter>Game\Behaviors</Filter>
     </ClCompile>
@@ -73,8 +73,17 @@
     <ClCompile Include="Source\PlayerCollision.cpp">
       <Filter>Game\Behaviors</Filter>
     </ClCompile>
+    <ClCompile Include="Source\PinkyAI.cpp">
+      <Filter>Game\Behaviors\Ghosts</Filter>
+    </ClCompile>
     <ClCompile Include="Source\InkyAI.cpp">
-      <Filter>Game\Behaviors</Filter>
+      <Filter>Game\Behaviors\Ghosts</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BaseAI.cpp">
+      <Filter>Game\Behaviors\Ghosts</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BlinkyAI.cpp">
+      <Filter>Game\Behaviors\Ghosts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -120,9 +129,6 @@
     <ClInclude Include="Source\GridMovement.h">
       <Filter>Game\Behaviors</Filter>
     </ClInclude>
-    <ClInclude Include="Source\BaseAI.h">
-      <Filter>Game\Behaviors</Filter>
-    </ClInclude>
     <ClInclude Include="Source\PlayerController.h">
       <Filter>Game\Behaviors</Filter>
     </ClInclude>
@@ -136,7 +142,16 @@
       <Filter>Game\Behaviors</Filter>
     </ClInclude>
     <ClInclude Include="Source\InkyAI.h">
-      <Filter>Game\Behaviors</Filter>
+      <Filter>Game\Behaviors\Ghosts</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PinkyAI.h">
+      <Filter>Game\Behaviors\Ghosts</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BaseAI.h">
+      <Filter>Game\Behaviors\Ghosts</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BlinkyAI.h">
+      <Filter>Game\Behaviors\Ghosts</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

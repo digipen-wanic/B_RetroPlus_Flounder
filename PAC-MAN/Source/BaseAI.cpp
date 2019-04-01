@@ -21,11 +21,12 @@
 #include <GameObject.h>
 #include <Space.h>
 #include <GameObjectManager.h>
-#include <SpriteTilemap.h>
-#include "PlayerScore.h"
+#include <Parser.h>
 
 // Components
 #include <Transform.h>
+#include <SpriteTilemap.h>
+#include "PlayerScore.h"
 
 //------------------------------------------------------------------------------
 
@@ -42,7 +43,7 @@ namespace Behaviors
 	// Constructor
 	// Params:
 	//   dotsLeftToLeave = How many dots the player must eat before the ghost moves.
-	BaseAI::BaseAI(unsigned dotsLeftToLeave) : player(nullptr), target(), hasMoved(false), dotsLeftToLeave(dotsLeftToLeave), forceReverse(false), mode(SCATTER), wave(1)
+	BaseAI::BaseAI(unsigned dotsLeftToLeave) : player(nullptr), target(), scatterTarget(), hasMoved(false), dotsLeftToLeave(dotsLeftToLeave), forceReverse(false), mode(CHASE), wave(1)
 	{
 	}
 
@@ -70,6 +71,24 @@ namespace Behaviors
 		}
 
 		GridMovement::FixedUpdate(dt);
+	}
+
+	// Write object data to file
+	// Params:
+	//   parser = The parser that is writing this object to a file.
+	void BaseAI::Serialize(Parser& parser) const
+	{
+		GridMovement::Serialize(parser);
+		parser.WriteVariable("scatterTarget", scatterTarget);
+	}
+
+	// Read object data from a file
+	// Params:
+	//   parser = The parser that is reading this object's data from a file.
+	void BaseAI::Deserialize(Parser& parser)
+	{
+		GridMovement::Deserialize(parser);
+		parser.ReadVariable("scatterTarget", scatterTarget);
 	}
 
 	// Sets the ghost to the frightened state.
@@ -104,6 +123,10 @@ namespace Behaviors
 			forceReverse = false;
 			return;
 		}
+
+		// If we are in frigthened mode, we will handle tile movements in OnIntersection.
+		if (mode == FRIGHTENED)
+			return;
 
 		// Let child class handle targeting.
 		OnTarget(adjacentTiles, emptyCount);
@@ -142,6 +165,20 @@ namespace Behaviors
 		// If we have a reverse forced, we'll let OnTileMove handle this one.
 		if (forceReverse)
 			return;
+
+		// Handle frigthened mode.
+		if (mode == FRIGHTENED)
+		{
+			// Choose a random direction that has an empty tile and is not backwards.
+			AdjacentTile adjacentTile;
+			do
+			{
+				adjacentTile = adjacentTiles[rand() % 4];
+			} while (!adjacentTile.empty || adjacentTile.direction == (direction + DIRECTION_MAX / 2) % DIRECTION_MAX);
+
+			// Set the direction to the tile.
+			direction = adjacentTile.direction;
+		}
 	}
 }
 

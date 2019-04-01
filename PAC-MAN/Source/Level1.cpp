@@ -18,6 +18,8 @@
 #include "Level1.h"
 
 // Systems
+#include <Engine.h>
+#include <SoundManager.h>
 #include <Texture.h>
 #include <SpriteSource.h>
 #include <GameObject.h>
@@ -35,6 +37,7 @@
 #include <Physics.h>
 #include <SpriteTilemap.h>
 #include "GridMovement.h"
+#include "PlayerCollision.h"
 
 // Levels
 #include "MainMenu.h"
@@ -52,13 +55,17 @@ namespace Levels
 	//------------------------------------------------------------------------------
 
 	// Creates an instance of Level 1.
-	Level1::Level1() : Level("Level1"), columnsMap(8), rowsMap(5)
+	Level1::Level1() : Level("Level1"), columnsMap(8), rowsMap(5), soundManager(nullptr)
 	{
 	}
 
 	// Load the resources associated with Level 1.
 	void Level1::Load()
 	{
+		// Load sound effects.
+		soundManager = Engine::GetInstance().GetModule<SoundManager>();
+		soundManager->AddEffect("deathofpacfinal.wav");
+
 		GameObjectFactory& objectFactory = GameObjectFactory::GetInstance();
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
 		ResourceManager& resourceManager = GetSpace()->GetResourceManager();
@@ -74,7 +81,7 @@ namespace Levels
 		objectManager.AddArchetype(*objectFactory.CreateObject("Point", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("ControllableRectangle", resourceManager.GetMesh("Quad")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("PAC-MAN", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Ghost", resourceManager.GetMesh("Quad")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Blinky", resourceManager.GetMesh("Quad")));
 
 		// Load the tilemap.
 		dataMap = Tilemap::CreateTilemapFromFile("Assets/Levels/Level1.txt");
@@ -108,16 +115,19 @@ namespace Levels
 		GameObject* tilemap = new GameObject(*objectManager.GetArchetypeByName("Tilemap"));
 		objectManager.AddObject(*tilemap);
 
+		SpriteTilemap* spriteTilemap = tilemap->GetComponent<SpriteTilemap>();
+
 		// PAC-MAN.
 		GameObject* pacMan = new GameObject(*objectManager.GetArchetypeByName("PAC-MAN"));
-		pacMan->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-		pacMan->GetComponent<Transform>()->SetTranslation(Vector2D(100.0f, 100.0f));
+		pacMan->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, spriteTilemap);
+		pacMan->GetComponent<Behaviors::PlayerCollision>()->SetTilemap(dataMap, spriteTilemap);
+		pacMan->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 23.0f)));
 		objectManager.AddObject(*pacMan);
 
 		// Ghost.
-		GameObject* ghost = new GameObject(*objectManager.GetArchetypeByName("Ghost"));
-		//ghost->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-		ghost->GetComponent<Transform>()->SetTranslation(Vector2D(400.0f, 100.0f));
+		GameObject* ghost = new GameObject(*objectManager.GetArchetypeByName("Blinky"));
+		ghost->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
+		ghost->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 11.0f)));
 		objectManager.AddObject(*ghost);
 	}
 
@@ -146,6 +156,9 @@ namespace Levels
 	{
 		// Free all allocated memory.
 		delete dataMap;
+
+		// Unload all sounds.
+		soundManager->Shutdown();
 	}
 }
 

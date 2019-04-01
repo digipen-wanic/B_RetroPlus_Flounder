@@ -170,6 +170,13 @@ namespace Behaviors
 		//------------------------------------------------------------------------------
 		// Protected Variables:
 		//------------------------------------------------------------------------------
+		
+		// Components
+		Transform* transform;
+
+		// The tilemap used for the grid.
+		Tilemap* tilemap;
+		SpriteTilemap* spriteTilemap;
 
 		// Other variables
 		Direction direction;
@@ -181,13 +188,6 @@ namespace Behaviors
 
 		// Properties (save to/load from file)
 		float speed;
-
-		// The tilemap used for the grid.
-		Tilemap* tilemap;
-		SpriteTilemap* spriteTilemap;
-
-		// Components
-		Transform* transform;
 
 		// Other variables
 		float tileProgress;

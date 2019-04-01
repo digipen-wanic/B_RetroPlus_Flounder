@@ -35,7 +35,7 @@ class SpriteTilemap;
 namespace Behaviors
 {
 
-	class GridMovement : public Component
+	class GridMovement : public virtual Component
 	{
 	public:
 		//------------------------------------------------------------------------------

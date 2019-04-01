@@ -52,6 +52,9 @@ namespace Behaviors
 		// Returns whether the ghost is in the frightened state.
 		bool IsFrightened() const;
 
+		// Adds an overridden direction for a specific tile.
+		void AddOverrideTile(Vector2D tile, Direction direction);
+
 	protected:
 		//------------------------------------------------------------------------------
 		// Protected Enums:
@@ -92,15 +95,16 @@ namespace Behaviors
 		// Protected Variables:
 		//------------------------------------------------------------------------------
 
+		// The player game object.
+		GameObject* player;
+
+		// Other variables
 		Vector2D target;
 
 	private:
 		//------------------------------------------------------------------------------
 		// Private Variables:
 		//------------------------------------------------------------------------------
-
-		// The player game object.
-		GameObject* player;
 
 		// Other variables
 		bool hasMoved;

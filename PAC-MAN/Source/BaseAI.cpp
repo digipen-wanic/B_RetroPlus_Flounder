@@ -42,7 +42,7 @@ namespace Behaviors
 	// Constructor
 	// Params:
 	//   dotsLeftToLeave = How many dots the player must eat before the ghost moves.
-	BaseAI::BaseAI(unsigned dotsLeftToLeave) : target(), hasMoved(false), dotsLeftToLeave(dotsLeftToLeave), forceReverse(false), mode(SCATTER), wave(1)
+	BaseAI::BaseAI(unsigned dotsLeftToLeave) : player(nullptr), target(), hasMoved(false), dotsLeftToLeave(dotsLeftToLeave), forceReverse(false), mode(SCATTER), wave(1)
 	{
 	}
 
@@ -96,34 +96,38 @@ namespace Behaviors
 	{
 		UNREFERENCED_PARAMETER(emptyCount);
 
+		// If the ghost is forced to invert direction, handle that here.
 		if (forceReverse)
 		{
 			// Invert direction.
 			direction = static_cast<Direction>((direction + DIRECTION_MAX / 2) % DIRECTION_MAX);
 			forceReverse = false;
+			return;
 		}
-		else
+
+		// Let child class handle targeting.
+		OnTarget(adjacentTiles, emptyCount);
+
+		AdjacentTile closest;
+		float closestDistance = 999.0f;
+
+		// Choose closest tile to move towards.
+		for (size_t i = 0; i < 4; i++)
 		{
-			OnTarget(adjacentTiles, emptyCount);
-
-			AdjacentTile closest;
-			float closestDistance = 999.0f;
-
-			for (size_t i = 0; i < 4; i++)
+			// Make sure the tile is empty and would not be backtracking.
+			if (adjacentTiles[i].empty && !AlmostEqual(adjacentTiles[i].pos, GetOldTile()))
 			{
-				if (adjacentTiles[i].empty && !AlmostEqual(adjacentTiles[i].pos, GetOldTile()))
+				float distance = adjacentTiles[i].pos.Distance(target);
+				if (distance < closestDistance)
 				{
-					float distance = adjacentTiles[i].pos.Distance(target);
-					if (distance < closestDistance)
-					{
-						closestDistance = distance;
-						closest = adjacentTiles[i];
-					}
+					closestDistance = distance;
+					closest = adjacentTiles[i];
 				}
 			}
-
-			direction = closest.direction;
 		}
+
+		// Move in the direction of the closest tile.
+		direction = closest.direction;
 	}
 
 	// Called when met with an intersection after finishing moving to the next tile.

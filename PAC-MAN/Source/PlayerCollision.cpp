@@ -80,6 +80,7 @@ namespace Behaviors
 
 		GameObjectManager& objectManager = GetOwner()->GetSpace()->GetObjectManager();
 
+		// Gather enemies.
 		objectManager.GetAllObjectsByName("Blinky", enemies);
 		objectManager.GetAllObjectsByName("Pinky", enemies);
 		objectManager.GetAllObjectsByName("Inky", enemies);
@@ -88,6 +89,8 @@ namespace Behaviors
 		for (auto it = enemies.begin(); it != enemies.end(); ++it)
 		{
 			Vector2D enemyTile = FloorVector2D(spriteTilemap->WorldToTile((*it)->GetComponent<Transform>()->GetTranslation()));
+
+			// Check if the player and this enemy are on the same tile.
 			if (AlmostEqual(playerTile, enemyTile))
 			{
 				if ((*it)->GetComponent<BaseAI>()->IsFrightened())
@@ -108,10 +111,14 @@ namespace Behaviors
 		for (auto it = gameObjects.begin(); it != gameObjects.end(); ++it)
 		{
 			Vector2D dotTile = FloorVector2D(spriteTilemap->WorldToTile((*it)->GetComponent<Transform>()->GetTranslation()));
+
+			// Check if the player and this dot are on the same tile.
 			if (AlmostEqual(playerTile, dotTile))
 			{
+				// Add score and destroy the dot.
 				playerScore->IncreaseScore(10);
 				playerScore->IncreaseDots();
+				(*it)->Destroy();
 			}
 		}
 
@@ -121,9 +128,15 @@ namespace Behaviors
 		for (auto it = gameObjects.begin(); it != gameObjects.end(); ++it)
 		{
 			Vector2D energizerTIle = FloorVector2D(spriteTilemap->WorldToTile((*it)->GetComponent<Transform>()->GetTranslation()));
+
+			// Check if the player and this energizer are on the same tile.
 			if (AlmostEqual(playerTile, energizerTIle))
 			{
+				// Add score and destroy the energizer.
 				playerScore->IncreaseScore(50);
+				(*it)->Destroy();
+
+				// Set all enemies to the frightened state.
 				for (auto it2 = enemies.begin(); it2 != enemies.end(); ++it2)
 				{
 					(*it2)->GetComponent<BaseAI>()->SetFrightened();
@@ -145,7 +158,29 @@ namespace Behaviors
 	// Called when the player dies.
 	void PlayerCollision::OnDeath()
 	{
-		// TODO: make player dead
+		std::vector<GameObject*> enemies;
+
+		GameObjectManager& objectManager = GetOwner()->GetSpace()->GetObjectManager();
+
+		// Gather enemies.
+		objectManager.GetAllObjectsByName("Blinky", enemies);
+		objectManager.GetAllObjectsByName("Pinky", enemies);
+		objectManager.GetAllObjectsByName("Inky", enemies);
+		objectManager.GetAllObjectsByName("Clyde", enemies);
+
+		// Freeze player.
+		GetOwner()->GetComponent<GridMovement>()->SetFrozen(true);
+
+		// Freeze ghosts.
+		for (auto it = enemies.begin(); it != enemies.end(); ++it)
+		{
+			(*it)->GetComponent<GridMovement>()->SetFrozen(true);
+		}
+
+		// Play death animation.
+
+		// Restart level when animation is done.
+		GetOwner()->GetSpace()->RestartLevel();
 	}
 }
 

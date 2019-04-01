@@ -3,7 +3,7 @@ Tilemap
   numComponents : 2
   Transform
   {
-    translation : { -264, 232 }
+    translation : { -216, 232 }
     rotation : 0
     scale : { 16, 16 }
   }

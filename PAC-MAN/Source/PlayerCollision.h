@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	PlayerScore.h
-// Author(s):	Tyler Miller (miller.t)
+// File Name:	PlayerCollision.h
+// Author(s):	David Cohen (david.cohen)
 // Project:		PAC-MAN
 // Course:		WANIC VGP2 2018-2019
 //
@@ -15,9 +15,22 @@
 // Include Files:
 //------------------------------------------------------------------------------
 
-#include "Component.h"
+#include "Component.h" // base class
 
 //------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Forward Declarations:
+//------------------------------------------------------------------------------
+
+class Transform;
+class Tilemap;
+class SpriteTilemap;
+
+namespace Behaviors
+{
+	class PlayerScore;
+}
 
 //------------------------------------------------------------------------------
 // Public Structures:
@@ -25,45 +38,49 @@
 
 namespace Behaviors
 {
-	class PlayerScore : public Component
+	class PlayerCollision : public Component
 	{
 	public:
 		//------------------------------------------------------------------------------
 		// Public Functions:
 		//------------------------------------------------------------------------------
 
-		// Constructor.
-		PlayerScore();
+		// Constructor
+		PlayerCollision();
 
 		// Initialize this component (happens at object creation).
 		void Initialize() override;
 
-		// Clone a component and return a pointer to the cloned component.
-		// Returns:
-		//   A pointer to a dynamically allocated clone of the component.
-		Component* Clone() const override;
-
-		// Increases score by the given amount.
+		// Updates components using a fixed timestep (usually just physics)
 		// Params:
-		//   amount = The amount to increase the score by.
-		void IncreaseScore(unsigned amount);
+		//	 dt = A fixed change in time, usually 1/60th of a second.
+		void FixedUpdate(float dt) override;
 
-		// Gets the score.
-		unsigned int GetScore() const;
+		// Sets the tilemap used for the grid.
+		// Params:
+		//   tilemap = The tilemap.
+		//   spriteTilemap = The sprite tilemap.
+		void SetTilemap(Tilemap* tilemap, SpriteTilemap* spriteTilemap);
 
-		// Increases dots by the given amount.
-		void IncreaseDots();
-
-		// Gets the number of dots.
-		unsigned GetDots() const;
+		// Called when the player dies.
+		void OnDeath();
 
 	private:
 		//------------------------------------------------------------------------------
-		// Private variables:
+		// Private Variables:
 		//------------------------------------------------------------------------------
 
+		// The tilemap used for the grid.
+		Tilemap* tilemap;
+		SpriteTilemap* spriteTilemap;
+
+		// Components
+		Transform* transform;
+		PlayerScore* playerScore;
+
 		// Other variables
-		unsigned int score;
-		unsigned int dots;
+		int ghostStreak;
 	};
 }
+
+//------------------------------------------------------------------------------

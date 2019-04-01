@@ -19,7 +19,8 @@
 #include <Engine.h>
 
 // Engine modules
-#include "Space.h"
+#include <Space.h>
+#include <SoundManager.h>
 
 // Initial game state
 #include "Level1.h"
@@ -80,9 +81,10 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prevInstance, _In
 
 	// Add additional modules to engine
 	Engine::GetInstance().AddModule(space);
+	Engine::GetInstance().AddModule(new SoundManager());
 	
 	// Game engine goes!
-	Engine::GetInstance().Start(800, 600, 200);
+	Engine::GetInstance().Start(448, 576, 60);
 
 	return 0;
 }

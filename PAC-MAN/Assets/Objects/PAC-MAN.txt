@@ -1,26 +1,20 @@
 PAC-MAN
 {
-  numComponents : 4
+  numComponents : 3
   Transform
   {
     translation : { 0, 0 }
     rotation : 0
-    scale : { 100, 100 }
+    scale : { 16, 16 }
   }
   Sprite
   {
     frameIndex : 0
     color : { 1 , 1 , 1 , 1 }
   }
-  ColliderCircle
-  {
-    group : 0
-    mask : 18446744073709551615
-    radius : 50
-  }
   Behaviors::PlayerController
   {
-    speed : 4
+    speed : 8.8
     upKey : 87
     leftKey : 65
     downKey : 83

@@ -83,6 +83,8 @@ namespace Behaviors
 		//   spriteTilemap = The sprite tilemap.
 		void SetTilemap(Tilemap* tilemap, SpriteTilemap* spriteTilemap);
 
+		Vector2D GetDirectionVector(int scalar = 1) const;
+
 	protected:
 		//------------------------------------------------------------------------------
 		// Protected Enums:

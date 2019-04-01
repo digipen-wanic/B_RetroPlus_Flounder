@@ -49,6 +49,12 @@ namespace Behaviors
 		// Sets the ghost to the frightened state.
 		void SetFrightened();
 
+		// Returns whether the ghost is in the frightened state.
+		bool IsFrightened() const;
+
+		// Adds an overridden direction for a specific tile.
+		void AddOverrideTile(Vector2D tile, Direction direction);
+
 	protected:
 		//------------------------------------------------------------------------------
 		// Protected Enums:
@@ -85,19 +91,25 @@ namespace Behaviors
 		//   emptyCount = How many empty tiles were found.
 		virtual void OnTarget(AdjacentTile adjacentTiles[4], size_t emptyCount) = 0;
 
-	private:
 		//------------------------------------------------------------------------------
-		// Private Variables:
+		// Protected Variables:
 		//------------------------------------------------------------------------------
 
 		// The player game object.
 		GameObject* player;
 
 		// Other variables
+		Vector2D target;
+
+	private:
+		//------------------------------------------------------------------------------
+		// Private Variables:
+		//------------------------------------------------------------------------------
+
+		// Other variables
 		bool hasMoved;
 		unsigned dotsLeftToLeave;
 		bool forceReverse;
-		Vector2D target;
 		Mode mode;
 		unsigned wave;
 	};

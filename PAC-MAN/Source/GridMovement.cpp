@@ -202,6 +202,39 @@ namespace Behaviors
 		spriteTilemap = spriteTilemap_;
 	}
 
+	Vector2D GridMovement::GetDirectionVector(int scalar) const
+	{
+		// This is done in a weird way, the same way the original game did it.
+		// Source: http://donhodges.com/pacman_pinky_explanation.htm
+
+		unsigned short vector = 0;
+		switch (direction)
+		{
+		case UP:
+			vector = 0x00FF;
+			break;
+		case LEFT:
+			vector = 0x0100;
+			break;
+		case DOWN:
+			vector = 0x0001;
+			break;
+		case RIGHT:
+			vector = 0xFF00;
+			break;
+		}
+
+		// Integer overflow occurs here for UP!
+		vector *= static_cast<unsigned short>(scalar);
+
+		// Extract the X and Y as signed bytes.
+		char x = static_cast<char>((vector & 0xFF00) >> 8);
+		char y = static_cast<char>(vector & 0x00FF);
+		
+		// Convert the original PAC-MAN's coordinate system to our coordinate system.
+		return Vector2D(-static_cast<float>(x), -static_cast<float>(y));
+	}
+
 	//------------------------------------------------------------------------------
 	// Protected Functions:
 	//------------------------------------------------------------------------------

@@ -16,9 +16,13 @@ Blinky
   {
     speed : 8.25
     scatterTarget : { 25, -2 }
-    overriddenTilesCount : 0
+    overriddenTilesCount : 4
     overriddenTiles : 
     {
+      { { 13, 13 }, 0 }
+      { { 14, 13 }, 0 }
+      { { 13, 14 }, 0 }
+      { { 14, 14 }, 0 }
     }
     overriddenExclusionTilesCount : 4
     overriddenExclusionTiles : 

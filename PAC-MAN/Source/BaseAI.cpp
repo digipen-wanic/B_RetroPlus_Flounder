@@ -46,7 +46,7 @@ namespace Behaviors
 	// Constructor
 	// Params:
 	//   dotsLeftToLeave = How many dots the player must eat before the ghost moves.
-	BaseAI::BaseAI(unsigned dotsLeftToLeave) : player(nullptr), target(), scatterTarget(), hasMoved(false), dotsLeftToLeave(dotsLeftToLeave), forceReverse(false), mode(CHASE), wave(1),
+	BaseAI::BaseAI(unsigned dotsLeftToLeave) : player(nullptr), target(), scatterTarget(), hasMoved(false), dotsLeftToLeave(dotsLeftToLeave), forceReverse(false), isDead(false), mode(CHASE), wave(1),
 		overriddenTiles(), overriddenExclusionTiles()
 	{
 	}
@@ -166,6 +166,18 @@ namespace Behaviors
 		return mode == FRIGHTENED;
 	}
 
+	// Marks the enemy as dead.
+	void BaseAI::SetDead()
+	{
+		isDead = true;
+	}
+
+	// Returns whether the ghost is dead.
+	bool BaseAI::IsDead() const
+	{
+		return isDead;
+	}
+
 	// Adds an overridden direction for a specific tile.
 		// Params:
 		//   tile = The coordinates of the tile to add an override for.
@@ -196,13 +208,20 @@ namespace Behaviors
 	{
 		UNREFERENCED_PARAMETER(emptyCount);
 
-		// If the ghost is forced to invert direction, handle that here.
-		if (forceReverse)
+		if (isDead)
 		{
-			// Invert direction.
-			direction = static_cast<Direction>((direction + DIRECTION_MAX / 2) % DIRECTION_MAX);
-			forceReverse = false;
-			return;
+			target = Vector2D(13, 14);
+
+			if (AlmostEqual(GetNewTile(), target))
+			{
+				isDead = false;
+			}
+
+			if (isDead)
+			{
+				Pathfind(adjacentTiles, emptyCount);
+				return;
+			}
 		}
 
 		// Check all overridden tiles.
@@ -215,6 +234,15 @@ namespace Behaviors
 				direction = it->direction;
 				return;
 			}
+		}
+
+		// If the ghost is forced to invert direction, handle that here.
+		if (forceReverse)
+		{
+			// Invert direction.
+			direction = static_cast<Direction>((direction + DIRECTION_MAX / 2) % DIRECTION_MAX);
+			forceReverse = false;
+			return;
 		}
 
 		// If we are in frigthened mode, choose random directions.
@@ -235,6 +263,31 @@ namespace Behaviors
 		// Let child class handle targeting.
 		OnTarget(adjacentTiles, emptyCount);
 
+		Pathfind(adjacentTiles, emptyCount);
+	}
+
+	// Called when met with an intersection after finishing moving to the next tile.
+	// Params:
+	//   adjacentTiles = An array of adjacent empty tiles.
+	//   emptyCount = How many empty tiles were found.
+	void BaseAI::OnIntersection(AdjacentTile adjacentTiles[4], size_t emptyCount)
+	{
+		UNREFERENCED_PARAMETER(adjacentTiles);
+		UNREFERENCED_PARAMETER(emptyCount);
+	}
+
+	//------------------------------------------------------------------------------
+	// Private Functions:
+	//------------------------------------------------------------------------------
+
+	// Handles pathfinding and setting direction.
+	// Params:
+	//   adjacentTiles = An array of adjacent tiles.
+	//   emptyCount = How many empty tiles were found.
+	void BaseAI::Pathfind(AdjacentTile adjacentTiles[4], size_t emptyCount)
+	{
+		UNREFERENCED_PARAMETER(emptyCount);
+
 		AdjacentTile closest;
 		float closestDistance = 999.0f;
 
@@ -254,7 +307,8 @@ namespace Behaviors
 				continue;
 
 			// Make sure the tile is empty and would not be backtracking.
-			if (adjacentTiles[i].empty && !AlmostEqual(adjacentTiles[i].pos, GetOldTile()))
+			bool valid;
+			if ((adjacentTiles[i].empty || isDead && GetCellValue(adjacentTiles[i].pos, valid) == 31) && !AlmostEqual(adjacentTiles[i].pos, GetOldTile()))
 			{
 				float distance = adjacentTiles[i].pos.Distance(target);
 				if (distance < closestDistance)
@@ -267,16 +321,6 @@ namespace Behaviors
 
 		// Move in the direction of the closest tile.
 		direction = closest.direction;
-	}
-
-	// Called when met with an intersection after finishing moving to the next tile.
-	// Params:
-	//   adjacentTiles = An array of adjacent empty tiles.
-	//   emptyCount = How many empty tiles were found.
-	void BaseAI::OnIntersection(AdjacentTile adjacentTiles[4], size_t emptyCount)
-	{
-		UNREFERENCED_PARAMETER(adjacentTiles);
-		UNREFERENCED_PARAMETER(emptyCount);
 	}
 
 	// Insertion operator for OverriddenTile.

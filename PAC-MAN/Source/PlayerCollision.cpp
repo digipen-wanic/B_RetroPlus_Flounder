@@ -104,11 +104,13 @@ namespace Behaviors
 			// Check if the player and this enemy are on the same tile.
 			if (AlmostEqual(playerTile, enemyTile))
 			{
-				if ((*it)->GetComponent<BaseAI>()->IsFrightened())
+				BaseAI* baseAI = (*it)->GetComponent<BaseAI>();
+				if (baseAI->IsFrightened())
 				{
 					// Eat the enemy.
 					playerScore->IncreaseScore(200); // TODO: ADD STREAKS
-				}
+					baseAI->SetDead();
+				} 
 				else
 				{
 					OnDeath();

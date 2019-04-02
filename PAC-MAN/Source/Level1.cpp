@@ -76,12 +76,12 @@ namespace Levels
 
 		// Load the circle texture and sprite source.
 		resourceManager.GetSpriteSource("Circle.png");
-		resourceManager.GetSpriteSource("PacManSheetAnimations_02.png", columnsPacMan, rowsPacMan);
+		resourceManager.GetSpriteSource("PacMan.png", columnsPacMan, rowsPacMan);
 
 		// Load the archetypes from their files.
 		objectManager.AddArchetype(*objectFactory.CreateObject("Dot", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Energizer", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("PAC-MAN", resourceManager.GetMesh("PacMan"), resourceManager.GetSpriteSource("PacManSheetAnimations_02.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("PAC-MAN", resourceManager.GetMesh("PacMan"), resourceManager.GetSpriteSource("PacMan.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Blinky", resourceManager.GetMesh("Quad")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Pinky", resourceManager.GetMesh("Quad")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Inky", resourceManager.GetMesh("Quad")));

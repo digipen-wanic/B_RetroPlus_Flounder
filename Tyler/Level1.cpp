@@ -258,6 +258,8 @@ namespace Levels
 				for (float y = min.y; y <= max.y; y++)
 				{
 					Vector2D pos = spriteTilemap->TileToWorld(Vector2D(x, y));
+					if (dataMap->GetCellValue(static_cast<int>(x), static_cast<int>(y)) != 0)
+						return;
 
 					// Make sure there are no duplicates.
 					for (auto it = dotPositions.begin(); it != dotPositions.end(); ++it)
@@ -278,7 +280,9 @@ namespace Levels
 		energizerPositions.push_back(spriteTilemap->TileToWorld(Vector2D(26, 23)));
 
 		// Add the dots.
-		Fill(Vector2D(1, 1), Vector2D(4, 1));
+		Fill(Vector2D(1, 1), Vector2D(12, 1));
+		Fill(Vector2D(6, 2), Vector2D(6, 26));
+		Fill(Vector2D(21, 2), Vector2D(21, 26));
 	}
 }
 

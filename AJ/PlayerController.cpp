@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
 // File Name:	PlayerController.h
-// Author(s):	Tyler Miller (miller.t)
+// Author(s):	Tyler Miller (miller.t), A.J. Bussman (anthony.bussman)
 // Project:		PAC-MAN
 // Course:		WANIC VGP2 2018-2019
 //
@@ -54,6 +54,10 @@ namespace Behaviors
 		parser.WriteVariable("leftKey", leftKey);
 		parser.WriteVariable("downKey", downKey);
 		parser.WriteVariable("rightKey", rightKey);
+		parser.WriteVariable("NormalSpeed", NormalSpeed);
+		parser.WriteVariable("NormDotSpeed", NormDotSpeed);
+		parser.WriteVariable("FrightendSpeed", FrightendSpeed);
+		parser.WriteVariable("FrightDotSpeed", FrightDotSpeed);
 	}
 
 	// Read object data from a file
@@ -67,6 +71,10 @@ namespace Behaviors
 		parser.ReadVariable("leftKey", leftKey);
 		parser.ReadVariable("downKey", downKey);
 		parser.ReadVariable("rightKey", rightKey);
+		parser.ReadVariable("NormalSpeed", NormalSpeed);
+		parser.ReadVariable("NormDotSpeed", NormDotSpeed);
+		parser.ReadVariable("FrightendSpeed", FrightendSpeed);
+		parser.ReadVariable("FrightDotSpeed", FrightDotSpeed);
 	}
 
 	// Set the keys for player.
@@ -86,7 +94,7 @@ namespace Behaviors
 	// Returns the desired speed variable
 	// Params:
 	//	 SpeedIndex = which speed variable is desired
-	// 0 = NormalSpeed, 1 = NormDotSpeed, 2 = FrightenedSpeed, 3 = FrightDotSpeed
+	//   0 = NormalSpeed, 1 = NormDotSpeed, 2 = FrightenedSpeed, 3 = FrightDotSpeed
 	float PlayerController::GetSpeed(unsigned speedIndex)
 	{
 		// Return the desired speed

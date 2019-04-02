@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	BlinkyAI.cpp
-// Author(s):	A.J. Bussman (anthony.bussman)
+// File Name:	InkyAI.cpp
+// Author(s):	Tyler Miller (miller.t)
 // Project:		PAC-MAN
 // Course:		WANIC VGP2 2018-2019
 //
@@ -15,19 +15,16 @@
 
 #include "stdafx.h"
 
-#include "BlinkyAI.h"
+#include "InkyAI.h"
 
 // Systems
-#include <GameObject.h>
+#include <Space.h>
 
 // Components
 #include <Transform.h>
 #include <SpriteTilemap.h>
-#include "PlayerScore.h"
 #include "PlayerController.h"
-
-#define IncreaseSpeedRate 5 // percent of PAC-MAN
-#define GhostBaseSpeed 75 // percent of PAC-MAN
+#include "GridMovement.h"
 
 //------------------------------------------------------------------------------
 
@@ -41,45 +38,25 @@ namespace Behaviors
 	// Public Functions:
 	//------------------------------------------------------------------------------
 
-	// Default constructor.
-	BlinkyAI::BlinkyAI() : BaseAI(0), isElroy(false)
+	// Default constructor
+	InkyAI::InkyAI() : BaseAI(30), blinky(nullptr)
 	{
 	}
 
 	// Clone a component and return a pointer to the cloned component.
 	// Returns:
 	//   A pointer to a dynamically allocated clone of the component.
-	Component* BlinkyAI::Clone() const
+	Component* InkyAI::Clone() const
 	{
-		return new BlinkyAI(*this);
+		return new InkyAI(*this);
 	}
 
-	// Updates components using a fixed timestep (usually just physics)
-	// Params:
-	//     dt = A fixed change in time, usually 1/60th of a second.
-	void BlinkyAI::FixedUpdate(float dt)
+	// Initialize this component (happens at object creation).
+	void InkyAI::Initialize()
 	{
-		// Call BaseAI's FixedUpdate
-		BaseAI::FixedUpdate(dt);
-
-		float pacmanBaseSpeed = player->GetComponent<PlayerController>()->GetSpeed(0);
-
-		// Check if 10 pellets are left
-		if (player->GetComponent<PlayerScore>()->GetDots() >= 230)
-		{
-			// Set isElroy to true
-			isElroy = true;
-			// Increase speed by another 5%
-			GetOwner()->GetComponent<GridMovement>()->SetSpeed((GhostBaseSpeed + 2 * IncreaseSpeedRate) * pacmanBaseSpeed);
-		}
-		// Check if 20 pellets are left
-		else if (player->GetComponent<PlayerScore>()->GetDots() >= 220)
-		{
-			// Set isElroy to true
-			isElroy = true;
-			// Increase speed by 5%
-			GetOwner()->GetComponent<GridMovement>()->SetSpeed((GhostBaseSpeed + IncreaseSpeedRate) * pacmanBaseSpeed);
-		}
+		BaseAI::Initialize();
+		
+		blinky = GetOwner()->GetSpace()->GetObjectManager().GetObjectByName("Blinky");
 	}
 
 	//------------------------------------------------------------------------------
@@ -90,13 +67,16 @@ namespace Behaviors
 	// Params:
 	//   adjacentTiles = An array of adjacent empty tiles.
 	//   emptyCount = How many empty tiles were found.
-	void BlinkyAI::OnTarget(AdjacentTile adjacentTiles[4], size_t emptyCount)
+	void InkyAI::OnTarget(AdjacentTile adjacentTiles[4], size_t emptyCount)
 	{
 		UNREFERENCED_PARAMETER(adjacentTiles);
 		UNREFERENCED_PARAMETER(emptyCount);
 
-		// Set Chase Target (Player Position)
-		if (mode == CHASE || isElroy)
-			target = GetSpriteTilemap()->WorldToTile(player->GetComponent<Transform>()->GetTranslation());
+		// Get two tiles infornt of PAC-MAN
+		Vector2D pacmanPlus2 = player->GetComponent<GridMovement>()->GetDirectionVector(2);
+		// Get Vector from Blinky to two tiles infront of PAC-MAN
+		Vector2D blinkyPP2Vec = pacmanPlus2 - blinky->GetComponent<Transform>()->GetTranslation();
+		// Set target to twice the vector blinkyPP2Vec
+		target = 2 * blinkyPP2Vec;
 	}
 }

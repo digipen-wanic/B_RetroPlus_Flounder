@@ -1,0 +1,30 @@
+KingGhost
+{
+  numComponents : 4
+  Transform
+  {
+    translation : { 0, 0 }
+    rotation : 0
+    scale : { 16, 16 }
+  }
+  Sprite
+  {
+    frameIndex : 0
+    color : { 1 , 1 , 1 , 1 }
+  }
+  Animation
+  {
+  }
+  Behaviors::PlayerController
+  {
+    speed : 8.25
+    upKey : 38
+    leftKey : 40
+    downKey : 39
+    rightKey : 39
+    NormalSpeed : 8.8
+    NormDotSpeed : 7.81
+    FrightenedSpeed : 9.9
+    FrightDotSpeed : 8.69
+  }
+}

@@ -94,6 +94,15 @@ namespace Behaviors
 			parser.WriteValue(*it);
 
 		parser.EndScope();
+
+		parser.WriteVariable("overriddenExclusionTilesCount", overriddenExclusionTiles.size());
+		parser.WriteValue("overriddenExclusionTiles : ");
+		parser.BeginScope();
+
+		for (auto it = overriddenExclusionTiles.begin(); it != overriddenExclusionTiles.end(); ++it)
+			parser.WriteValue(*it);
+
+		parser.EndScope();
 	}
 
 	// Read object data from a file
@@ -118,6 +127,22 @@ namespace Behaviors
 			OverriddenTile overriddenTile;
 			parser.ReadValue(overriddenTile);
 			overriddenTiles.push_back(overriddenTile);
+		}
+		parser.ReadSkip("}");
+
+		size_t overriddenExclusionTilesCount;
+		parser.ReadVariable("overriddenExclusionTilesCount", overriddenExclusionTilesCount);
+		overriddenExclusionTiles.reserve(overriddenExclusionTilesCount);
+
+		parser.ReadSkip("overriddenExclusionTiles");
+		parser.ReadSkip(':');
+		parser.ReadSkip("{");
+
+		for (size_t i = 0; i < overriddenExclusionTilesCount; i++)
+		{
+			OverriddenTile overriddenExclusionTile;
+			parser.ReadValue(overriddenExclusionTile);
+			overriddenExclusionTiles.push_back(overriddenExclusionTile);
 		}
 		parser.ReadSkip("}");
 	}
@@ -192,9 +217,20 @@ namespace Behaviors
 			}
 		}
 
-		// If we are in frigthened mode, we will handle tile movements in OnIntersection.
+		// If we are in frigthened mode, choose random directions.
 		if (mode == FRIGHTENED)
+		{
+			// Choose a random direction that has an empty tile and is not backwards.
+			AdjacentTile adjacentTile;
+			do
+			{
+				adjacentTile = adjacentTiles[rand() % 4];
+			} while (!adjacentTile.empty || adjacentTile.direction == (direction + DIRECTION_MAX / 2) % DIRECTION_MAX);
+
+			// Set the direction to the tile.
+			direction = adjacentTile.direction;
 			return;
+		}
 
 		// Let child class handle targeting.
 		OnTarget(adjacentTiles, emptyCount);
@@ -241,24 +277,6 @@ namespace Behaviors
 	{
 		UNREFERENCED_PARAMETER(adjacentTiles);
 		UNREFERENCED_PARAMETER(emptyCount);
-
-		// If we have a reverse forced, we'll let OnTileMove handle this one.
-		if (forceReverse)
-			return;
-
-		// Handle frigthened mode.
-		if (mode == FRIGHTENED)
-		{
-			// Choose a random direction that has an empty tile and is not backwards.
-			AdjacentTile adjacentTile;
-			do
-			{
-				adjacentTile = adjacentTiles[rand() % 4];
-			} while (!adjacentTile.empty || adjacentTile.direction == (direction + DIRECTION_MAX / 2) % DIRECTION_MAX);
-
-			// Set the direction to the tile.
-			direction = adjacentTile.direction;
-		}
 	}
 
 	// Insertion operator for OverriddenTile.

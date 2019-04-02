@@ -103,6 +103,7 @@ namespace Behaviors
 		unsigned downKey;
 		unsigned rightKey;
 
+		// Speeds for PAC-MAN in different modes
 		float NormalSpeed;
 		float NormDotSpeed;
 		float FrightendSpeed;

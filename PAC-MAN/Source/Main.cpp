@@ -45,6 +45,7 @@
 #include "BlinkyAI.h"
 #include "InkyAI.h"
 #include "PinkyAI.h"
+#include "ClydeAI.h"
 
 //------------------------------------------------------------------------------
 
@@ -84,6 +85,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prevInstance, _In
 	objectFactory.RegisterComponent<Behaviors::BlinkyAI>();
 	objectFactory.RegisterComponent<Behaviors::InkyAI>();
 	objectFactory.RegisterComponent<Behaviors::PinkyAI>();
+	//objectFactory.RegisterComponent<Behaviors::ClydeAI>();
 
 	// Create a new space called "GameSpace"
 	Space* space = new Space("GameSpace");
@@ -96,7 +98,8 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prevInstance, _In
 	Engine::GetInstance().AddModule(new SoundManager());
 	
 	// Game engine goes!
-	Engine::GetInstance().Start(448, 576, 60);
+	//Engine::GetInstance().Start(448, 576, 60);
+	Engine::GetInstance().Start(672, 864, 60);
 
 	return 0;
 }

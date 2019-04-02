@@ -88,6 +88,9 @@
     <ClCompile Include="Source\PlayerAnimation.cpp">
       <Filter>Game\Behaviors</Filter>
     </ClCompile>
+    <ClCompile Include="Source\ClydeAI.cpp">
+      <Filter>Game\Behaviors\Ghosts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\stdafx.h">
@@ -158,6 +161,9 @@
     </ClInclude>
     <ClInclude Include="Source\PlayerAnimation.h">
       <Filter>Game\Behaviors</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ClydeAI.h">
+      <Filter>Game\Behaviors\Ghosts</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -135,4 +135,10 @@ bool Animation::IsDone() const
 	return isDone;
 }
 
+// Gets the current frame index.
+unsigned Animation::GetCurrentFrame() const
+{
+	return frameIndex;
+}
+
 //----------------------------------------------------------------------------

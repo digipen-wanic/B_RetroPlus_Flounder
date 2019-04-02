@@ -55,7 +55,7 @@ namespace Levels
 	//------------------------------------------------------------------------------
 
 	// Creates an instance of Level 1.
-	Level1::Level1() : Level("Level1"), columnsMap(8), rowsMap(5), startLives(3), lives(startLives), soundManager(nullptr), energizerPositions(), dotPositions()
+	Level1::Level1() : Level("Level1"), columnsMap(8), rowsMap(5), columnsPacMan(4), rowsPacMan(4), startLives(3), lives(0), soundManager(nullptr), energizerPositions(), dotPositions()
 	{
 	}
 
@@ -72,14 +72,16 @@ namespace Levels
 
 		// Create a new quad mesh for the sprite.
 		resourceManager.GetMesh("Quad");
+		resourceManager.GetMesh("PacMan", columnsPacMan, rowsPacMan);
 
 		// Load the circle texture and sprite source.
 		resourceManager.GetSpriteSource("Circle.png");
+		resourceManager.GetSpriteSource("PacManSheetAnimations_02.png", columnsPacMan, rowsPacMan);
 
 		// Load the archetypes from their files.
 		objectManager.AddArchetype(*objectFactory.CreateObject("Dot", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Energizer", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("PAC-MAN", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("PAC-MAN", resourceManager.GetMesh("PacMan"), resourceManager.GetSpriteSource("PacManSheetAnimations_02.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Blinky", resourceManager.GetMesh("Quad")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Pinky", resourceManager.GetMesh("Quad")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Inky", resourceManager.GetMesh("Quad")));
@@ -104,7 +106,7 @@ namespace Levels
 			objectManager.AddArchetype(*tilemap);
 		}
 
-		lives = startLives;
+		lives = 0;
 	}
 
 	// Initialize the memory associated with Level 1.
@@ -143,12 +145,10 @@ namespace Levels
 		inky->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(11.5f, 14.0f)));
 		objectManager.AddObject(*inky);
 
-		/*
-		GameObject* clyde = new GameObject(*objectManager.GetArchetypeByName("Clyde"));
-		clyde->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-		clyde->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(15.5f, 14.0f)));
-		objectManager.AddObject(*clyde);
-		*/
+		//GameObject* clyde = new GameObject(*objectManager.GetArchetypeByName("Clyde"));
+		//clyde->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
+		//clyde->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(15.5f, 14.0f)));
+		//objectManager.AddObject(*clyde);
 
 		// If there are no energizers or dots, place them.
 		if (lives == 0)
@@ -160,13 +160,17 @@ namespace Levels
 		for (auto it = energizerPositions.begin(); it != energizerPositions.end(); ++it)
 		{
 			// Create energizer at position.
-
+			GameObject* energizerPellet = new GameObject(*objectManager.GetArchetypeByName("Energizer"));
+			energizerPellet->GetComponent<Transform>()->SetTranslation(*it);
+			objectManager.AddObject(*energizerPellet);
 		}
 
 		for (auto it = dotPositions.begin(); it != dotPositions.end(); ++it)
 		{
 			// Create dot at position.
-
+			GameObject* Pellet = new GameObject(*objectManager.GetArchetypeByName("Dot"));
+			Pellet->GetComponent<Transform>()->SetTranslation(*it);
+			objectManager.AddObject(*Pellet);
 		}
 
 		--lives;
@@ -253,14 +257,38 @@ namespace Levels
 			{
 				for (float y = min.y; y <= max.y; y++)
 				{
+					if (dataMap->GetCellValue(static_cast<unsigned>(x), static_cast<unsigned>(y)) != 0)
+						continue;
+
 					Vector2D pos = spriteTilemap->TileToWorld(Vector2D(x, y));
+
+					bool skip = false;
 
 					// Make sure there are no duplicates.
 					for (auto it = dotPositions.begin(); it != dotPositions.end(); ++it)
 					{
 						if (AlmostEqual(pos, *it))
-							return;
+						{
+							skip = true;
+							break;
+						}
 					}
+
+					if (skip)
+						continue;
+
+					// Make sure it is not overlapping an energizer.
+					for (auto it = energizerPositions.begin(); it != energizerPositions.end(); ++it)
+					{
+						if (AlmostEqual(pos, *it))
+						{
+							skip = true;
+							break;
+						}
+					}
+
+					if (skip)
+						continue;
 
 					dotPositions.push_back(pos);
 				}
@@ -268,10 +296,16 @@ namespace Levels
 		};
 
 		// Add the energizers.
-
+		energizerPositions.push_back(spriteTilemap->TileToWorld(Vector2D(1, 3)));
+		energizerPositions.push_back(spriteTilemap->TileToWorld(Vector2D(26, 3)));
+		energizerPositions.push_back(spriteTilemap->TileToWorld(Vector2D(1, 23)));
+		energizerPositions.push_back(spriteTilemap->TileToWorld(Vector2D(26, 23)));
 
 		// Add the dots.
-		Fill(Vector2D(1, 1), Vector2D(4, 1));
+		Fill(Vector2D(1, 1), Vector2D(26, 8));
+		Fill(Vector2D(6, 9), Vector2D(6, 19));
+		Fill(Vector2D(21, 9), Vector2D(21, 19));
+		Fill(Vector2D(1, 20), Vector2D(26, 29));
 	}
 }
 

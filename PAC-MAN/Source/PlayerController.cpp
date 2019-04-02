@@ -54,6 +54,10 @@ namespace Behaviors
 		parser.WriteVariable("leftKey", leftKey);
 		parser.WriteVariable("downKey", downKey);
 		parser.WriteVariable("rightKey", rightKey);
+		parser.WriteVariable("NormalSpeed", NormalSpeed);
+		parser.WriteVariable("NormDotSpeed", NormDotSpeed);
+		parser.WriteVariable("FrightenedSpeed", FrightendSpeed);
+		parser.WriteVariable("FrightDotSpeed", FrightDotSpeed);
 	}
 
 	// Read object data from a file
@@ -67,6 +71,10 @@ namespace Behaviors
 		parser.ReadVariable("leftKey", leftKey);
 		parser.ReadVariable("downKey", downKey);
 		parser.ReadVariable("rightKey", rightKey);
+		parser.ReadVariable("NormalSpeed", NormalSpeed);
+		parser.ReadVariable("NormDotSpeed", NormDotSpeed);
+		parser.ReadVariable("FrightenedSpeed", FrightendSpeed);
+		parser.ReadVariable("FrightDotSpeed", FrightDotSpeed);
 	}
 
 	// Set the keys for player.

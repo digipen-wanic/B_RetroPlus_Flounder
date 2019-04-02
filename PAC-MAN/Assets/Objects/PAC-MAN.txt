@@ -5,7 +5,7 @@ PAC-MAN
   {
     translation : { 0, 0 }
     rotation : 0
-    scale : { 16, 16 }
+    scale : { 40, 40 }
   }
   Sprite
   {
@@ -22,6 +22,10 @@ PAC-MAN
     leftKey : 65
     downKey : 83
     rightKey : 68
+    NormalSpeed : 8.8
+    NormDotSpeed : 7.81
+    FrightenedSpeed : 9.9
+    FrightDotSpeed : 8.69
   }
   Behaviors::PlayerScore
   {
@@ -31,11 +35,11 @@ PAC-MAN
   }
   Behaviors::PlayerAnimation
   {
-    spawnStart : 0
-    idleStart : 0
-    moveStart : 0
-    moveLength : 1
+    spawnStart : 11
+    idleStart : 11
+    moveStart : 11
+    moveLength : 4
     deathStart : 0
-    deathLength : 1
+    deathLength : 11
   }
 }

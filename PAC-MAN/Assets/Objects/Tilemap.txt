@@ -3,9 +3,9 @@ Tilemap
   numComponents : 2
   Transform
   {
-    translation : { -216, 232 }
+    translation : { -324, 348 }
     rotation : 0
-    scale : { 16, 16 }
+    scale : { 24, 24 }
   }
   SpriteTilemap
   {

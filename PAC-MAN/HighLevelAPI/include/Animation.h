@@ -64,6 +64,9 @@ public:
 	//	 The value in isDone.
 	bool IsDone() const;
 
+	// Gets the current frame index.
+	unsigned GetCurrentFrame() const;
+
 private:
 	// The current frame being displayed.
 	unsigned frameIndex;

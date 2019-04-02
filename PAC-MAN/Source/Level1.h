@@ -84,6 +84,10 @@ namespace Levels
 		unsigned columnsMap;
 		unsigned rowsMap;
 
+		// PAC-MAN
+		unsigned columnsPacMan;
+		unsigned rowsPacMan;
+
 		// Other variables.
 		unsigned startLives;
 		unsigned lives;

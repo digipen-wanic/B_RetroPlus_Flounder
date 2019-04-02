@@ -117,7 +117,7 @@ namespace Behaviors
 		}
 
 		std::vector<GameObject*> gameObjects;
-		objectManager.GetAllObjectsByName("Dots", gameObjects);
+		objectManager.GetAllObjectsByName("Dot", gameObjects);
 
 		for (auto it = gameObjects.begin(); it != gameObjects.end(); ++it)
 		{

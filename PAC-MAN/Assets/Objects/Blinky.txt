@@ -20,5 +20,13 @@ Blinky
     overriddenTiles : 
     {
     }
+    overriddenExclusionTilesCount : 4
+    overriddenExclusionTiles : 
+    {
+        { { 12, 11}, 0 }
+        { { 15, 11 }, 0 }
+        { { 12, 23 }, 0 }
+        { { 15, 23 }, 0 }
+    }
   }
 }

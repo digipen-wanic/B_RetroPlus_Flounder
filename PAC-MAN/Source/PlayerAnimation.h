@@ -25,6 +25,7 @@
 // Forward Declarations:
 //------------------------------------------------------------------------------
 
+class Transform;
 class Animation;
 
 //------------------------------------------------------------------------------
@@ -116,6 +117,7 @@ namespace Behaviors
 		State nextState;
 
 		// Components
+		Transform* transform;
 		Animation* animation;
 		PlayerController* playerController;
 

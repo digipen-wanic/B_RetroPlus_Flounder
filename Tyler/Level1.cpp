@@ -18,6 +18,8 @@
 #include "Level1.h"
 
 // Systems
+#include <Engine.h>
+#include <SoundManager.h>
 #include <Texture.h>
 #include <SpriteSource.h>
 #include <GameObject.h>
@@ -35,6 +37,7 @@
 #include <Physics.h>
 #include <SpriteTilemap.h>
 #include "GridMovement.h"
+#include "PlayerCollision.h"
 
 // Levels
 #include "MainMenu.h"
@@ -52,13 +55,17 @@ namespace Levels
 	//------------------------------------------------------------------------------
 
 	// Creates an instance of Level 1.
-	Level1::Level1() : Level("Level1"), columnsMap(4), rowsMap(3)
+	Level1::Level1() : Level("Level1"), columnsMap(8), rowsMap(5), startLives(3), lives(0), soundManager(nullptr), energizerPositions(), dotPositions()
 	{
 	}
 
 	// Load the resources associated with Level 1.
 	void Level1::Load()
 	{
+		// Load sound effects.
+		soundManager = Engine::GetInstance().GetModule<SoundManager>();
+		soundManager->AddEffect("deathofpacfinal.wav");
+
 		GameObjectFactory& objectFactory = GameObjectFactory::GetInstance();
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
 		ResourceManager& resourceManager = GetSpace()->GetResourceManager();
@@ -70,14 +77,15 @@ namespace Levels
 		resourceManager.GetSpriteSource("Circle.png");
 
 		// Load the archetypes from their files.
-		objectManager.AddArchetype(*objectFactory.CreateObject("Circle", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Point", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("ControllableRectangle", resourceManager.GetMesh("Quad")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Dot", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Energizer", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("PAC-MAN", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Ghost", resourceManager.GetMesh("Quad")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Blinky", resourceManager.GetMesh("Quad")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Pinky", resourceManager.GetMesh("Quad")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Inky", resourceManager.GetMesh("Quad")));
 
 		// Load the tilemap.
-		dataMap = Tilemap::CreateTilemapFromFile("Assets/Levels/Level2.txt");
+		dataMap = Tilemap::CreateTilemapFromFile("Assets/Levels/Level1.txt");
 		if (dataMap == nullptr)
 		{
 			std::cout << "Error loading map!" << std::endl;
@@ -88,13 +96,15 @@ namespace Levels
 			resourceManager.GetMesh("Map", columnsMap, rowsMap);
 
 			// Load the tilemap texture and sprite source.
-			resourceManager.GetSpriteSource("Tilemap.png", columnsMap, rowsMap);
+			resourceManager.GetSpriteSource("ArtTileSet.png", columnsMap, rowsMap);
 
 			// Create the tilemap and add it to the object manager.
-			GameObject* tilemap = objectFactory.CreateObject("Tilemap", resourceManager.GetMesh("Map"), resourceManager.GetSpriteSource("Tilemap.png"));
+			GameObject* tilemap = objectFactory.CreateObject("Tilemap", resourceManager.GetMesh("Map"), resourceManager.GetSpriteSource("ArtTileSet.png"));
 			tilemap->GetComponent<SpriteTilemap>()->SetTilemap(dataMap);
 			objectManager.AddArchetype(*tilemap);
 		}
+
+		lives = 0;
 	}
 
 	// Initialize the memory associated with Level 1.
@@ -108,55 +118,64 @@ namespace Levels
 		GameObject* tilemap = new GameObject(*objectManager.GetArchetypeByName("Tilemap"));
 		objectManager.AddObject(*tilemap);
 
+		SpriteTilemap* spriteTilemap = tilemap->GetComponent<SpriteTilemap>();
+
 		// PAC-MAN.
 		GameObject* pacMan = new GameObject(*objectManager.GetArchetypeByName("PAC-MAN"));
-		pacMan->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-		pacMan->GetComponent<Transform>()->SetTranslation(Vector2D(100.0f, 100.0f));
+		pacMan->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, spriteTilemap);
+		pacMan->GetComponent<Behaviors::PlayerCollision>()->SetTilemap(dataMap, spriteTilemap);
+		pacMan->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 23.0f)));
 		objectManager.AddObject(*pacMan);
 
-		// Ghost.
-		GameObject* ghost = new GameObject(*objectManager.GetArchetypeByName("Ghost"));
-		//ghost->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-		ghost->GetComponent<Transform>()->SetTranslation(Vector2D(400.0f, 100.0f));
-		objectManager.AddObject(*ghost);
+		// Ghosts.
+		GameObject* blinky = new GameObject(*objectManager.GetArchetypeByName("Blinky"));
+		blinky->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
+		blinky->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 11.0f)));
+		objectManager.AddObject(*blinky);
 
-		//Energizer Pellet
-		GameObject* energizerPellet = new GameObject(*objectManager.GetArchetypeByName("EnergizerPellet"));
-		energizerPellet->GetComponent<Transform>()->SetTranslation(Vector2D(500, 100));
-		objectManager.AddObject(*energizerPellet);
+		GameObject* pinky = new GameObject(*objectManager.GetArchetypeByName("Pinky"));
+		pinky->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
+		pinky->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 14.0f)));
+		objectManager.AddObject(*pinky);
 
-		GameObject* energizerPellet2 = new GameObject(*objectManager.GetArchetypeByName("EnergizerPellet"));
-		energizerPellet->GetComponent<Transform>()->SetTranslation(Vector2D(500, 100));
-		objectManager.AddObject(*energizerPellet2);
+		GameObject* inky = new GameObject(*objectManager.GetArchetypeByName("Inky"));
+		inky->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
+		inky->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(11.5f, 14.0f)));
+		objectManager.AddObject(*inky);
 
-		GameObject* energizerPellet3 = new GameObject(*objectManager.GetArchetypeByName("EnergizerPellet"));
-		energizerPellet->GetComponent<Transform>()->SetTranslation(Vector2D(500, 100));
-		objectManager.AddObject(*energizerPellet3);
+		/*
+		GameObject* clyde = new GameObject(*objectManager.GetArchetypeByName("Clyde"));
+		clyde->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
+		clyde->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(15.5f, 14.0f)));
+		objectManager.AddObject(*clyde);
+		*/
 
-		GameObject* energizerPellet4 = new GameObject(*objectManager.GetArchetypeByName("EnergizerPellet"));
-		energizerPellet->GetComponent<Transform>()->SetTranslation(Vector2D(500, 100));
-		objectManager.AddObject(*energizerPellet4);
-
-		Vector2D theTile = Vector2D(0, 0);
-		for (int y = 0; y < 36; y++)
+		// If there are no energizers or dots, place them.
+		if (lives == 0)
 		{
-			for (int x = 0; x < 28; x++)
-			{
-				Vector2D epPos1 = energizerPellet->GetComponent<Transform>()->GetTranslation();
-				Vector2D epPos2 = energizerPellet2->GetComponent<Transform>()->GetTranslation();
-				Vector2D epPos3 = energizerPellet3->GetComponent<Transform>()->GetTranslation();
-				Vector2D epPos4 = energizerPellet4->GetComponent<Transform>()->GetTranslation();
-				theTile = Vector2D(static_cast<float>(x), static_cast<float>(y));
-				if (tilemap->GetComponent<Tilemap>()->GetCellValue(x,y) == 0 && !AlmostEqual(epPos1, theTile)
-					&& !AlmostEqual(epPos2, theTile) && !AlmostEqual(epPos3, theTile) && !AlmostEqual(epPos4, theTile))
-				{
-					GameObject* pellet = new GameObject(*objectManager.GetArchetypeByName("Pellet"));
-					pellet->GetComponent<Transform>()->SetTranslation(Vector2D(static_cast<float>(x), static_cast<float>(y)));
-					objectManager.AddObject(*pellet);
-				}
-			}
+			lives = startLives;
+			PopulateDots();
 		}
+
+		for (auto it = energizerPositions.begin(); it != energizerPositions.end(); ++it)
+		{
+			// Create energizer at position.
+			GameObject* energizerPellet = new GameObject(*objectManager.GetArchetypeByName("Energizer"));
+			energizerPellet->GetComponent<Transform>()->SetTranslation(*it);
+			objectManager.AddObject(*energizerPellet);
+		}
+
+		for (auto it = dotPositions.begin(); it != dotPositions.end(); ++it)
+		{
+			// Create dot at position.
+			GameObject* Pellet = new GameObject(*objectManager.GetArchetypeByName("Dot"));
+			Pellet->GetComponent<Transform>()->SetTranslation(*it);
+			objectManager.AddObject(*Pellet);
+		}
+
+		--lives;
 	}
+
 	// Update Level 1.
 	// Params:
 	//	 dt = Change in time (in seconds) since the last game loop.
@@ -177,11 +196,89 @@ namespace Levels
 		}
 	}
 
+	// Destroy objects associated with level 1.
+	void Level1::Shutdown()
+	{
+		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
+		
+		// Gather all energizers.
+		std::vector<GameObject*> energizers;
+		objectManager.GetAllObjectsByName("Energizer", energizers);
+
+		// Store their positions.
+		energizerPositions.clear();
+		for (auto it = energizers.begin(); it != energizers.end(); ++it)
+		{
+			energizerPositions.push_back((*it)->GetComponent<Transform>()->GetTranslation());
+		}
+
+		// Gather all dots.
+		std::vector<GameObject*> dots;
+		objectManager.GetAllObjectsByName("Dot", dots);
+
+		// Store their positions.
+		dotPositions.clear();
+		for (auto it = dots.begin(); it != dots.end(); ++it)
+		{
+			dotPositions.push_back((*it)->GetComponent<Transform>()->GetTranslation());
+		}
+	}
+
 	// Unload the resources associated with Level 1.
 	void Level1::Unload()
 	{
 		// Free all allocated memory.
 		delete dataMap;
+
+		// Unload all sounds.
+		soundManager->Shutdown();
+	}
+
+	//------------------------------------------------------------------------------
+	// Private Functions:
+	//------------------------------------------------------------------------------
+
+	// Resets the energizer and dot position lists.
+	void Level1::PopulateDots()
+	{
+		energizerPositions.clear();
+		dotPositions.clear();
+
+		SpriteTilemap* spriteTilemap = GetSpace()->GetObjectManager().GetObjectByName("Tilemap")->GetComponent<SpriteTilemap>();
+
+		// Helper lambda to fill in an area with dots.
+		// Params:
+		//   min = The top left corner of the rectangle to fill.
+		//   max = The bottom right corner of the rectangle to fill.
+		auto Fill = [&](Vector2D min, Vector2D max)
+		{
+			// Fill area specified by min and max.
+			for (float x = min.x; x <= max.x; x++)
+			{
+				for (float y = min.y; y <= max.y; y++)
+				{
+					Vector2D pos = spriteTilemap->TileToWorld(Vector2D(x, y));
+
+					// Make sure there are no duplicates.
+					for (auto it = dotPositions.begin(); it != dotPositions.end(); ++it)
+					{
+						if (AlmostEqual(pos, *it))
+							return;
+					}
+
+					dotPositions.push_back(pos);
+				}
+			}
+		};
+
+		// Add the energizers.
+		energizerPositions.push_back(spriteTilemap->TileToWorld(Vector2D(1, 3)));
+		energizerPositions.push_back(spriteTilemap->TileToWorld(Vector2D(26, 3)));
+		energizerPositions.push_back(spriteTilemap->TileToWorld(Vector2D(1, 23)));
+		energizerPositions.push_back(spriteTilemap->TileToWorld(Vector2D(26, 23)));
+
+		// Add the dots.
+		Fill(Vector2D(1, 1), Vector2D(4, 1));
 	}
 }
 

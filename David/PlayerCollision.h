@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	InkyAI.h
-// Author(s):	Tyler Miller (miller.t)
+// File Name:	PlayerCollision.h
+// Author(s):	David Cohen (david.cohen)
 // Project:		PAC-MAN
 // Course:		WANIC VGP2 2018-2019
 //
@@ -15,9 +15,22 @@
 // Include Files:
 //------------------------------------------------------------------------------
 
-#include "BaseAI.h" // base class
+#include "Component.h" // base class
 
 //------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Forward Declarations:
+//------------------------------------------------------------------------------
+
+class Transform;
+class Tilemap;
+class SpriteTilemap;
+
+namespace Behaviors
+{
+	class PlayerScore;
+}
 
 //------------------------------------------------------------------------------
 // Public Structures:
@@ -25,41 +38,54 @@
 
 namespace Behaviors
 {
-	class InkyAI : public BaseAI
+	class PlayerCollision : public Component
 	{
 	public:
 		//------------------------------------------------------------------------------
 		// Public Functions:
 		//------------------------------------------------------------------------------
 
-		// Default constructor
-		InkyAI();
+		// Constructor
+		PlayerCollision();
+
+		// Initialize this component (happens at object creation).
+		void Initialize() override;
 
 		// Clone a component and return a pointer to the cloned component.
 		// Returns:
 		//   A pointer to a dynamically allocated clone of the component.
 		Component* Clone() const override;
-		
-		// Initialize this component (happens at object creation).
-		void Initialize() override;
-		
-	protected:
-		//------------------------------------------------------------------------------
-		// Protected Functions:
-		//------------------------------------------------------------------------------
 
-		// Called when the AI should choose a target.
+		// Updates components using a fixed timestep (usually just physics)
 		// Params:
-		//   adjacentTiles = An array of adjacent empty tiles.
-		//   emptyCount = How many empty tiles were found.
-		virtual void OnTarget(AdjacentTile adjacentTiles[4], size_t emptyCount) override;
+		//	 dt = A fixed change in time, usually 1/60th of a second.
+		void FixedUpdate(float dt) override;
+
+		// Sets the tilemap used for the grid.
+		// Params:
+		//   tilemap = The tilemap.
+		//   spriteTilemap = The sprite tilemap.
+		void SetTilemap(Tilemap* tilemap, SpriteTilemap* spriteTilemap);
+
+		// Called when the player dies.
+		void OnDeath();
 
 	private:
 		//------------------------------------------------------------------------------
 		// Private Variables:
 		//------------------------------------------------------------------------------
 
-		// The Blinky game object.
-		GameObject* blinky;
+		// The tilemap used for the grid.
+		Tilemap* tilemap;
+		SpriteTilemap* spriteTilemap;
+
+		// Components
+		Transform* transform;
+		PlayerScore* playerScore;
+
+		// Other variables
+		int ghostStreak;
 	};
 }
+
+//------------------------------------------------------------------------------

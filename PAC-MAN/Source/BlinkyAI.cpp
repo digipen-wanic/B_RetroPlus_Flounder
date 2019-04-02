@@ -91,6 +91,6 @@ namespace Behaviors
 
 		// Set Chase Target (Player Position)
 		if (mode == CHASE)
-			target = spriteTilemap->WorldToTile(player->GetComponent<Transform>()->GetTranslation());
+			target = GetSpriteTilemap()->WorldToTile(player->GetComponent<Transform>()->GetTranslation());
 	}
 }

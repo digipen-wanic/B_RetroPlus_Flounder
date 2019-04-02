@@ -42,8 +42,8 @@ namespace Behaviors
 	// Constructor
 	// Params:
 	//   speed = How fast the game object moves between tiles.
-	GridMovement::GridMovement(float speed) : Component("GridMovement"), transform(nullptr), tilemap(nullptr), spriteTilemap(nullptr), direction(UP),
-		speed(speed), tileProgress(0.0f), frozen(false), oldTile(), newTile()
+	GridMovement::GridMovement(float speed) : Component("GridMovement"), direction(UP),
+		speed(speed), transform(nullptr), tilemap(nullptr), spriteTilemap(nullptr), tileProgress(0.0f), frozen(false), oldTile(), newTile()
 	{
 	}
 
@@ -85,7 +85,7 @@ namespace Behaviors
 				// Give child class a chance to update direction when we have reached the end of a move.
 				OnTileMove(adjacentTiles, emptyCount);
 
-				oldTile = Vector2D(floor(newTile.x), floor(newTile.y));
+				oldTile = Vector2D(newTile.x, newTile.y);
 
 				// Calculate the new tile based on the target direction.
 				switch (direction)
@@ -105,9 +105,18 @@ namespace Behaviors
 				}
 
 				// If the tile in the target direction is not empty, cancel the movement.
+				bool isPlayer = GetOwner()->GetName() == "PAC-MAN";
 				bool newTileValid;
-				if (GetCellValue(newTile, newTileValid) > 0)
+				int cellValue = GetCellValue(newTile, newTileValid);
+				if (cellValue > 0 && !(!isPlayer && cellValue == 31))
+				{
 					newTile = oldTile;
+				}
+				else
+				{
+					// Round tiles.
+					newTile = Vector2D(floor(newTile.x), floor(newTile.y));
+				}
 
 				// If a new tile has been chosen, subtract 1 from tile movement progress so that we interpolate the correct amount.
 				if (!AlmostEqual(oldTile, newTile))
@@ -205,6 +214,15 @@ namespace Behaviors
 		spriteTilemap = spriteTilemap_;
 	}
 
+	// Gets a vector in the direction this game object is facing.
+		// This function calculates the vector in such a way that it
+		// reproduces a bug from the original game. When the direction
+		// is UP, the vector returned may be skewed to the left with a
+		// scalar greater than one.
+		// Params:
+		//   scalar = The magnitude of the vector returned.
+		// Returns:
+		//   The vector in the direction this game object is facing, multiplied by the scalar.
 	Vector2D GridMovement::GetDirectionVector(int scalar) const
 	{
 		// This is done in a weird way, the same way the original game did it.
@@ -235,7 +253,7 @@ namespace Behaviors
 		char y = static_cast<char>(vector & 0x00FF);
 		
 		// Convert the original PAC-MAN's coordinate system to our coordinate system.
-		return Vector2D(-static_cast<float>(x), -static_cast<float>(y));
+		return Vector2D(-static_cast<float>(x), static_cast<float>(y));
 	}
 
 	//------------------------------------------------------------------------------
@@ -246,6 +264,18 @@ namespace Behaviors
 	Vector2D GridMovement::GetOldTile() const
 	{
 		return oldTile;
+	}
+
+	// Gets the new tile.
+	Vector2D GridMovement::GetNewTile() const
+	{
+		return newTile;
+	}
+
+	// Gets the transform (constant).
+	const Transform* GridMovement::GetTransform() const
+	{
+		return transform;
 	}
 
 	// Gets the tilemap (constant).

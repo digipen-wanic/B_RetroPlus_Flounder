@@ -56,6 +56,9 @@ namespace Behaviors
 		//   parser = The parser that is reading this object's data from a file.
 		void Deserialize(Parser& parser) override;
 
+		// Draw a sprite (Sprite can be textured or untextured).
+		void Draw() override;
+
 		// Sets the ghost to the frightened state.
 		void SetFrightened();
 
@@ -63,7 +66,16 @@ namespace Behaviors
 		bool IsFrightened() const;
 
 		// Adds an overridden direction for a specific tile.
-		//void AddOverrideTile(Vector2D tile, Direction direction);
+		// Params:
+		//   tile = The coordinates of the tile to add an override for.
+		//   overriddenDirection = The direction the AI should be forced to move in when encountering the specified tile.
+		void AddOverrideTile(Vector2D tile, Direction overriddenDirection);
+
+		// Adds an overridden direction exclusion for a specific tile.
+		// Params:
+		//   tile = The coordinates of the tile to add an override for.
+		//   excludedDirection = The direction the AI cannot move in when encountering the specified tile.
+		void AddOverrideExclusionTile(Vector2D tile, Direction excludedDirection);
 
 	protected:
 		//------------------------------------------------------------------------------
@@ -115,6 +127,16 @@ namespace Behaviors
 
 	private:
 		//------------------------------------------------------------------------------
+		// Private Structures:
+		//------------------------------------------------------------------------------
+
+		struct OverriddenTile
+		{
+			Vector2D pos;
+			Direction direction;
+		};
+
+		//------------------------------------------------------------------------------
 		// Private Variables:
 		//------------------------------------------------------------------------------
 
@@ -123,6 +145,24 @@ namespace Behaviors
 		unsigned dotsLeftToLeave;
 		bool forceReverse;
 		unsigned wave;
+		std::vector<OverriddenTile> overriddenTiles;
+		std::vector<OverriddenTile> overriddenExclusionTiles;
+
+		// Insertion operator for OverriddenTile.
+		// Params:
+		//   os = The output stream.
+		//   overriddenTile = The overridden tile.
+		// Returns:
+		//   A reference to the output stream.
+		friend std::ostream& operator<<(std::ostream& os, const OverriddenTile& overriddenTile);
+
+		// Extraction operator for OverriddenTile.
+		// Params:
+		//   is = The input stream.
+		//   overriddenTile = The overridden tile.
+		// Returns:
+		//   A reference to the input stream.
+		friend std::istream& operator>>(std::istream& is, OverriddenTile& overriddenTile);
 	};
 }
 

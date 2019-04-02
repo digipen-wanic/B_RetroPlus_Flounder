@@ -55,7 +55,7 @@ namespace Levels
 	//------------------------------------------------------------------------------
 
 	// Creates an instance of Level 1.
-	Level1::Level1() : Level("Level1"), columnsMap(8), rowsMap(5), soundManager(nullptr)
+	Level1::Level1() : Level("Level1"), columnsMap(8), rowsMap(5), startLives(3), lives(startLives), soundManager(nullptr), energizerPositions(), dotPositions()
 	{
 	}
 
@@ -77,11 +77,12 @@ namespace Levels
 		resourceManager.GetSpriteSource("Circle.png");
 
 		// Load the archetypes from their files.
-		objectManager.AddArchetype(*objectFactory.CreateObject("Circle", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Point", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("ControllableRectangle", resourceManager.GetMesh("Quad")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Dot", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Energizer", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("PAC-MAN", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Blinky", resourceManager.GetMesh("Quad")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Pinky", resourceManager.GetMesh("Quad")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Inky", resourceManager.GetMesh("Quad")));
 
 		// Load the tilemap.
 		dataMap = Tilemap::CreateTilemapFromFile("Assets/Levels/Level1.txt");
@@ -102,6 +103,8 @@ namespace Levels
 			tilemap->GetComponent<SpriteTilemap>()->SetTilemap(dataMap);
 			objectManager.AddArchetype(*tilemap);
 		}
+
+		lives = startLives;
 	}
 
 	// Initialize the memory associated with Level 1.
@@ -124,11 +127,49 @@ namespace Levels
 		pacMan->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 23.0f)));
 		objectManager.AddObject(*pacMan);
 
-		// Ghost.
-		GameObject* ghost = new GameObject(*objectManager.GetArchetypeByName("Blinky"));
-		ghost->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-		ghost->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 11.0f)));
-		objectManager.AddObject(*ghost);
+		// Ghosts.
+		GameObject* blinky = new GameObject(*objectManager.GetArchetypeByName("Blinky"));
+		blinky->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
+		blinky->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 11.0f)));
+		objectManager.AddObject(*blinky);
+
+		GameObject* pinky = new GameObject(*objectManager.GetArchetypeByName("Pinky"));
+		pinky->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
+		pinky->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 14.0f)));
+		objectManager.AddObject(*pinky);
+
+		GameObject* inky = new GameObject(*objectManager.GetArchetypeByName("Inky"));
+		inky->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
+		inky->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(11.5f, 14.0f)));
+		objectManager.AddObject(*inky);
+
+		/*
+		GameObject* clyde = new GameObject(*objectManager.GetArchetypeByName("Clyde"));
+		clyde->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
+		clyde->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(15.5f, 14.0f)));
+		objectManager.AddObject(*clyde);
+		*/
+
+		// If there are no energizers or dots, place them.
+		if (lives == 0)
+		{
+			lives = startLives;
+			PopulateDots();
+		}
+
+		for (auto it = energizerPositions.begin(); it != energizerPositions.end(); ++it)
+		{
+			// Create energizer at position.
+
+		}
+
+		for (auto it = dotPositions.begin(); it != dotPositions.end(); ++it)
+		{
+			// Create dot at position.
+
+		}
+
+		--lives;
 	}
 
 	// Update Level 1.
@@ -151,6 +192,34 @@ namespace Levels
 		}
 	}
 
+	// Destroy objects associated with level 1.
+	void Level1::Shutdown()
+	{
+		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
+		
+		// Gather all energizers.
+		std::vector<GameObject*> energizers;
+		objectManager.GetAllObjectsByName("Energizer", energizers);
+
+		// Store their positions.
+		energizerPositions.clear();
+		for (auto it = energizers.begin(); it != energizers.end(); ++it)
+		{
+			energizerPositions.push_back((*it)->GetComponent<Transform>()->GetTranslation());
+		}
+
+		// Gather all dots.
+		std::vector<GameObject*> dots;
+		objectManager.GetAllObjectsByName("Dot", dots);
+
+		// Store their positions.
+		dotPositions.clear();
+		for (auto it = dots.begin(); it != dots.end(); ++it)
+		{
+			dotPositions.push_back((*it)->GetComponent<Transform>()->GetTranslation());
+		}
+	}
+
 	// Unload the resources associated with Level 1.
 	void Level1::Unload()
 	{
@@ -159,6 +228,50 @@ namespace Levels
 
 		// Unload all sounds.
 		soundManager->Shutdown();
+	}
+
+	//------------------------------------------------------------------------------
+	// Private Functions:
+	//------------------------------------------------------------------------------
+
+	// Resets the energizer and dot position lists.
+	void Level1::PopulateDots()
+	{
+		energizerPositions.clear();
+		dotPositions.clear();
+
+		SpriteTilemap* spriteTilemap = GetSpace()->GetObjectManager().GetObjectByName("Tilemap")->GetComponent<SpriteTilemap>();
+
+		// Helper lambda to fill in an area with dots.
+		// Params:
+		//   min = The top left corner of the rectangle to fill.
+		//   max = The bottom right corner of the rectangle to fill.
+		auto Fill = [&](Vector2D min, Vector2D max)
+		{
+			// Fill area specified by min and max.
+			for (float x = min.x; x <= max.x; x++)
+			{
+				for (float y = min.y; y <= max.y; y++)
+				{
+					Vector2D pos = spriteTilemap->TileToWorld(Vector2D(x, y));
+
+					// Make sure there are no duplicates.
+					for (auto it = dotPositions.begin(); it != dotPositions.end(); ++it)
+					{
+						if (AlmostEqual(pos, *it))
+							return;
+					}
+
+					dotPositions.push_back(pos);
+				}
+			}
+		};
+
+		// Add the energizers.
+
+
+		// Add the dots.
+		Fill(Vector2D(1, 1), Vector2D(4, 1));
 	}
 }
 

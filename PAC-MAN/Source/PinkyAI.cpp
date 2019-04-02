@@ -14,10 +14,15 @@
 //------------------------------------------------------------------------------
 
 #include "stdafx.h"
+
 #include "PinkyAI.h"
 
-#include "GameObject.h"
-#include "Transform.h"
+// Systems
+#include <GameObject.h>
+#include <Transform.h>
+
+// Components
+#include <SpriteTilemap.h>
 #include "PlayerController.h"
 
 //------------------------------------------------------------------------------
@@ -32,11 +37,17 @@ namespace Behaviors
 	// Public Functions:
 	//------------------------------------------------------------------------------
 
-	// Initialize this component (happens at object creation).
-	void PinkyAI::Initialize()
+	// Default constructor
+	PinkyAI::PinkyAI() : BaseAI(0)
 	{
-		// Set scatterTarget to Upper-Left Corner
-		scatterTarget = Vector2D(2.0f, -2.0f);
+	}
+
+	// Clone a component and return a pointer to the cloned component.
+	// Returns:
+	//   A pointer to a dynamically allocated clone of the component.
+	Component* PinkyAI::Clone() const
+	{
+		return new PinkyAI(*this);
 	}
 
 	//------------------------------------------------------------------------------
@@ -52,14 +63,12 @@ namespace Behaviors
 		UNREFERENCED_PARAMETER(adjacentTiles);
 		UNREFERENCED_PARAMETER(emptyCount);
 
-		// Set Scatter Target (Upper-Left Corner)
-		if (mode == SCATTER)
-			target = scatterTarget;
 		// Set Chase Target (4 infront of Player Position)
-		else if (mode == CHASE)
+		if (mode == CHASE)
 		{
 			// Set target to player
-			target = player->GetComponent<Transform>()->GetTranslation();
+			target = GetSpriteTilemap()->WorldToTile(player->GetComponent<Transform>()->GetTranslation());
+
 			// Add 4 * Direction Vector of PAC-MAN
 			target += player->GetComponent<PlayerController>()->GetDirectionVector(4);
 		}

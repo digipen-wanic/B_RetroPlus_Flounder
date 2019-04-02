@@ -85,6 +85,9 @@
     <ClCompile Include="Source\BlinkyAI.cpp">
       <Filter>Game\Behaviors\Ghosts</Filter>
     </ClCompile>
+    <ClCompile Include="Source\PlayerAnimation.cpp">
+      <Filter>Game\Behaviors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\stdafx.h">
@@ -152,6 +155,9 @@
     </ClInclude>
     <ClInclude Include="Source\BlinkyAI.h">
       <Filter>Game\Behaviors\Ghosts</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PlayerAnimation.h">
+      <Filter>Game\Behaviors</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

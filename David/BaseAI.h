@@ -34,10 +34,48 @@ namespace Behaviors
 		//------------------------------------------------------------------------------
 
 		// Constructor
-		BaseAI();
+		// Params:
+		//   dotsLeftToLeave = How many dots the player must eat before the ghost moves.
+		BaseAI(unsigned dotsLeftToLeave);
+
+		// Initialize this component (happens at object creation).
+		void Initialize() override;
+
+		// Updates components using a fixed timestep (usually just physics)
+		// Params:
+		//	 dt = A fixed change in time, usually 1/60th of a second.
+		virtual void FixedUpdate(float dt) override;
+
+		// Write object data to file
+		// Params:
+		//   parser = The parser that is writing this object to a file.
+		void Serialize(Parser& parser) const override;
+
+		// Read object data from a file
+		// Params:
+		//   parser = The parser that is reading this object's data from a file.
+		void Deserialize(Parser& parser) override;
+
+		// Draw a sprite (Sprite can be textured or untextured).
+		void Draw() override;
 
 		// Sets the ghost to the frightened state.
 		void SetFrightened();
+
+		// Returns whether the ghost is in the frightened state.
+		bool IsFrightened() const;
+
+		// Adds an overridden direction for a specific tile.
+		// Params:
+		//   tile = The coordinates of the tile to add an override for.
+		//   overriddenDirection = The direction the AI should be forced to move in when encountering the specified tile.
+		void AddOverrideTile(Vector2D tile, Direction overriddenDirection);
+
+		// Adds an overridden direction exclusion for a specific tile.
+		// Params:
+		//   tile = The coordinates of the tile to add an override for.
+		//   excludedDirection = The direction the AI cannot move in when encountering the specified tile.
+		void AddOverrideExclusionTile(Vector2D tile, Direction excludedDirection);
 
 	protected:
 		//------------------------------------------------------------------------------
@@ -75,16 +113,56 @@ namespace Behaviors
 		//   emptyCount = How many empty tiles were found.
 		virtual void OnTarget(AdjacentTile adjacentTiles[4], size_t emptyCount) = 0;
 
+		//------------------------------------------------------------------------------
+		// Protected Variables:
+		//------------------------------------------------------------------------------
+
+		// The player game object.
+		GameObject* player;
+
+		// Other variables
+		Vector2D target;
+		Vector2D scatterTarget;
+		Mode mode;
+
 	private:
+		//------------------------------------------------------------------------------
+		// Private Structures:
+		//------------------------------------------------------------------------------
+
+		struct OverriddenTile
+		{
+			Vector2D pos;
+			Direction direction;
+		};
+
 		//------------------------------------------------------------------------------
 		// Private Variables:
 		//------------------------------------------------------------------------------
 
 		// Other variables
+		bool hasMoved;
+		unsigned dotsLeftToLeave;
 		bool forceReverse;
-		Vector2D target;
-		Mode mode;
 		unsigned wave;
+		std::vector<OverriddenTile> overriddenTiles;
+		std::vector<OverriddenTile> overriddenExclusionTiles;
+
+		// Insertion operator for OverriddenTile.
+		// Params:
+		//   os = The output stream.
+		//   overriddenTile = The overridden tile.
+		// Returns:
+		//   A reference to the output stream.
+		friend std::ostream& operator<<(std::ostream& os, const OverriddenTile& overriddenTile);
+
+		// Extraction operator for OverriddenTile.
+		// Params:
+		//   is = The input stream.
+		//   overriddenTile = The overridden tile.
+		// Returns:
+		//   A reference to the input stream.
+		friend std::istream& operator>>(std::istream& is, OverriddenTile& overriddenTile);
 	};
 }
 

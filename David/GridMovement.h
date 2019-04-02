@@ -35,7 +35,7 @@ class SpriteTilemap;
 namespace Behaviors
 {
 
-	class GridMovement : public virtual Component
+	class GridMovement : public Component
 	{
 	public:
 		//------------------------------------------------------------------------------
@@ -71,11 +71,28 @@ namespace Behaviors
 		// Gets the speed of the game object.
 		float GetSpeed() const;
 
+		// Sets whether the game object is frozen.
+		void SetFrozen(bool frozen);
+
+		// Gets whether the game object is frozen.
+		bool IsFrozen() const;
+
 		// Sets the tilemap used for the grid.
 		// Params:
 		//   tilemap = The tilemap.
 		//   spriteTilemap = The sprite tilemap.
 		void SetTilemap(Tilemap* tilemap, SpriteTilemap* spriteTilemap);
+
+		// Gets a vector in the direction this game object is facing.
+		// This function calculates the vector in such a way that it
+		// reproduces a bug from the original game. When the direction
+		// is UP, the vector returned may be skewed to the left with a
+		// scalar greater than one.
+		// Params:
+		//   scalar = The magnitude of the vector returned.
+		// Returns:
+		//   The vector in the direction this game object is facing, multiplied by the scalar.
+		Vector2D GetDirectionVector(int scalar = 1) const;
 
 	protected:
 		//------------------------------------------------------------------------------
@@ -118,6 +135,12 @@ namespace Behaviors
 
 		// Gets the old tile.
 		Vector2D GetOldTile() const;
+
+		// Gets the new tile.
+		Vector2D GetNewTile() const;
+
+		// Gets the transform (constant).
+		const Transform* GetTransform() const;
 
 		// Gets the tilemap (constant).
 		const Tilemap* GetTilemap() const;
@@ -174,15 +197,16 @@ namespace Behaviors
 		// Properties (save to/load from file)
 		float speed;
 
+		// Components
+		Transform* transform;
+
 		// The tilemap used for the grid.
 		Tilemap* tilemap;
 		SpriteTilemap* spriteTilemap;
 
-		// Components
-		Transform* transform;
-
 		// Other variables
 		float tileProgress;
+		bool frozen;
 		Vector2D oldTile;
 		Vector2D newTile;
 	};

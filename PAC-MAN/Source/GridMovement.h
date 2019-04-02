@@ -83,6 +83,15 @@ namespace Behaviors
 		//   spriteTilemap = The sprite tilemap.
 		void SetTilemap(Tilemap* tilemap, SpriteTilemap* spriteTilemap);
 
+		// Gets a vector in the direction this game object is facing.
+		// This function calculates the vector in such a way that it
+		// reproduces a bug from the original game. When the direction
+		// is UP, the vector returned may be skewed to the left with a
+		// scalar greater than one.
+		// Params:
+		//   scalar = The magnitude of the vector returned.
+		// Returns:
+		//   The vector in the direction this game object is facing, multiplied by the scalar.
 		Vector2D GetDirectionVector(int scalar = 1) const;
 
 	protected:
@@ -127,6 +136,12 @@ namespace Behaviors
 		// Gets the old tile.
 		Vector2D GetOldTile() const;
 
+		// Gets the new tile.
+		Vector2D GetNewTile() const;
+
+		// Gets the transform (constant).
+		const Transform* GetTransform() const;
+
 		// Gets the tilemap (constant).
 		const Tilemap* GetTilemap() const;
 
@@ -170,13 +185,6 @@ namespace Behaviors
 		//------------------------------------------------------------------------------
 		// Protected Variables:
 		//------------------------------------------------------------------------------
-		
-		// Components
-		Transform* transform;
-
-		// The tilemap used for the grid.
-		Tilemap* tilemap;
-		SpriteTilemap* spriteTilemap;
 
 		// Other variables
 		Direction direction;
@@ -188,6 +196,13 @@ namespace Behaviors
 
 		// Properties (save to/load from file)
 		float speed;
+
+		// Components
+		Transform* transform;
+
+		// The tilemap used for the grid.
+		Tilemap* tilemap;
+		SpriteTilemap* spriteTilemap;
 
 		// Other variables
 		float tileProgress;

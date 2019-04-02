@@ -9,28 +9,59 @@
 //
 //------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------
+// Include Files:
+//------------------------------------------------------------------------------
+
 #include "stdafx.h"
+
 #include "InkyAI.h"
-#include "Transform.h"
+
+// Systems
+#include <Space.h>
+
+// Components
+#include <Transform.h>
+#include <SpriteTilemap.h>
 #include "PlayerController.h"
 #include "GridMovement.h"
-#include "Space.h"
+
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Public Structures:
+//------------------------------------------------------------------------------
 
 namespace Behaviors
 {
+	//------------------------------------------------------------------------------
+	// Public Functions:
+	//------------------------------------------------------------------------------
 
-	InkyAI::InkyAI()
-		: BaseAI(30), pacman(nullptr), blinky(nullptr)
+	// Default constructor
+	InkyAI::InkyAI() : BaseAI(30), blinky(nullptr)
 	{
+	}
+
+	// Clone a component and return a pointer to the cloned component.
+	// Returns:
+	//   A pointer to a dynamically allocated clone of the component.
+	Component* InkyAI::Clone() const
+	{
+		return new InkyAI(*this);
 	}
 
 	// Initialize this component (happens at object creation).
 	void InkyAI::Initialize()
 	{
-		pacman = GetOwner()->GetSpace()->GetObjectManager().GetObjectByName("PAC-MAN");
+		BaseAI::Initialize();
+
 		blinky = GetOwner()->GetSpace()->GetObjectManager().GetObjectByName("Blinky");
-		transform = GetOwner()->GetComponent<Transform>();
 	}
+
+	//------------------------------------------------------------------------------
+	// Protected Functions:
+	//------------------------------------------------------------------------------
 
 	// Called when the AI should choose a target.
 	// Params:
@@ -40,7 +71,8 @@ namespace Behaviors
 	{
 		UNREFERENCED_PARAMETER(adjacentTiles);
 		UNREFERENCED_PARAMETER(emptyCount);
-		Vector2D pacmanDir = pacman->GetComponent<GridMovement>()->GetDirectionVector(2);
+
+		Vector2D pacmanDir = player->GetComponent<GridMovement>()->GetDirectionVector(2);
 		Vector2D blinkyVec = blinky->GetComponent<Transform>()->GetTranslation();
 		target = pacmanDir + blinkyVec;
 	}

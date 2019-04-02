@@ -1,4 +1,4 @@
-Blinky
+Pinky
 {
   numComponents : 3
   Transform
@@ -12,13 +12,17 @@ Blinky
     frameIndex : 0
     color : { 1 , 1 , 1 , 1 }
   }
-  Behaviors::BlinkyAI
+  Behaviors::PinkyAI
   {
     speed : 8.25
-    scatterTarget : { 25, -2 }
-    overriddenTilesCount : 0
+    scatterTarget : { 2, -2 }
+    overriddenTilesCount : 4
     overriddenTiles : 
     {
+      { { 13, 13 }, 0 }
+      { { 14, 13 }, 0 }
+      { { 13, 14 }, 0 }
+      { { 14, 14 }, 0 }
     }
   }
 }

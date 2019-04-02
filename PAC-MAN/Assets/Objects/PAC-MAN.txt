@@ -1,6 +1,6 @@
 PAC-MAN
 {
-  numComponents : 5
+  numComponents : 7
   Transform
   {
     translation : { 0, 0 }
@@ -11,6 +11,9 @@ PAC-MAN
   {
     frameIndex : 0
     color : { 1 , 1 , 1 , 1 }
+  }
+  Animation
+  {
   }
   Behaviors::PlayerController
   {
@@ -25,5 +28,14 @@ PAC-MAN
   }
   Behaviors::PlayerCollision
   {
+  }
+  Behaviors::PlayerAnimation
+  {
+    spawnStart : 0
+    idleStart : 0
+    moveStart : 0
+    moveLength : 1
+    deathStart : 0
+    deathLength : 1
   }
 }

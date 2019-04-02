@@ -17,6 +17,9 @@
 
 #include <Level.h>
 
+#include <vector>
+#include <Vector2D.h>
+
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -58,10 +61,20 @@ namespace Levels
 		//	 dt = Change in time (in seconds) since the last game loop.
 		void Update(float dt) override;
 
+		// Destroy objects associated with level 1.
+		void Shutdown() override;
+
 		// Unload the resources associated with Level 1.
 		void Unload() override;
 
 	private:
+		//------------------------------------------------------------------------------
+		// Private Functions:
+		//------------------------------------------------------------------------------
+
+		// Resets the energizer and dot position lists.
+		void PopulateDots();
+
 		//------------------------------------------------------------------------------
 		// Private Variables:
 		//------------------------------------------------------------------------------
@@ -72,7 +85,11 @@ namespace Levels
 		unsigned rowsMap;
 
 		// Other variables.
+		unsigned startLives;
+		unsigned lives;
 		SoundManager* soundManager;
+		std::vector<Vector2D> energizerPositions;
+		std::vector<Vector2D> dotPositions;
 	};
 }
 

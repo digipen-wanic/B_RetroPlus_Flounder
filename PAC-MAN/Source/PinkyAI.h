@@ -32,8 +32,13 @@ namespace Behaviors
 		// Public Functions:
 		//------------------------------------------------------------------------------
 
-		// Initialize this component (happens at object creation).
-		void Initialize() override;
+		// Default constructor
+		PinkyAI();
+
+		// Clone a component and return a pointer to the cloned component.
+		// Returns:
+		//   A pointer to a dynamically allocated clone of the component.
+		Component* Clone() const override;
 
 	protected:
 		//------------------------------------------------------------------------------

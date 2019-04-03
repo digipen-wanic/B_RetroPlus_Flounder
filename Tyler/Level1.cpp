@@ -70,6 +70,7 @@ namespace Levels
 		soundManager->AddEffect("eatGhost.wav");
 		soundManager->AddEffect("ghostMovementFinal.wav");
 		soundManager->AddEffect("soundIntroMusic.wav");
+		soundManager->AddEffect("soundExtraLife.wav");
 
 		GameObjectFactory& objectFactory = GameObjectFactory::GetInstance();
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();

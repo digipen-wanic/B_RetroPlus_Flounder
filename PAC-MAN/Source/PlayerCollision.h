@@ -32,6 +32,11 @@ namespace Behaviors
 	class PlayerScore;
 }
 
+namespace FMOD
+{
+	class Channel;
+}
+
 //------------------------------------------------------------------------------
 // Public Structures:
 //------------------------------------------------------------------------------
@@ -85,6 +90,9 @@ namespace Behaviors
 
 		// Other variables
 		int ghostStreak;
+		bool oddConsumable;
+		FMOD::Channel* energizerSound;
+		FMOD::Channel* ghostDeathSound;
 	};
 }
 

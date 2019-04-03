@@ -59,7 +59,7 @@ namespace Behaviors
 	//------------------------------------------------------------------------------
 
 	// Constructor
-	PlayerCollision::PlayerCollision() : Component("PlayerCollision"), tilemap(nullptr), spriteTilemap(nullptr), transform(nullptr)
+	PlayerCollision::PlayerCollision() : Component("PlayerCollision"), tilemap(nullptr), spriteTilemap(nullptr), transform(nullptr), ghostStreak(0), oddConsumable(false), energizerSound(nullptr), ghostDeathSound(nullptr)
 	{
 	}
 
@@ -68,6 +68,11 @@ namespace Behaviors
 	{
 		transform = GetOwner()->GetComponent<Transform>();
 		playerScore = GetOwner()->GetComponent<PlayerScore>();
+
+		ghostDeathSound = Engine::GetInstance().GetModule<SoundManager>()->PlaySound("GhostDeath.wav");
+		ghostDeathSound->setPaused(true);
+		energizerSound = Engine::GetInstance().GetModule<SoundManager>()->PlaySound("GhostDeath.wav");
+		energizerSound->setPaused(true);
 	}
 
 	// Clone a component and return a pointer to the cloned component.
@@ -105,15 +110,19 @@ namespace Behaviors
 			if (AlmostEqual(playerTile, enemyTile))
 			{
 				BaseAI* baseAI = (*it)->GetComponent<BaseAI>();
-				if (baseAI->IsFrightened())
+				if (!baseAI->IsDead())
 				{
-					// Eat the enemy.
-					playerScore->IncreaseScore(200); // TODO: ADD STREAKS
-					baseAI->SetDead();
-				} 
-				else
-				{
-					OnDeath();
+					if (baseAI->IsFrightened())
+					{
+						// Eat the enemy.
+						playerScore->IncreaseScore(200); // TODO: ADD STREAKS
+						baseAI->SetDead();
+						Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatGhost.wav");
+					}
+					else
+					{
+						OnDeath();
+					}
 				}
 			}
 		}
@@ -132,6 +141,16 @@ namespace Behaviors
 				playerScore->IncreaseScore(10);
 				playerScore->IncreaseDots();
 				(*it)->Destroy();
+				if (oddConsumable)
+				{
+					Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatDot1.wav");
+					oddConsumable = false;
+				}
+				else
+				{
+					Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatDot2.wav");
+					oddConsumable = true;
+				}
 			}
 		}
 
@@ -155,6 +174,34 @@ namespace Behaviors
 					(*it2)->GetComponent<BaseAI>()->SetFrightened();
 				}
 			}
+		}
+
+		bool enemyDead = false;
+		bool enemyFrightened = false;
+
+		for (auto it = enemies.begin(); it != enemies.end(); ++it)
+		{
+			BaseAI* baseAI = (*it)->GetComponent<BaseAI>();
+			if (baseAI->IsDead())
+				enemyDead = true;
+			if (baseAI->IsFrightened())
+				enemyFrightened = true;
+		}
+
+		if (enemyDead)
+		{
+			ghostDeathSound->setPaused(false);
+			energizerSound->setPaused(true);
+		}
+		else if (enemyFrightened)
+		{
+			ghostDeathSound->setPaused(true);
+			energizerSound->setPaused(false);
+		}
+		else
+		{
+			ghostDeathSound->setPaused(true);
+			energizerSound->setPaused(true);
 		}
 	}
 
@@ -197,7 +244,7 @@ namespace Behaviors
 		}
 
 		// Play death sound.
-		Engine::GetInstance().GetModule<SoundManager>()->PlaySound("deathofpacfinal.wav");
+		Engine::GetInstance().GetModule<SoundManager>()->PlaySound("PacManDeath.wav");
 
 		// Play death animation.
 		playerAnimation->OnDeath();

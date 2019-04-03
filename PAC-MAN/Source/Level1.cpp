@@ -69,7 +69,14 @@ namespace Levels
 	{
 		// Load sound effects.
 		soundManager = Engine::GetInstance().GetModule<SoundManager>();
-		soundManager->AddEffect("deathofpacfinal.wav");
+		soundManager->AddEffect("PacManDeath.wav");
+		soundManager->AddEffect("EatDot1.wav");
+		soundManager->AddEffect("EatDot2.wav");
+		soundManager->AddEffect("EatGhost.wav");
+		soundManager->AddEffect("GhostMove.wav");
+		soundManager->AddEffect("MusicIntro.wav");
+		soundManager->AddEffect("ExtraLife.wav");
+		soundManager->AddMusic("GhostDeath.wav");
 
 		GameObjectFactory& objectFactory = GameObjectFactory::GetInstance();
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
@@ -130,7 +137,7 @@ namespace Levels
 	{
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
 
-		// Add various physics objects to the scene.
+		soundManager->PlaySound("MusicIntro.wav");
 
 		// Tilemap.
 		GameObject* tilemap = new GameObject(*objectManager.GetArchetypeByName("Tilemap"));
@@ -143,7 +150,38 @@ namespace Levels
 		pacMan->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, spriteTilemap);
 		pacMan->GetComponent<Behaviors::PlayerCollision>()->SetTilemap(dataMap, spriteTilemap);
 		pacMan->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 23.0f)));
-		objectManager.AddObject(*pacMan);
+
+		// If there are no energizers or dots, place them.
+		if (lives == 0)
+		{
+			lives = startLives;
+			PopulateDots();
+		}
+		else
+		{
+			Behaviors::PlayerScore* playerScore = pacMan->GetComponent<Behaviors::PlayerScore>();
+			playerScore->SetScore(oldScore);
+			playerScore->SetDots(oldDots);
+		}
+
+		// Add all energizers & dots.
+
+		for (auto it = energizerPositions.begin(); it != energizerPositions.end(); ++it)
+		{
+			// Create energizer at position.
+			GameObject* energizerPellet = new GameObject(*objectManager.GetArchetypeByName("Energizer"));
+			energizerPellet->GetComponent<Transform>()->SetTranslation(*it);
+			objectManager.AddObject(*energizerPellet);
+			energizerPellet->GetComponent<Animation>()->Play(0, 2, 0.125f, true);
+		}
+
+		for (auto it = dotPositions.begin(); it != dotPositions.end(); ++it)
+		{
+			// Create dot at position.
+			GameObject* Pellet = new GameObject(*objectManager.GetArchetypeByName("Dot"));
+			Pellet->GetComponent<Transform>()->SetTranslation(*it);
+			objectManager.AddObject(*Pellet);
+		}
 
 		// Ghosts.
 		GameObject* blinky = new GameObject(*objectManager.GetArchetypeByName("Blinky"));
@@ -166,35 +204,14 @@ namespace Levels
 		clyde->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(15.5f, 14.0f)));
 		objectManager.AddObject(*clyde);
 
-		// If there are no energizers or dots, place them.
-		if (lives == 0)
-		{
-			lives = startLives;
-			PopulateDots();
-		}
-		else
-		{
-			Behaviors::PlayerScore* playerScore = pacMan->GetComponent<Behaviors::PlayerScore>();
-			playerScore->SetScore(oldScore);
-			playerScore->SetDots(oldDots);
-		}
+		// Add PAC-MAN here so it draws over everything else.
+		objectManager.AddObject(*pacMan);
 
-		for (auto it = energizerPositions.begin(); it != energizerPositions.end(); ++it)
-		{
-			// Create energizer at position.
-			GameObject* energizerPellet = new GameObject(*objectManager.GetArchetypeByName("Energizer"));
-			energizerPellet->GetComponent<Transform>()->SetTranslation(*it);
-			objectManager.AddObject(*energizerPellet);
-			energizerPellet->GetComponent<Animation>()->Play(0, 2, 0.125f, true);
-		}
-
-		for (auto it = dotPositions.begin(); it != dotPositions.end(); ++it)
-		{
-			// Create dot at position.
-			GameObject* Pellet = new GameObject(*objectManager.GetArchetypeByName("Dot"));
-			Pellet->GetComponent<Transform>()->SetTranslation(*it);
-			objectManager.AddObject(*Pellet);
-		}
+		// Re-initialize all ghosts so they can find the player object since it was added after them.
+		blinky->Initialize();
+		pinky->Initialize();
+		inky->Initialize();
+		clyde->Initialize();
 
 		--lives;
 	}

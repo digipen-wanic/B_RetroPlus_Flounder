@@ -94,6 +94,9 @@
     <ClCompile Include="Source\GhostAnimation.cpp">
       <Filter>Game\Behaviors\Ghosts</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Level2.cpp">
+      <Filter>Game\Levels</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\stdafx.h">
@@ -170,6 +173,9 @@
     </ClInclude>
     <ClInclude Include="Source\GhostAnimation.h">
       <Filter>Game\Behaviors\Ghosts</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Level2.h">
+      <Filter>Game\Levels</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

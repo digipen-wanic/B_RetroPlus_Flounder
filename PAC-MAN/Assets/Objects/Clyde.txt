@@ -44,6 +44,6 @@ Clyde
     moveLeftStart : 3
     moveDownStart : 6
     moveUpStart : 9
-    moveLength : 2
+    moveLength : 3
   }
 }

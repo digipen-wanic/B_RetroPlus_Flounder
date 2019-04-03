@@ -108,6 +108,8 @@ namespace Behaviors
 				{
 					// Eat the enemy.
 					playerScore->IncreaseScore(200); // TODO: ADD STREAKS
+					baseAI->SetDead();
+					Engine::GetInstance().GetModule<SoundManager>()->PlaySound("eatGhost.wav");
 				}
 				else
 				{
@@ -162,6 +164,7 @@ namespace Behaviors
 				{
 					(*it2)->GetComponent<BaseAI>()->SetFrightened();
 				}
+				Engine::GetInstance().GetModule<SoundManager>()->PlaySound("ghostMovementFinal.wav");
 			}
 		}
 	}

@@ -3,7 +3,7 @@ Score
   numComponents : 2
   Transform
   {
-    translation : { 0, 0 }
+    translation : { 0, 400 }
     rotation : 0
     scale : { 64, 64 }
   }

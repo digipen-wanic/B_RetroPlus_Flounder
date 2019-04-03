@@ -17,6 +17,8 @@
 
 #include "Component.h" // base class
 
+#include "PlayerController.h"
+
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -87,8 +89,10 @@ namespace Behaviors
 		// Components
 		Transform* transform;
 		PlayerScore* playerScore;
+		PlayerController* playerController;
 
 		// Other variables
+		GridMovement::Direction oldDirection;
 		int ghostStreak;
 		bool oddConsumable;
 		FMOD::Channel* energizerSound;

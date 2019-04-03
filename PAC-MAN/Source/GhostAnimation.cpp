@@ -77,6 +77,14 @@ namespace Behaviors
 		parser.ReadVariable("moveDownStart", moveDownStart);
 		parser.ReadVariable("moveUpStart", moveUpStart);
 		parser.ReadVariable("moveLength", moveLength);
+		parser.ReadVariable("eyesRightStart", eyesRightStart);
+		parser.ReadVariable("eyesLeftStart", eyesLeftStart);
+		parser.ReadVariable("eyesDownStart", eyesDownStart);
+		parser.ReadVariable("eyesUpStart", eyesUpStart);
+		parser.ReadVariable("frightenedStart", frightenedStart);
+		parser.ReadVariable("frightenedLength", frightenedLength);
+		parser.ReadVariable("frightenedEndStart", frightenedEndStart);
+		parser.ReadVariable("frightenedEndLength", frightenedEndLength);
 	}
 
 	// Saves object data to a file.
@@ -89,6 +97,14 @@ namespace Behaviors
 		parser.WriteVariable("moveDownStart", moveDownStart);
 		parser.WriteVariable("moveUpStart", moveUpStart);
 		parser.WriteVariable("moveLength", moveLength);
+		parser.WriteVariable("eyesRightStart", eyesRightStart);
+		parser.WriteVariable("eyesLeftStart", eyesLeftStart);
+		parser.WriteVariable("eyesDownStart", eyesDownStart);
+		parser.WriteVariable("eyesUpStart", eyesUpStart);
+		parser.WriteVariable("frightenedStart", frightenedStart);
+		parser.WriteVariable("frightenedLength", frightenedLength);
+		parser.WriteVariable("frightenedEndStart", frightenedEndStart);
+		parser.WriteVariable("frightenedEndLength", frightenedEndLength);
 	}
 
 	// Fixed update function for this component.
@@ -127,20 +143,48 @@ namespace Behaviors
 			}
 		}
 
-		switch (baseAI->direction)
+		if (baseAI->IsDead())
 		{
-		case GridMovement::Direction::UP:
-			nextState = State::StateMoveUp;
-			break;
-		case GridMovement::Direction::LEFT:
-			nextState = State::StateMoveLeft;
-			break;
-		case GridMovement::Direction::DOWN:
-			nextState = State::StateMoveDown;
-			break;
-		case GridMovement::Direction::RIGHT:
-			nextState = State::StateMoveRight;
-			break;
+			switch (baseAI->direction)
+			{
+			case GridMovement::Direction::UP:
+				nextState = State::StateEyesUp;
+				break;
+			case GridMovement::Direction::LEFT:
+				nextState = State::StateEyesLeft;
+				break;
+			case GridMovement::Direction::DOWN:
+				nextState = State::StateEyesDown;
+				break;
+			case GridMovement::Direction::RIGHT:
+				nextState = State::StateEyesRight;
+				break;
+			}
+		}
+		else if (baseAI->IsFrightened())
+		{
+			if (baseAI->frightTimer <= baseAI->frightenTime - 4.0f)
+				nextState = State::StateFrightenedEnd;
+			else
+				nextState = State::StateFrightened;
+		}
+		else
+		{
+			switch (baseAI->direction)
+			{
+			case GridMovement::Direction::UP:
+				nextState = State::StateMoveUp;
+				break;
+			case GridMovement::Direction::LEFT:
+				nextState = State::StateMoveLeft;
+				break;
+			case GridMovement::Direction::DOWN:
+				nextState = State::StateMoveDown;
+				break;
+			case GridMovement::Direction::RIGHT:
+				nextState = State::StateMoveRight;
+				break;
+			}
 		}
 	}
 
@@ -172,6 +216,30 @@ namespace Behaviors
 				// If the state is changed to the moving up state, begin playing the moving up animation.
 			case State::StateMoveUp:
 				animation->Play(moveUpStart, moveLength, 0.1f, true);
+				break;
+				// If the state is changed to the eyes right state, begin playing the eyes right animation.
+			case State::StateEyesRight:
+				animation->Play(eyesRightStart, 1, 0.1f, true);
+				break;
+				// If the state is changed to the eyes left state, begin playing the eyes left animation.
+			case State::StateEyesLeft:
+				animation->Play(eyesLeftStart, 1, 0.1f, true);
+				break;
+				// If the state is changed to the eyes down state, begin playing the eyes down animation.
+			case State::StateEyesDown:
+				animation->Play(eyesDownStart, 1, 0.1f, true);
+				break;
+				// If the state is changed to the eyes up state, begin playing the eyes up animation.
+			case State::StateEyesUp:
+				animation->Play(eyesUpStart, 1, 0.1f, true);
+				break;
+				// If the state is changed to the frightened state, begin playing the frightened animation.
+			case State::StateFrightened:
+				animation->Play(frightenedStart, frightenedLength, 0.1f, true);
+				break;
+				// If the state is changed to the frightened end state, begin playing the frightened end animation.
+			case State::StateFrightenedEnd:
+				animation->Play(frightenedEndStart, frightenedEndLength, 0.1f, true);
 				break;
 			}
 		}

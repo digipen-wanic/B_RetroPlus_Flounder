@@ -137,7 +137,7 @@ namespace Behaviors
 	// Returns whether the death animation is currently playing.
 	bool PlayerAnimation::IsDying() const
 	{
-		return currentState == State::StateDeath;
+		return deathQueued || currentState == State::StateDeath;
 	}
 
 	//------------------------------------------------------------------------------

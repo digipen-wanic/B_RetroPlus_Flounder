@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	Level1.cpp
-// Author(s):	David Cohen (david.cohen)
+// File Name:	Level2.cpp
+// Author(s):	A.J. Bussman (anthony.bussman)
 // Project:		BetaFramework
 // Course:		WANIC VGP2 2018-2019
 //
@@ -15,7 +15,7 @@
 
 #include "stdafx.h"
 
-#include "Level1.h"
+#include "Level2.h"
 
 // Systems
 #include <Engine.h>
@@ -30,13 +30,13 @@
 #include <Mesh.h>
 #include <GameObjectFactory.h>
 #include <Tilemap.h>
-#include <MeshHelper.h>
 
 // Components
+#include <MeshHelper.h>
+#include <Animation.h>
 #include <Transform.h>
 #include <Physics.h>
 #include <SpriteTilemap.h>
-#include <Animation.h>
 #include "GridMovement.h"
 #include "PlayerScore.h"
 #include "PlayerCollision.h"
@@ -56,27 +56,20 @@ namespace Levels
 	// Public Functions:
 	//------------------------------------------------------------------------------
 
-	// Creates an instance of Level 1.
-	Level1::Level1() : Level("Level1"),
-		columnsMap(8), rowsMap(5), columnsEnergizer(2), rowsEnergizer(1), columnsPacMan(4), rowsPacMan(4), columnsGhost(5), rowsGhost(5),
+	// Creates an instance of Level 2.
+	Level2::Level2() : Level("Level2"),
+		columnsMap(8), rowsMap(5), columnsEnergizer(2), rowsEnergizer(1), columnsPacMan(4), rowsPacMan(4), columnsGhost(3), rowsGhost(4),
 		startLives(3), lives(0), oldScore(0), oldDots(0),
 		soundManager(nullptr), energizerPositions(), dotPositions()
 	{
 	}
 
-	// Load the resources associated with Level 1.
-	void Level1::Load()
+	// Load the resources associated with Level 2.
+	void Level2::Load()
 	{
 		// Load sound effects.
 		soundManager = Engine::GetInstance().GetModule<SoundManager>();
-		soundManager->AddEffect("PacManDeath.wav");
-		soundManager->AddEffect("EatDot1.wav");
-		soundManager->AddEffect("EatDot2.wav");
-		soundManager->AddEffect("EatGhost.wav");
-		soundManager->AddEffect("GhostMove.wav");
-		soundManager->AddEffect("MusicIntro.wav");
-		soundManager->AddEffect("ExtraLife.wav");
-		soundManager->AddMusic("GhostDeath.wav");
+		soundManager->AddEffect("deathofpacfinal.wav");
 
 		GameObjectFactory& objectFactory = GameObjectFactory::GetInstance();
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
@@ -84,33 +77,22 @@ namespace Levels
 
 		// Create a new quad mesh for the sprite.
 		resourceManager.GetMesh("Quad");
-		resourceManager.GetMesh("Energizer", columnsEnergizer, rowsEnergizer);
-		resourceManager.GetMesh("PacMan", columnsPacMan, rowsPacMan);
-		resourceManager.GetMesh("Blinky", columnsGhost, rowsGhost);
-		resourceManager.GetMesh("Pinky", columnsGhost, rowsGhost);
-		resourceManager.GetMesh("Inky", columnsGhost, rowsGhost);
-		resourceManager.GetMesh("Clyde", columnsGhost, rowsGhost);
 
 		// Load the circle texture and sprite source.
-		resourceManager.GetSpriteSource("Dot.png");
-		resourceManager.GetSpriteSource("Energizer.png", columnsEnergizer, rowsEnergizer);
-		resourceManager.GetSpriteSource("PacMan.png", columnsPacMan, rowsPacMan);
-		resourceManager.GetSpriteSource("Blinky.png", columnsGhost, rowsGhost);
-		resourceManager.GetSpriteSource("Pinky.png", columnsGhost, rowsGhost);
-		resourceManager.GetSpriteSource("Inky.png", columnsGhost, rowsGhost);
-		resourceManager.GetSpriteSource("Clyde.png", columnsGhost, rowsGhost);
+		resourceManager.GetSpriteSource("Circle.png");
 
 		// Load the archetypes from their files.
-		objectManager.AddArchetype(*objectFactory.CreateObject("Dot", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Dot.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Energizer", resourceManager.GetMesh("Energizer"), resourceManager.GetSpriteSource("Energizer.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("PAC-MAN", resourceManager.GetMesh("PacMan"), resourceManager.GetSpriteSource("PacMan.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Blinky", resourceManager.GetMesh("Blinky"), resourceManager.GetSpriteSource("Blinky.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Pinky", resourceManager.GetMesh("Pinky"), resourceManager.GetSpriteSource("Pinky.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Inky", resourceManager.GetMesh("Inky"), resourceManager.GetSpriteSource("Inky.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Clyde", resourceManager.GetMesh("Clyde"), resourceManager.GetSpriteSource("Clyde.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Dot", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Energizer", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("PAC-MAN", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("KingGhost", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Blinky", resourceManager.GetMesh("Quad")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Pinky", resourceManager.GetMesh("Quad")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Inky", resourceManager.GetMesh("Quad")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Clyde", resourceManager.GetMesh("Quad")));
 
 		// Load the tilemap.
-		dataMap = Tilemap::CreateTilemapFromFile("Assets/Levels/Level1.txt");
+		dataMap = Tilemap::CreateTilemapFromFile("Assets/Levels/Level2.txt");
 		if (dataMap == nullptr)
 		{
 			std::cout << "Error loading map!" << std::endl;
@@ -129,15 +111,13 @@ namespace Levels
 			objectManager.AddArchetype(*tilemap);
 		}
 
-		lives = 0;
+		lives = startLives;
 	}
 
-	// Initialize the memory associated with Level 1.
-	void Level1::Initialize()
+	// Initialize the memory associated with Level 2.
+	void Level2::Initialize()
 	{
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
-
-		soundManager->PlaySound("MusicIntro.wav");
 
 		// Tilemap.
 		GameObject* tilemap = new GameObject(*objectManager.GetArchetypeByName("Tilemap"));
@@ -183,50 +163,29 @@ namespace Levels
 			objectManager.AddObject(*Pellet);
 		}
 
-		// Ghosts.
-		GameObject* blinky = new GameObject(*objectManager.GetArchetypeByName("Blinky"));
-		blinky->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-		blinky->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 11.0f)));
-		objectManager.AddObject(*blinky);
-
-		GameObject* pinky = new GameObject(*objectManager.GetArchetypeByName("Pinky"));
-		pinky->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-		pinky->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 14.0f)));
-		objectManager.AddObject(*pinky);
-
-		GameObject* inky = new GameObject(*objectManager.GetArchetypeByName("Inky"));
-		inky->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-		inky->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(11.5f, 14.0f)));
-		objectManager.AddObject(*inky);
-
-		GameObject* clyde = new GameObject(*objectManager.GetArchetypeByName("Clyde"));
-		clyde->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-		clyde->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(15.5f, 14.0f)));
-		objectManager.AddObject(*clyde);
+		// KingGhost
+		GameObject* kingGhost = new GameObject(*objectManager.GetArchetypeByName("KingGhost"));
+		kingGhost->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, spriteTilemap);
+		kingGhost->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 11.0f)));
+		objectManager.AddObject(*kingGhost);
 
 		// Add PAC-MAN here so it draws over everything else.
 		objectManager.AddObject(*pacMan);
 
-		// Re-initialize all ghosts so they can find the player object since it was added after them.
-		blinky->Initialize();
-		pinky->Initialize();
-		inky->Initialize();
-		clyde->Initialize();
-
 		--lives;
 	}
 
-	// Update Level 1.
+	// Update Level 2.
 	// Params:
 	//	 dt = Change in time (in seconds) since the last game loop.
-	void Level1::Update(float dt)
+	void Level2::Update(float dt)
 	{
 		UNREFERENCED_PARAMETER(dt);
 
 		Input& input = Input::GetInstance();
 
 		// Handle level switching.
-		if (input.CheckTriggered('1'))
+		if (input.CheckTriggered('0'))
 		{
 			GetSpace()->SetLevel<MainMenu>();
 		}
@@ -236,11 +195,11 @@ namespace Levels
 		}
 	}
 
-	// Destroy objects associated with level 1.
-	void Level1::Shutdown()
+	// Destroy objects associated with level 2.
+	void Level2::Shutdown()
 	{
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
-		
+
 		// Gather all energizers.
 		std::vector<GameObject*> energizers;
 		objectManager.GetAllObjectsByName("Energizer", energizers);
@@ -268,8 +227,8 @@ namespace Levels
 		oldDots = playerScore->GetDots();
 	}
 
-	// Unload the resources associated with Level 1.
-	void Level1::Unload()
+	// Unload the resources associated with Level 2.
+	void Level2::Unload()
 	{
 		// Free all allocated memory.
 		delete dataMap;
@@ -283,7 +242,7 @@ namespace Levels
 	//------------------------------------------------------------------------------
 
 	// Resets the energizer and dot position lists.
-	void Level1::PopulateDots()
+	void Level2::PopulateDots()
 	{
 		energizerPositions.clear();
 		dotPositions.clear();

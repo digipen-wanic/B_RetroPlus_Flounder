@@ -138,7 +138,7 @@ size_t GameObjectManager::GetAllObjectsByName(const std::string& objectName, std
 	// Loop through every game object and check if its name matches.
 	for (auto it = gameObjectActiveList.begin(); it != gameObjectActiveList.end(); it++)
 	{
-		if ((*it)->GetName() == objectName)
+		if (!(*it)->IsDestroyed() && (*it)->GetName() == objectName)
 		{
 			objectList.push_back(*it);
 			++found;

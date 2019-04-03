@@ -15,6 +15,7 @@ Clyde
   Behaviors::ClydeAI
   {
     speed : 8.25
+    frightSpeed : 5.5
     scatterTarget : { 27, 32 }
     overriddenTilesCount : 6
     overriddenTiles : 
@@ -45,5 +46,13 @@ Clyde
     moveDownStart : 6
     moveUpStart : 9
     moveLength : 3
+    eyesRightStart : 12
+    eyesLeftStart : 13
+    eyesDownStart : 14
+    eyesUpStart : 15
+    frightenedStart : 16
+    frightenedLength : 2
+    frightenedEndStart : 18
+    frightenedEndLength : 2
   }
 }

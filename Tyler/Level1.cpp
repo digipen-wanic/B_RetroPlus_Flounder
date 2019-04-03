@@ -197,6 +197,12 @@ namespace Levels
 		{
 			GameObject* fruit = new GameObject(*objectManager.GetArchetypeByName("Fruit"));
 			objectManager.AddObject(*fruit);
+			timerDestroy = RandomRange(9.f, 10.f);
+		}
+
+		if (timerDestroy <= 0)
+		{
+			objectManager.GetObjectByName("Fruit")->Destroy();
 		}
 
 		Input& input = Input::GetInstance();

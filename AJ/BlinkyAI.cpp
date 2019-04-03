@@ -26,8 +26,8 @@
 #include "PlayerScore.h"
 #include "PlayerController.h"
 
-#define IncreaseSpeedRate 5 // percent of PAC-MAN
-#define GhostBaseSpeed 75 // percent of PAC-MAN
+#define IncreaseSpeedRate 0.05f // percent of PAC-MAN
+#define GhostBaseSpeed 0.75f // percent of PAC-MAN
 
 //------------------------------------------------------------------------------
 
@@ -62,23 +62,26 @@ namespace Behaviors
 		// Call BaseAI's FixedUpdate
 		BaseAI::FixedUpdate(dt);
 
-		float pacmanBaseSpeed = player->GetComponent<PlayerController>()->GetSpeed(0);
+		if (mode == CHASE)
+		{
+			float pacmanBaseSpeed = player->GetComponent<PlayerController>()->GetSpeed(0);
 
-		// Check if 10 pellets are left
-		if (player->GetComponent<PlayerScore>()->GetDots() >= 230)
-		{
-			// Set isElroy to true
-			isElroy = true;
-			// Increase speed by another 5%
-			GetOwner()->GetComponent<GridMovement>()->SetSpeed((GhostBaseSpeed + 2 * IncreaseSpeedRate) * pacmanBaseSpeed);
-		}
-		// Check if 20 pellets are left
-		else if (player->GetComponent<PlayerScore>()->GetDots() >= 220)
-		{
-			// Set isElroy to true
-			isElroy = true;
-			// Increase speed by 5%
-			GetOwner()->GetComponent<GridMovement>()->SetSpeed((GhostBaseSpeed + IncreaseSpeedRate) * pacmanBaseSpeed);
+			// Check if 10 pellets are left
+			if (player->GetComponent<PlayerScore>()->GetDots() >= 230)
+			{
+				// Set isElroy to true
+				isElroy = true;
+				// Increase speed by another 5%
+				GetOwner()->GetComponent<GridMovement>()->SetSpeed((GhostBaseSpeed + 2 * IncreaseSpeedRate) * pacmanBaseSpeed);
+			}
+			// Check if 20 pellets are left
+			else if (player->GetComponent<PlayerScore>()->GetDots() >= 220)
+			{
+				// Set isElroy to true
+				isElroy = true;
+				// Increase speed by 5%
+				GetOwner()->GetComponent<GridMovement>()->SetSpeed((GhostBaseSpeed + IncreaseSpeedRate) * pacmanBaseSpeed);
+			}
 		}
 	}
 

@@ -190,6 +190,14 @@ namespace Levels
 	void Level1::Update(float dt)
 	{
 		UNREFERENCED_PARAMETER(dt);
+		
+		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
+
+		if (oldDots == 70 || oldDots == 170)
+		{
+			GameObject* fruit = new GameObject(*objectManager.GetArchetypeByName("Fruit"));
+			objectManager.AddObject(*fruit);
+		}
 
 		Input& input = Input::GetInstance();
 

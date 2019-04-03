@@ -35,9 +35,6 @@ namespace Behaviors
 		// Constructor.
 		PlayerScore();
 
-		// Initialize this component (happens at object creation).
-		void Initialize() override;
-
 		// Clone a component and return a pointer to the cloned component.
 		// Returns:
 		//   A pointer to a dynamically allocated clone of the component.

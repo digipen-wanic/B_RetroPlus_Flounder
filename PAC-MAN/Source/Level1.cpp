@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
 // File Name:	Level1.cpp
-// Author(s):	David Cohen (david.cohen)
+// Author(s):	David Cohen (david.cohen) & Tyler Miller (miller.t)
 // Project:		BetaFramework
 // Course:		WANIC VGP2 2018-2019
 //
@@ -40,6 +40,7 @@
 #include "GridMovement.h"
 #include "PlayerScore.h"
 #include "PlayerCollision.h"
+#include <SpriteText.h>
 
 // Levels
 #include "MainMenu.h"
@@ -59,7 +60,7 @@ namespace Levels
 	// Creates an instance of Level 1.
 	Level1::Level1() : Level("Level1"),
 		columnsMap(8), rowsMap(5), columnsEnergizer(2), rowsEnergizer(1), columnsPacMan(4), rowsPacMan(4), columnsGhost(5), rowsGhost(5),
-		startLives(3), lives(0), oldScore(0), oldDots(0),
+		startLives(3), lives(0), oldScore(0), oldDots(0), scoreText(nullptr), pacMan(nullptr),
 		soundManager(nullptr), energizerPositions(), dotPositions()
 	{
 	}
@@ -81,6 +82,7 @@ namespace Levels
 		GameObjectFactory& objectFactory = GameObjectFactory::GetInstance();
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
 		ResourceManager& resourceManager = GetSpace()->GetResourceManager();
+		
 
 		// Create a new quad mesh for the sprite.
 		resourceManager.GetMesh("Quad");
@@ -90,6 +92,10 @@ namespace Levels
 		resourceManager.GetMesh("Pinky", columnsGhost, rowsGhost);
 		resourceManager.GetMesh("Inky", columnsGhost, rowsGhost);
 		resourceManager.GetMesh("Clyde", columnsGhost, rowsGhost);
+
+		// Create a new quad mesh for the sprite.
+		resourceManager.GetSpriteSource("Code New Roman.png", 12, 8);
+		resourceManager.GetMesh("FontAtlas", 12, 8);
 
 		// Load the circle texture and sprite source.
 		resourceManager.GetSpriteSource("Dot.png");
@@ -108,6 +114,7 @@ namespace Levels
 		objectManager.AddArchetype(*objectFactory.CreateObject("Pinky", resourceManager.GetMesh("Pinky"), resourceManager.GetSpriteSource("Pinky.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Inky", resourceManager.GetMesh("Inky"), resourceManager.GetSpriteSource("Inky.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Clyde", resourceManager.GetMesh("Clyde"), resourceManager.GetSpriteSource("Clyde.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Score", resourceManager.GetMesh("FontAtlas"), resourceManager.GetSpriteSource("Code New Roman.png")));
 
 		// Load the tilemap.
 		dataMap = Tilemap::CreateTilemapFromFile("Assets/Levels/Level1.txt");
@@ -145,8 +152,13 @@ namespace Levels
 
 		SpriteTilemap* spriteTilemap = tilemap->GetComponent<SpriteTilemap>();
 
+		//Set sprite text
+		scoreText = new GameObject(*objectManager.GetArchetypeByName("Score"));
+		scoreText->GetComponent<SpriteText>()->SetText(std::to_string(oldScore).c_str());
+		objectManager.AddObject(*scoreText);
+
 		// PAC-MAN.
-		GameObject* pacMan = new GameObject(*objectManager.GetArchetypeByName("PAC-MAN"));
+		pacMan = new GameObject(*objectManager.GetArchetypeByName("PAC-MAN"));
 		pacMan->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, spriteTilemap);
 		pacMan->GetComponent<Behaviors::PlayerCollision>()->SetTilemap(dataMap, spriteTilemap);
 		pacMan->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 23.0f)));
@@ -222,6 +234,8 @@ namespace Levels
 	void Level1::Update(float dt)
 	{
 		UNREFERENCED_PARAMETER(dt);
+
+		scoreText->GetComponent<SpriteText>()->SetText(std::to_string(pacMan->GetComponent<Behaviors::PlayerScore>()->GetScore()).c_str());
 
 		Input& input = Input::GetInstance();
 

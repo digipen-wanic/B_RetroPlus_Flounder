@@ -29,6 +29,11 @@
 // Public Functions:
 //------------------------------------------------------------------------------
 
+// Default constructor.
+SpriteText::SpriteText() : text(), horizontalAlignment(Alignment::CENTER), verticalAlignment(Alignment::CENTER)
+{
+}
+
 // Create a new sprite text.
 SpriteText::SpriteText(const char* text) : text(text), horizontalAlignment(Alignment::CENTER), verticalAlignment(Alignment::CENTER)
 {

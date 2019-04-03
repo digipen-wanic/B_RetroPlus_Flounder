@@ -104,6 +104,9 @@ namespace Levels
 		SoundManager* soundManager;
 		std::vector<Vector2D> energizerPositions;
 		std::vector<Vector2D> dotPositions;
+
+		GameObject* scoreText;
+		GameObject* pacMan;
 	};
 }
 

@@ -44,7 +44,7 @@ Component* SpriteText::Clone() const
 void SpriteText::Draw()
 {
 	// If there is no map, there is nothing to draw.
-	if (text == nullptr || *text == '\0' || mesh == nullptr || spriteSource == nullptr)
+	if (text.c_str() == nullptr || *text.data() == '\0' || mesh == nullptr || spriteSource == nullptr)
 		return;
 
 	Vector2D translation = transform->GetTranslation();
@@ -98,17 +98,17 @@ void SpriteText::Draw()
 	Graphics::GetInstance().SetSpriteBlendColor(color);
 
 	int newlines = 0;
-	for (const char* iter = text; *iter; ++iter)
+	for (auto it = text.begin(); it != text.end(); ++it)
 	{
 		// When a newline is encountered, move the sprite back on the X axis and move down 1 character on the Y axis (accounts for scale & rotation).
-		if (*iter == '\n')
+		if (*it == '\n')
 		{
 			pos = 0.1875f * Vector2D(right.x * scale.x, right.y * scale.y) + (0.25f + (++newlines * 0.5f)) * Vector2D(down.x * scale.x, down.y * scale.y);
 			continue;
 		}
 
 		// Calculate the frame in the spritesheet.
-		int frame = *iter - 32;
+		int frame = *it - 32;
 
 		// Skip characters outside of the printable ASCII charset.
 		if (frame < 0 || frame >= static_cast<int>(spriteSource->GetNumCols() * spriteSource->GetNumRows()))
@@ -160,7 +160,7 @@ void SpriteText::SetText(const char* text_)
 }
 
 // Get the current string being desplayed.
-const char* SpriteText::GetText() const
+const std::string& SpriteText::GetText() const
 {
 	return text;
 }
@@ -201,10 +201,10 @@ float SpriteText::GetWidth() const
 	// The largest width found.
 	float maxWidth = width;
 
-	for (const char* iter = text; *iter; ++iter)
+	for (auto it = text.begin(); it != text.end(); ++it)
 	{
 		// When a newline is encountered, reset the current line's width to 0.
-		if (*iter == '\n')
+		if (*it == '\n')
 		{
 			width = 0.0f;
 			continue;
@@ -229,9 +229,9 @@ float SpriteText::GetHeight() const
 
 	// Count how many newlines are in the text.
 	int newlines = 0;
-	for (const char* iter = text; *iter; ++iter)
+	for (auto it = text.begin(); it != text.end(); ++it)
 	{
-		if (*iter == '\n')
+		if (*it == '\n')
 		{
 			++newlines;
 		}

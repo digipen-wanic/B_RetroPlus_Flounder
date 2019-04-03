@@ -70,7 +70,7 @@ public:
 	void SetText(const char* text);
 
 	// Get the current string being desplayed.
-	const char* GetText() const;
+	const std::string& GetText() const;
 
 	// Gets the current horizontal alignment.
 	Alignment GetHorizontalAlignment() const;
@@ -100,7 +100,7 @@ private:
 	//------------------------------------------------------------------------------
 
 	// The text this component should draw.
-	const char* text;
+	std::string text;
 
 	// Properties (save to/load from file)
 

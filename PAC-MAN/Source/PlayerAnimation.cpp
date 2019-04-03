@@ -42,7 +42,7 @@ namespace Behaviors
 
 	// Default constructor
 	PlayerAnimation::PlayerAnimation() : Component("PlayerAnimation"),
-		spawnStart(0), idleStart(0), moveStart(0), moveLength(0), deathStart(0), deathLength(0),
+		spawnStart(0), moveStart(0), moveLength(0), deathStart(0), deathLength(0),
 		currentState(StateSpawn), nextState(StateSpawn), transform(nullptr), animation(nullptr), playerController(nullptr), deathQueued(false)
 	{
 	}
@@ -73,7 +73,6 @@ namespace Behaviors
 	void PlayerAnimation::Deserialize(Parser& parser)
 	{
 		parser.ReadVariable("spawnStart", spawnStart);
-		parser.ReadVariable("idleStart", idleStart);
 		parser.ReadVariable("moveStart", moveStart);
 		parser.ReadVariable("moveLength", moveLength);
 		parser.ReadVariable("deathStart", deathStart);
@@ -86,7 +85,6 @@ namespace Behaviors
 	void PlayerAnimation::Serialize(Parser& parser) const
 	{
 		parser.WriteVariable("spawnStart", spawnStart);
-		parser.WriteVariable("idleStart", idleStart);
 		parser.WriteVariable("moveStart", moveStart);
 		parser.WriteVariable("moveLength", moveLength);
 		parser.WriteVariable("deathStart", deathStart);

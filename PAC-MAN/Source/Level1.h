@@ -84,13 +84,23 @@ namespace Levels
 		unsigned columnsMap;
 		unsigned rowsMap;
 
+		// Energizer
+		unsigned columnsEnergizer;
+		unsigned rowsEnergizer;
+
 		// PAC-MAN
 		unsigned columnsPacMan;
 		unsigned rowsPacMan;
 
+		// Ghosts
+		unsigned columnsGhost;
+		unsigned rowsGhost;
+
 		// Other variables.
 		unsigned startLives;
 		unsigned lives;
+		unsigned oldScore;
+		unsigned oldDots;
 		SoundManager* soundManager;
 		std::vector<Vector2D> energizerPositions;
 		std::vector<Vector2D> dotPositions;

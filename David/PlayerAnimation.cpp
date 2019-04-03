@@ -42,8 +42,8 @@ namespace Behaviors
 
 	// Default constructor
 	PlayerAnimation::PlayerAnimation() : Component("PlayerAnimation"),
-		spawnStart(0), idleStart(0), moveStart(0), moveLength(0), deathStart(0), deathLength(0),
-		currentState(StateSpawn), nextState(StateSpawn), animation(nullptr), playerController(nullptr), deathQueued(false)
+		spawnStart(0), moveStart(0), moveLength(0), deathStart(0), deathLength(0),
+		currentState(StateSpawn), nextState(StateSpawn), transform(nullptr), animation(nullptr), playerController(nullptr), deathQueued(false)
 	{
 	}
 
@@ -59,6 +59,7 @@ namespace Behaviors
 	void PlayerAnimation::Initialize()
 	{
 		// Store the required components for ease of access.
+		transform = GetOwner()->GetComponent<Transform>();
 		animation = GetOwner()->GetComponent<Animation>();
 		playerController = GetOwner()->GetComponent<PlayerController>();
 
@@ -72,7 +73,6 @@ namespace Behaviors
 	void PlayerAnimation::Deserialize(Parser& parser)
 	{
 		parser.ReadVariable("spawnStart", spawnStart);
-		parser.ReadVariable("idleStart", idleStart);
 		parser.ReadVariable("moveStart", moveStart);
 		parser.ReadVariable("moveLength", moveLength);
 		parser.ReadVariable("deathStart", deathStart);
@@ -85,7 +85,6 @@ namespace Behaviors
 	void PlayerAnimation::Serialize(Parser& parser) const
 	{
 		parser.WriteVariable("spawnStart", spawnStart);
-		parser.WriteVariable("idleStart", idleStart);
 		parser.WriteVariable("moveStart", moveStart);
 		parser.WriteVariable("moveLength", moveLength);
 		parser.WriteVariable("deathStart", deathStart);
@@ -104,6 +103,29 @@ namespace Behaviors
 
 		// Update the current state if necessary.
 		ChangeCurrentState();
+
+		if (currentState == State::StateMove || currentState == State::StateIdle)
+		{
+			switch (playerController->direction)
+			{
+			case GridMovement::Direction::UP:
+				transform->SetRotation(M_PI_F / 2.0f);
+				break;
+			case GridMovement::Direction::LEFT:
+				transform->SetRotation(M_PI_F);
+				break;
+			case GridMovement::Direction::DOWN:
+				transform->SetRotation(M_PI_F * 1.5f);
+				break;
+			case GridMovement::Direction::RIGHT:
+				transform->SetRotation(0.0f);
+				break;
+			}
+		}
+		else
+		{
+			transform->SetRotation(0.0f);
+		}
 	}
 
 	// Called when the player dies.
@@ -126,8 +148,19 @@ namespace Behaviors
 	void PlayerAnimation::ChooseNextState()
 	{
 		// If the spawn animation is still playing, don't do anything.
-		if (currentState == State::StateSpawn && !animation->IsDone())
-			return;
+		if (currentState == State::StateSpawn)
+		{
+			if (animation->IsDone())
+			{
+				playerController->SetFrozen(false);
+			}
+			else
+			{
+				playerController->SetFrozen(true);
+				playerController->direction = GridMovement::Direction::LEFT;
+				return;
+			}
+		}
 
 		// If the death animation should be playing, play it.
 		if (deathQueued)
@@ -173,15 +206,15 @@ namespace Behaviors
 				break;
 				// If the state is changed to the idle state, begin playing the idle animation.
 			case State::StateIdle:
-				animation->Play(idleStart, 1, 0.0f, true);
+				animation->Play(animation->GetCurrentFrame(), 1, 0.0f, true);
 				break;
 				// If the state is changed to the moving state, begin playing the moving animation.
 			case State::StateMove:
-				animation->Play(moveStart, moveLength, 0.25f, true);
+				animation->Play(moveStart, moveLength, 0.05f, true);
 				break;
 				// If the state is changed to the dying state, begin playing the dying animation.
 			case State::StateDeath:
-				animation->Play(deathStart, deathLength, 0.25f, false);
+				animation->Play(deathStart, deathLength, 0.1f, false);
 				break;
 			}
 		}

@@ -25,6 +25,7 @@
 
 namespace Behaviors
 {
+	class GhostAnimation;
 
 	class BaseAI : public GridMovement
 	{
@@ -64,6 +65,12 @@ namespace Behaviors
 
 		// Returns whether the ghost is in the frightened state.
 		bool IsFrightened() const;
+
+		// Marks the enemy as dead.
+		void SetDead();
+
+		// Returns whether the ghost is dead.
+		bool IsDead() const;
 
 		// Adds an overridden direction for a specific tile.
 		// Params:
@@ -137,13 +144,27 @@ namespace Behaviors
 		};
 
 		//------------------------------------------------------------------------------
+		// Private Functions:
+		//------------------------------------------------------------------------------
+
+		// Handles pathfinding and setting direction.
+		// Params:
+		//   adjacentTiles = An array of adjacent tiles.
+		//   emptyCount = How many empty tiles were found.
+		void Pathfind(AdjacentTile adjacentTiles[4], size_t emptyCount);
+
+		//------------------------------------------------------------------------------
 		// Private Variables:
 		//------------------------------------------------------------------------------
+
+		// Components
+		GhostAnimation* ghostAnimation;
 
 		// Other variables
 		bool hasMoved;
 		unsigned dotsLeftToLeave;
 		bool forceReverse;
+		bool isDead;
 		unsigned wave;
 		std::vector<OverriddenTile> overriddenTiles;
 		std::vector<OverriddenTile> overriddenExclusionTiles;
@@ -163,6 +184,8 @@ namespace Behaviors
 		// Returns:
 		//   A reference to the input stream.
 		friend std::istream& operator>>(std::istream& is, OverriddenTile& overriddenTile);
+
+		friend class GhostAnimation;
 	};
 }
 

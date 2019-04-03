@@ -56,16 +56,28 @@ namespace Behaviors
 		score += increaseAmount;
 	}
 
+	// Sets the score.
+	void PlayerScore::SetScore(unsigned score_)
+	{
+		score = score_;
+	}
+
 	// Gets the score.
-	unsigned int PlayerScore::GetScore() const
+	unsigned PlayerScore::GetScore() const
 	{
 		return score;
 	}
 
-	// Increases dots by the given amount.
+	// Increases dots by 1.
 	void PlayerScore::IncreaseDots()
 	{
 		++dots;
+	}
+
+	// Sets the number of dots.
+	void PlayerScore::SetDots(unsigned dots_)
+	{
+		dots = dots_;
 	}
 
 	// Gets the number of dots.

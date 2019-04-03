@@ -113,6 +113,7 @@ xcopy fmod\lib\fmodstudio64.dll "$(OutDir)" /Y</Command>
     <ClCompile Include="Source\ClydeAI.cpp" />
     <ClCompile Include="Source\ColorChange.cpp" />
     <ClCompile Include="Source\Energizer.cpp" />
+    <ClCompile Include="Source\GhostAnimation.cpp" />
     <ClCompile Include="Source\GridMovement.cpp" />
     <ClCompile Include="Source\InkyAI.cpp" />
     <ClCompile Include="Source\MainMenu.cpp" />
@@ -143,6 +144,7 @@ xcopy fmod\lib\fmodstudio64.dll "$(OutDir)" /Y</Command>
     <ClInclude Include="Source\ClydeAI.h" />
     <ClInclude Include="Source\ColorChange.h" />
     <ClInclude Include="Source\Energizer.h" />
+    <ClInclude Include="Source\GhostAnimation.h" />
     <ClInclude Include="Source\GridMovement.h" />
     <ClInclude Include="Source\InkyAI.h" />
     <ClInclude Include="Source\MainMenu.h" />

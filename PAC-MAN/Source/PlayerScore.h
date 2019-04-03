@@ -48,11 +48,17 @@ namespace Behaviors
 		//   amount = The amount to increase the score by.
 		void IncreaseScore(unsigned amount);
 
-		// Gets the score.
-		unsigned int GetScore() const;
+		// Sets the score.
+		void SetScore(unsigned score);
 
-		// Increases dots by the given amount.
+		// Gets the score.
+		unsigned GetScore() const;
+
+		// Increases dots by 1.
 		void IncreaseDots();
+
+		// Sets the number of dots.
+		void SetDots(unsigned dots);
 
 		// Gets the number of dots.
 		unsigned GetDots() const;
@@ -63,7 +69,7 @@ namespace Behaviors
 		//------------------------------------------------------------------------------
 
 		// Other variables
-		unsigned int score;
-		unsigned int dots;
+		unsigned score;
+		unsigned dots;
 	};
 }

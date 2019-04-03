@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	PlayerAnimation.h
+// File Name:	GhostAnimation.h
 // Author(s):	David Cohen (david.cohen)
 // Project:		PAC-MAN
 // Course:		WANIC VGP2 2018-2019
@@ -34,9 +34,9 @@ class Animation;
 
 namespace Behaviors
 {
-	class PlayerController;
+	class BaseAI;
 
-	class PlayerAnimation : public Component
+	class GhostAnimation : public Component
 	{
 	public:
 		//------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ namespace Behaviors
 		//------------------------------------------------------------------------------
 
 		// Default constructor
-		PlayerAnimation();
+		GhostAnimation();
 
 		// Clone a component and return a pointer to the cloned component.
 		// Returns:
@@ -69,12 +69,6 @@ namespace Behaviors
 		//   dt = The (fixed) change in time since the last step.
 		void Update(float dt) override;
 
-		// Called when the player dies.
-		void OnDeath();
-
-		// Returns whether the death animation is currently playing.
-		bool IsDying() const;
-
 	private:
 		//------------------------------------------------------------------------------
 		// Private Functions:
@@ -93,9 +87,10 @@ namespace Behaviors
 		enum State
 		{
 			StateSpawn = 0,
-			StateIdle,
-			StateMove,
-			StateDeath,
+			StateMoveRight,
+			StateMoveLeft,
+			StateMoveDown,
+			StateMoveUp,
 
 			STATE_MAX
 		};
@@ -105,11 +100,11 @@ namespace Behaviors
 		//------------------------------------------------------------------------------
 
 		// Animation variables
-		unsigned spawnStart;
-		unsigned moveStart;
+		unsigned moveRightStart;
+		unsigned moveLeftStart;
+		unsigned moveDownStart;
+		unsigned moveUpStart;
 		unsigned moveLength;
-		unsigned deathStart;
-		unsigned deathLength;
 
 		// Animation state
 		State currentState;
@@ -118,10 +113,12 @@ namespace Behaviors
 		// Components
 		Transform* transform;
 		Animation* animation;
-		PlayerController* playerController;
+		BaseAI* baseAI;
 
 		// Other variables.
 		bool deathQueued;
+
+		friend class BaseAI;
 	};
 }
 

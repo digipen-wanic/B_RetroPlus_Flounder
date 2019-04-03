@@ -91,6 +91,9 @@
     <ClCompile Include="Source\ClydeAI.cpp">
       <Filter>Game\Behaviors\Ghosts</Filter>
     </ClCompile>
+    <ClCompile Include="Source\GhostAnimation.cpp">
+      <Filter>Game\Behaviors\Ghosts</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\stdafx.h">
@@ -163,6 +166,9 @@
       <Filter>Game\Behaviors</Filter>
     </ClInclude>
     <ClInclude Include="Source\ClydeAI.h">
+      <Filter>Game\Behaviors\Ghosts</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GhostAnimation.h">
       <Filter>Game\Behaviors\Ghosts</Filter>
     </ClInclude>
   </ItemGroup>

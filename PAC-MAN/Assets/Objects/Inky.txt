@@ -1,11 +1,11 @@
 Inky
 {
-  numComponents : 3
+  numComponents : 5
   Transform
   {
     translation : { 0, 0 }
     rotation : 0
-    scale : { 16, 16 }
+    scale : { 40, 40 }
   }
   Sprite
   {
@@ -34,5 +34,16 @@ Inky
         { { 12, 23 }, 0 }
         { { 15, 23 }, 0 }
     }
+  }
+  Animation
+  {
+  }
+  Behaviors::GhostAnimation
+  {
+    moveRightStart : 0
+    moveLeftStart : 3
+    moveDownStart : 6
+    moveUpStart : 9
+    moveLength : 2
   }
 }

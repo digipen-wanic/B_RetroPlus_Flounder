@@ -30,13 +30,15 @@
 #include <Mesh.h>
 #include <GameObjectFactory.h>
 #include <Tilemap.h>
+#include <MeshHelper.h>
 
 // Components
-#include <MeshHelper.h>
 #include <Transform.h>
 #include <Physics.h>
 #include <SpriteTilemap.h>
+#include <Animation.h>
 #include "GridMovement.h"
+#include "PlayerScore.h"
 #include "PlayerCollision.h"
 
 // Levels
@@ -55,7 +57,10 @@ namespace Levels
 	//------------------------------------------------------------------------------
 
 	// Creates an instance of Level 1.
-	Level1::Level1() : Level("Level1"), columnsMap(8), rowsMap(5), columnsPacMan(4), rowsPacMan(4), startLives(3), lives(0), soundManager(nullptr), energizerPositions(), dotPositions()
+	Level1::Level1() : Level("Level1"),
+		columnsMap(8), rowsMap(5), columnsEnergizer(2), rowsEnergizer(1), columnsPacMan(4), rowsPacMan(4), columnsGhost(3), rowsGhost(4),
+		startLives(3), lives(0), oldScore(0), oldDots(0),
+		soundManager(nullptr), energizerPositions(), dotPositions()
 	{
 	}
 
@@ -72,19 +77,30 @@ namespace Levels
 
 		// Create a new quad mesh for the sprite.
 		resourceManager.GetMesh("Quad");
+		resourceManager.GetMesh("Energizer", columnsEnergizer, rowsEnergizer);
 		resourceManager.GetMesh("PacMan", columnsPacMan, rowsPacMan);
+		resourceManager.GetMesh("Blinky", columnsGhost, rowsGhost);
+		resourceManager.GetMesh("Pinky", columnsGhost, rowsGhost);
+		resourceManager.GetMesh("Inky", columnsGhost, rowsGhost);
+		resourceManager.GetMesh("Clyde", columnsGhost, rowsGhost);
 
 		// Load the circle texture and sprite source.
-		resourceManager.GetSpriteSource("Circle.png");
+		resourceManager.GetSpriteSource("Dot.png");
+		resourceManager.GetSpriteSource("Energizer.png", columnsEnergizer, rowsEnergizer);
 		resourceManager.GetSpriteSource("PacMan.png", columnsPacMan, rowsPacMan);
+		resourceManager.GetSpriteSource("Blinky.png", columnsGhost, rowsGhost);
+		resourceManager.GetSpriteSource("Pinky.png", columnsGhost, rowsGhost);
+		resourceManager.GetSpriteSource("Inky.png", columnsGhost, rowsGhost);
+		resourceManager.GetSpriteSource("Clyde.png", columnsGhost, rowsGhost);
 
 		// Load the archetypes from their files.
-		objectManager.AddArchetype(*objectFactory.CreateObject("Dot", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Energizer", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Dot", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Dot.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Energizer", resourceManager.GetMesh("Energizer"), resourceManager.GetSpriteSource("Energizer.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("PAC-MAN", resourceManager.GetMesh("PacMan"), resourceManager.GetSpriteSource("PacMan.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Blinky", resourceManager.GetMesh("Quad")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Pinky", resourceManager.GetMesh("Quad")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Inky", resourceManager.GetMesh("Quad")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Blinky", resourceManager.GetMesh("Blinky"), resourceManager.GetSpriteSource("Blinky.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Pinky", resourceManager.GetMesh("Pinky"), resourceManager.GetSpriteSource("Pinky.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Inky", resourceManager.GetMesh("Inky"), resourceManager.GetSpriteSource("Inky.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Clyde", resourceManager.GetMesh("Clyde"), resourceManager.GetSpriteSource("Clyde.png")));
 
 		// Load the tilemap.
 		dataMap = Tilemap::CreateTilemapFromFile("Assets/Levels/Level1.txt");
@@ -145,16 +161,22 @@ namespace Levels
 		inky->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(11.5f, 14.0f)));
 		objectManager.AddObject(*inky);
 
-		//GameObject* clyde = new GameObject(*objectManager.GetArchetypeByName("Clyde"));
-		//clyde->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-		//clyde->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(15.5f, 14.0f)));
-		//objectManager.AddObject(*clyde);
+		GameObject* clyde = new GameObject(*objectManager.GetArchetypeByName("Clyde"));
+		clyde->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
+		clyde->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(15.5f, 14.0f)));
+		objectManager.AddObject(*clyde);
 
 		// If there are no energizers or dots, place them.
 		if (lives == 0)
 		{
 			lives = startLives;
 			PopulateDots();
+		}
+		else
+		{
+			Behaviors::PlayerScore* playerScore = pacMan->GetComponent<Behaviors::PlayerScore>();
+			playerScore->SetScore(oldScore);
+			playerScore->SetDots(oldDots);
 		}
 
 		for (auto it = energizerPositions.begin(); it != energizerPositions.end(); ++it)
@@ -163,6 +185,7 @@ namespace Levels
 			GameObject* energizerPellet = new GameObject(*objectManager.GetArchetypeByName("Energizer"));
 			energizerPellet->GetComponent<Transform>()->SetTranslation(*it);
 			objectManager.AddObject(*energizerPellet);
+			energizerPellet->GetComponent<Animation>()->Play(0, 2, 0.125f, true);
 		}
 
 		for (auto it = dotPositions.begin(); it != dotPositions.end(); ++it)
@@ -222,6 +245,10 @@ namespace Levels
 		{
 			dotPositions.push_back((*it)->GetComponent<Transform>()->GetTranslation());
 		}
+
+		Behaviors::PlayerScore* playerScore = objectManager.GetObjectByName("PAC-MAN")->GetComponent<Behaviors::PlayerScore>();
+		oldScore = playerScore->GetScore();
+		oldDots = playerScore->GetDots();
 	}
 
 	// Unload the resources associated with Level 1.

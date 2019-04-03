@@ -41,7 +41,7 @@ namespace Behaviors
 	//------------------------------------------------------------------------------
 
 	// Default constructor.
-	ClydeAI::ClydeAI() : BaseAI(0)
+	ClydeAI::ClydeAI() : BaseAI(80)
 	{
 	}
 
@@ -69,10 +69,10 @@ namespace Behaviors
 		// Get Player Position
 		Vector2D playerPos = GetSpriteTilemap()->WorldToTile(player->GetComponent<Transform>()->GetTranslation());
 		// Get distance squared between Clyde and PAC-MAN
-		float disSqrdToPacman = GetNewTile().DistanceSquared(playerPos);
+		float distSqToPacman = GetNewTile().DistanceSquared(playerPos);
 
 		// If Clyde is further than 8 tiles from PAC-MAN 
-		if (disSqrdToPacman >= MaxDistanceSqrd)
+		if (distSqToPacman >= MaxDistanceSqrd)
 			target = playerPos;
 		else
 			target = scatterTarget;

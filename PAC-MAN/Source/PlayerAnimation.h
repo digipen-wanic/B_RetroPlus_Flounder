@@ -106,7 +106,6 @@ namespace Behaviors
 
 		// Animation variables
 		unsigned spawnStart;
-		unsigned idleStart;
 		unsigned moveStart;
 		unsigned moveLength;
 		unsigned deathStart;

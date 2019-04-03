@@ -30,6 +30,7 @@
 #include <Transform.h>
 #include <SpriteTilemap.h>
 #include "PlayerScore.h"
+#include "GhostAnimation.h"
 
 //------------------------------------------------------------------------------
 
@@ -46,7 +47,8 @@ namespace Behaviors
 	// Constructor
 	// Params:
 	//   dotsLeftToLeave = How many dots the player must eat before the ghost moves.
-	BaseAI::BaseAI(unsigned dotsLeftToLeave) : player(nullptr), target(), scatterTarget(), hasMoved(false), dotsLeftToLeave(dotsLeftToLeave), forceReverse(false), isDead(false), mode(CHASE), wave(1),
+	BaseAI::BaseAI(unsigned dotsLeftToLeave) : player(nullptr), target(), scatterTarget(), mode(CHASE), ghostAnimation(nullptr),
+		hasMoved(false), dotsLeftToLeave(dotsLeftToLeave), forceReverse(false), isDead(false), wave(1),
 		overriddenTiles(), overriddenExclusionTiles()
 	{
 	}
@@ -57,6 +59,8 @@ namespace Behaviors
 		GridMovement::Initialize();
 		SetFrozen(true);
 
+		ghostAnimation = GetOwner()->GetComponent<GhostAnimation>();
+
 		player = GetOwner()->GetSpace()->GetObjectManager().GetObjectByName("PAC-MAN");
 	}
 
@@ -65,7 +69,7 @@ namespace Behaviors
 	//	 dt = A fixed change in time, usually 1/60th of a second.
 	void BaseAI::FixedUpdate(float dt)
 	{
-		if (!hasMoved)
+		if (!hasMoved && ghostAnimation->currentState != GhostAnimation::State::StateSpawn)
 		{
 			if (player->GetComponent<PlayerScore>()->GetDots() >= dotsLeftToLeave)
 			{

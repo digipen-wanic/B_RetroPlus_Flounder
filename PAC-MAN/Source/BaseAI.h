@@ -25,6 +25,7 @@
 
 namespace Behaviors
 {
+	class GhostAnimation;
 
 	class BaseAI : public GridMovement
 	{
@@ -156,6 +157,9 @@ namespace Behaviors
 		// Private Variables:
 		//------------------------------------------------------------------------------
 
+		// Components
+		GhostAnimation* ghostAnimation;
+
 		// Other variables
 		bool hasMoved;
 		unsigned dotsLeftToLeave;
@@ -180,6 +184,8 @@ namespace Behaviors
 		// Returns:
 		//   A reference to the input stream.
 		friend std::istream& operator>>(std::istream& is, OverriddenTile& overriddenTile);
+
+		friend class GhostAnimation;
 	};
 }
 

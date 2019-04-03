@@ -36,7 +36,6 @@ PAC-MAN
   Behaviors::PlayerAnimation
   {
     spawnStart : 11
-    idleStart : 11
     moveStart : 11
     moveLength : 4
     deathStart : 0

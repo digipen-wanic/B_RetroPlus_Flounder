@@ -215,14 +215,14 @@ namespace Behaviors
 	}
 
 	// Gets a vector in the direction this game object is facing.
-		// This function calculates the vector in such a way that it
-		// reproduces a bug from the original game. When the direction
-		// is UP, the vector returned may be skewed to the left with a
-		// scalar greater than one.
-		// Params:
-		//   scalar = The magnitude of the vector returned.
-		// Returns:
-		//   The vector in the direction this game object is facing, multiplied by the scalar.
+	// This function calculates the vector in such a way that it
+	// reproduces a bug from the original game. When the direction
+	// is UP, the vector returned may be skewed to the left with a
+	// scalar greater than one.
+	// Params:
+	//   scalar = The magnitude of the vector returned.
+	// Returns:
+	//   The vector in the direction this game object is facing, multiplied by the scalar.
 	Vector2D GridMovement::GetDirectionVector(int scalar) const
 	{
 		// This is done in a weird way, the same way the original game did it.

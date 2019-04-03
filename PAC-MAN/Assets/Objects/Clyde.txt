@@ -1,4 +1,4 @@
-Pinky
+Clyde
 {
   numComponents : 5
   Transform
@@ -12,17 +12,19 @@ Pinky
     frameIndex : 0
     color : { 1 , 1 , 1 , 1 }
   }
-  Behaviors::PinkyAI
+  Behaviors::ClydeAI
   {
     speed : 8.25
-    scatterTarget : { 2, -2 }
-    overriddenTilesCount : 4
+    scatterTarget : { 27, 32 }
+    overriddenTilesCount : 6
     overriddenTiles : 
     {
       { { 13, 13 }, 0 }
       { { 14, 13 }, 0 }
       { { 13, 14 }, 0 }
       { { 14, 14 }, 0 }
+      { { 15, 14 }, 1 }
+      { { 16, 14 }, 1 }
     }
     overriddenExclusionTilesCount : 4
     overriddenExclusionTiles : 

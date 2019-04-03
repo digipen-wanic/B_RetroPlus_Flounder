@@ -46,6 +46,7 @@
 #include "InkyAI.h"
 #include "PinkyAI.h"
 #include "ClydeAI.h"
+#include "GhostAnimation.h"
 
 //------------------------------------------------------------------------------
 
@@ -85,7 +86,8 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prevInstance, _In
 	objectFactory.RegisterComponent<Behaviors::BlinkyAI>();
 	objectFactory.RegisterComponent<Behaviors::InkyAI>();
 	objectFactory.RegisterComponent<Behaviors::PinkyAI>();
-	//objectFactory.RegisterComponent<Behaviors::ClydeAI>();
+	objectFactory.RegisterComponent<Behaviors::ClydeAI>();
+	objectFactory.RegisterComponent<Behaviors::GhostAnimation>();
 
 	// Create a new space called "GameSpace"
 	Space* space = new Space("GameSpace");

@@ -17,7 +17,11 @@
 
 #include "Component.h"
 
+//------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------
+// Public Structures:
+//------------------------------------------------------------------------------
 
 namespace Behaviors
 {
@@ -25,40 +29,44 @@ namespace Behaviors
 	{
 	public:
 		//------------------------------------------------------------------------------
-		// Public Structures:
+		// Public Functions:
 		//------------------------------------------------------------------------------
 
-		//constructor
+		// Constructor.
 		PlayerScore();
-
-		// Initialize this component (happens at object creation).
-		void Initialize() override;
 
 		// Clone a component and return a pointer to the cloned component.
 		// Returns:
 		//   A pointer to a dynamically allocated clone of the component.
 		Component* Clone() const override;
 
-		//Increases Score by given amount
-		//Params:
-		//unsigned int that increases score
-		void IncreaseScore(unsigned increaseAmount);
+		// Increases score by the given amount.
+		// Params:
+		//   amount = The amount to increase the score by.
+		void IncreaseScore(unsigned amount);
 
-		//Gets score
-		//Return:
-		//Unsigned int which is score
-		unsigned int GetScore(void);
+		// Sets the score.
+		void SetScore(unsigned score);
 
-		//Gets amount of dots
-		//Return:
-		//unsigned int that is the amount of dots left
-		unsigned GetAmountDots(void);
+		// Gets the score.
+		unsigned GetScore() const;
+
+		// Increases dots by 1.
+		void IncreaseDots();
+
+		// Sets the number of dots.
+		void SetDots(unsigned dots);
+
+		// Gets the number of dots.
+		unsigned GetDots() const;
 
 	private:
 		//------------------------------------------------------------------------------
 		// Private variables:
 		//------------------------------------------------------------------------------
-		unsigned int score;
-		unsigned int dots;
+
+		// Other variables
+		unsigned score;
+		unsigned dots;
 	};
 }

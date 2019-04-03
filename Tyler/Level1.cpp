@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
 // File Name:	Level1.cpp
-// Author(s):	David Cohen (david.cohen)
+// Author(s):	David Cohen (david.cohen) & Tyler Miller (miller.t)
 // Project:		BetaFramework
 // Course:		WANIC VGP2 2018-2019
 //
@@ -30,14 +30,17 @@
 #include <Mesh.h>
 #include <GameObjectFactory.h>
 #include <Tilemap.h>
+#include <MeshHelper.h>
 
 // Components
-#include <MeshHelper.h>
 #include <Transform.h>
 #include <Physics.h>
 #include <SpriteTilemap.h>
+#include <Animation.h>
 #include "GridMovement.h"
+#include "PlayerScore.h"
 #include "PlayerCollision.h"
+#include <SpriteText.h>
 
 // Levels
 #include "MainMenu.h"
@@ -55,7 +58,10 @@ namespace Levels
 	//------------------------------------------------------------------------------
 
 	// Creates an instance of Level 1.
-	Level1::Level1() : Level("Level1"), columnsMap(8), rowsMap(5), columnsPacMan(4), rowsPacMan(4), startLives(3), lives(0), soundManager(nullptr), energizerPositions(), dotPositions()
+	Level1::Level1() : Level("Level1"),
+		columnsMap(8), rowsMap(5), columnsEnergizer(2), rowsEnergizer(1), columnsPacMan(4), rowsPacMan(4), columnsGhost(3), rowsGhost(4),
+		startLives(3), lives(0), oldScore(0), oldDots(0), scoreText(nullptr), pacMan(nullptr),
+		soundManager(nullptr), energizerPositions(), dotPositions()
 	{
 	}
 
@@ -64,33 +70,51 @@ namespace Levels
 	{
 		// Load sound effects.
 		soundManager = Engine::GetInstance().GetModule<SoundManager>();
-		soundManager->AddEffect("deathofpacfinal.wav");
-		soundManager->AddEffect("eatDot1.wav");
-		soundManager->AddEffect("eatDot2.wav");
-		soundManager->AddEffect("eatGhost.wav");
-		soundManager->AddEffect("ghostMovementFinal.wav");
-		soundManager->AddEffect("soundIntroMusic.wav");
-		soundManager->AddEffect("soundExtraLife.wav");
+		soundManager->AddEffect("PacManDeath.wav");
+		soundManager->AddEffect("EatDot1.wav");
+		soundManager->AddEffect("EatDot2.wav");
+		soundManager->AddEffect("EatGhost.wav");
+		soundManager->AddEffect("GhostMove.wav");
+		soundManager->AddEffect("MusicIntro.wav");
+		soundManager->AddEffect("ExtraLife.wav");
+		soundManager->AddMusic("GhostDeath.wav");
 
 		GameObjectFactory& objectFactory = GameObjectFactory::GetInstance();
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
 		ResourceManager& resourceManager = GetSpace()->GetResourceManager();
+		
 
 		// Create a new quad mesh for the sprite.
 		resourceManager.GetMesh("Quad");
+		resourceManager.GetMesh("Energizer", columnsEnergizer, rowsEnergizer);
 		resourceManager.GetMesh("PacMan", columnsPacMan, rowsPacMan);
+		resourceManager.GetMesh("Blinky", columnsGhost, rowsGhost);
+		resourceManager.GetMesh("Pinky", columnsGhost, rowsGhost);
+		resourceManager.GetMesh("Inky", columnsGhost, rowsGhost);
+		resourceManager.GetMesh("Clyde", columnsGhost, rowsGhost);
+
+		// Create a new quad mesh for the sprite.
+		resourceManager.GetSpriteSource("Code New Roman.png", 12, 8);
+		resourceManager.GetMesh("FontAtlas", 12, 8);
 
 		// Load the circle texture and sprite source.
-		resourceManager.GetSpriteSource("Circle.png");
-		resourceManager.GetSpriteSource("PacManSheetAnimations_02.png", columnsPacMan, rowsPacMan);
+		resourceManager.GetSpriteSource("Dot.png");
+		resourceManager.GetSpriteSource("Energizer.png", columnsEnergizer, rowsEnergizer);
+		resourceManager.GetSpriteSource("PacMan.png", columnsPacMan, rowsPacMan);
+		resourceManager.GetSpriteSource("Blinky.png", columnsGhost, rowsGhost);
+		resourceManager.GetSpriteSource("Pinky.png", columnsGhost, rowsGhost);
+		resourceManager.GetSpriteSource("Inky.png", columnsGhost, rowsGhost);
+		resourceManager.GetSpriteSource("Clyde.png", columnsGhost, rowsGhost);
 
 		// Load the archetypes from their files.
-		objectManager.AddArchetype(*objectFactory.CreateObject("Dot", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Energizer", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Circle.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("PAC-MAN", resourceManager.GetMesh("PacMan"), resourceManager.GetSpriteSource("PacManSheetAnimations_02.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Blinky", resourceManager.GetMesh("Quad")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Pinky", resourceManager.GetMesh("Quad")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Inky", resourceManager.GetMesh("Quad")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Dot", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Dot.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Energizer", resourceManager.GetMesh("Energizer"), resourceManager.GetSpriteSource("Energizer.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("PAC-MAN", resourceManager.GetMesh("PacMan"), resourceManager.GetSpriteSource("PacMan.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Blinky", resourceManager.GetMesh("Blinky"), resourceManager.GetSpriteSource("Blinky.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Pinky", resourceManager.GetMesh("Pinky"), resourceManager.GetSpriteSource("Pinky.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Inky", resourceManager.GetMesh("Inky"), resourceManager.GetSpriteSource("Inky.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Clyde", resourceManager.GetMesh("Clyde"), resourceManager.GetSpriteSource("Clyde.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Score", resourceManager.GetMesh("FontAtlas"), resourceManager.GetSpriteSource("Code New Roman.png")));
 
 		// Load the tilemap.
 		dataMap = Tilemap::CreateTilemapFromFile("Assets/Levels/Level1.txt");
@@ -120,9 +144,7 @@ namespace Levels
 	{
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
 
-		soundManager->PlaySound("soundIntroMusic.wav");
-		
-		// Add various physics objects to the scene.
+		soundManager->PlaySound("MusicIntro.wav");
 
 		// Tilemap.
 		GameObject* tilemap = new GameObject(*objectManager.GetArchetypeByName("Tilemap"));
@@ -130,12 +152,48 @@ namespace Levels
 
 		SpriteTilemap* spriteTilemap = tilemap->GetComponent<SpriteTilemap>();
 
+		//Set sprite text
+		scoreText = new GameObject(*objectManager.GetArchetypeByName("Score"));
+		scoreText->GetComponent<SpriteText>()->SetText(std::to_string(oldScore).c_str());
+		objectManager.AddObject(*scoreText);
+
 		// PAC-MAN.
-		GameObject* pacMan = new GameObject(*objectManager.GetArchetypeByName("PAC-MAN"));
+		pacMan = new GameObject(*objectManager.GetArchetypeByName("PAC-MAN"));
 		pacMan->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, spriteTilemap);
 		pacMan->GetComponent<Behaviors::PlayerCollision>()->SetTilemap(dataMap, spriteTilemap);
 		pacMan->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 23.0f)));
-		objectManager.AddObject(*pacMan);
+
+		// If there are no energizers or dots, place them.
+		if (lives == 0)
+		{
+			lives = startLives;
+			PopulateDots();
+		}
+		else
+		{
+			Behaviors::PlayerScore* playerScore = pacMan->GetComponent<Behaviors::PlayerScore>();
+			playerScore->SetScore(oldScore);
+			playerScore->SetDots(oldDots);
+		}
+
+		// Add all energizers & dots.
+
+		for (auto it = energizerPositions.begin(); it != energizerPositions.end(); ++it)
+		{
+			// Create energizer at position.
+			GameObject* energizerPellet = new GameObject(*objectManager.GetArchetypeByName("Energizer"));
+			energizerPellet->GetComponent<Transform>()->SetTranslation(*it);
+			objectManager.AddObject(*energizerPellet);
+			energizerPellet->GetComponent<Animation>()->Play(0, 2, 0.125f, true);
+		}
+
+		for (auto it = dotPositions.begin(); it != dotPositions.end(); ++it)
+		{
+			// Create dot at position.
+			GameObject* Pellet = new GameObject(*objectManager.GetArchetypeByName("Dot"));
+			Pellet->GetComponent<Transform>()->SetTranslation(*it);
+			objectManager.AddObject(*Pellet);
+		}
 
 		// Ghosts.
 		GameObject* blinky = new GameObject(*objectManager.GetArchetypeByName("Blinky"));
@@ -153,33 +211,19 @@ namespace Levels
 		inky->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(11.5f, 14.0f)));
 		objectManager.AddObject(*inky);
 
-		//GameObject* clyde = new GameObject(*objectManager.GetArchetypeByName("Clyde"));
-		//clyde->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-		//clyde->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(15.5f, 14.0f)));
-		//objectManager.AddObject(*clyde);
+		GameObject* clyde = new GameObject(*objectManager.GetArchetypeByName("Clyde"));
+		clyde->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
+		clyde->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(15.5f, 14.0f)));
+		objectManager.AddObject(*clyde);
 
-		// If there are no energizers or dots, place them.
-		if (lives == 0)
-		{
-			lives = startLives;
-			PopulateDots();
-		}
+		// Add PAC-MAN here so it draws over everything else.
+		objectManager.AddObject(*pacMan);
 
-		for (auto it = energizerPositions.begin(); it != energizerPositions.end(); ++it)
-		{
-			// Create energizer at position.
-			GameObject* energizerPellet = new GameObject(*objectManager.GetArchetypeByName("Energizer"));
-			energizerPellet->GetComponent<Transform>()->SetTranslation(*it);
-			objectManager.AddObject(*energizerPellet);
-		}
-
-		for (auto it = dotPositions.begin(); it != dotPositions.end(); ++it)
-		{
-			// Create dot at position.
-			GameObject* Pellet = new GameObject(*objectManager.GetArchetypeByName("Dot"));
-			Pellet->GetComponent<Transform>()->SetTranslation(*it);
-			objectManager.AddObject(*Pellet);
-		}
+		// Re-initialize all ghosts so they can find the player object since it was added after them.
+		blinky->Initialize();
+		pinky->Initialize();
+		inky->Initialize();
+		clyde->Initialize();
 
 		--lives;
 	}
@@ -190,20 +234,8 @@ namespace Levels
 	void Level1::Update(float dt)
 	{
 		UNREFERENCED_PARAMETER(dt);
-		
-		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
 
-		if (oldDots == 70 || oldDots == 170)
-		{
-			GameObject* fruit = new GameObject(*objectManager.GetArchetypeByName("Fruit"));
-			objectManager.AddObject(*fruit);
-			timerDestroy = RandomRange(9.f, 10.f);
-		}
-
-		if (timerDestroy <= 0)
-		{
-			objectManager.GetObjectByName("Fruit")->Destroy();
-		}
+		scoreText->GetComponent<SpriteText>()->SetText(std::to_string(pacMan->GetComponent<Behaviors::PlayerScore>()->GetScore()).c_str());
 
 		Input& input = Input::GetInstance();
 
@@ -244,6 +276,10 @@ namespace Levels
 		{
 			dotPositions.push_back((*it)->GetComponent<Transform>()->GetTranslation());
 		}
+
+		Behaviors::PlayerScore* playerScore = objectManager.GetObjectByName("PAC-MAN")->GetComponent<Behaviors::PlayerScore>();
+		oldScore = playerScore->GetScore();
+		oldDots = playerScore->GetDots();
 	}
 
 	// Unload the resources associated with Level 1.

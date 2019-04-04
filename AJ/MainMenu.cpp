@@ -58,13 +58,26 @@ namespace Levels
 	// Load the resources associated with Main Menu.
 	void MainMenu::Load()
 	{
-		
+		GameObjectFactory& objectFactory = GameObjectFactory::GetInstance();
+		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
+		ResourceManager& resourceManager = GetSpace()->GetResourceManager();
+
+		// Create a new quad mesh for the sprite.
+		resourceManager.GetMesh("Quad");
+		resourceManager.GetSpriteSource("GhostIntro.png");
+
+		// Load the archetypes from their files.
+		objectManager.AddArchetype(*objectFactory.CreateObject("Menu", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("GhostIntro.png")));
 	}
 
 	// Initialize the memory associated with Main Menu.
 	void MainMenu::Initialize()
 	{
+		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
 		
+		// Background
+		GameObject* menu = new GameObject(*objectManager.GetArchetypeByName("Menu"));
+		objectManager.AddObject(*menu);
 	}
 
 	// Update Main Menu.
@@ -77,17 +90,17 @@ namespace Levels
 		Input& input = Input::GetInstance();
 
 		// Handle level switching.
-		if (input.CheckTriggered('1'))
+		if (input.CheckTriggered('0'))
+		{
+			GetSpace()->RestartLevel();
+		}
+		else if (input.CheckTriggered('1'))
 		{
 			GetSpace()->SetLevel<Level1>();
 		}
 		else if (input.CheckTriggered('2'))
 		{
 			GetSpace()->SetLevel<Level2>();
-		}
-		else if (input.CheckTriggered('0'))
-		{
-			GetSpace()->RestartLevel();
 		}
 	}
 

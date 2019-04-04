@@ -23,6 +23,7 @@
 #include <SoundManager.h>
 
 // Initial game state
+//#include "Level1.h"
 #include "MainMenu.h"
 
 // Game object factory
@@ -45,6 +46,8 @@
 #include "BlinkyAI.h"
 #include "InkyAI.h"
 #include "PinkyAI.h"
+#include "ClydeAI.h"
+#include "GhostAnimation.h"
 
 //------------------------------------------------------------------------------
 
@@ -84,16 +87,21 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prevInstance, _In
 	objectFactory.RegisterComponent<Behaviors::BlinkyAI>();
 	objectFactory.RegisterComponent<Behaviors::InkyAI>();
 	objectFactory.RegisterComponent<Behaviors::PinkyAI>();
+	objectFactory.RegisterComponent<Behaviors::ClydeAI>();
+	objectFactory.RegisterComponent<Behaviors::GhostAnimation>();
 
 	// Create a new space called "GameSpace"
 	Space* space = new Space("GameSpace");
 
-	// Set initial level to the second level.
+	// Set initial level to the Main Menu level.
 	space->SetLevel<Levels::MainMenu>();
 
 	// Add additional modules to engine
 	Engine::GetInstance().AddModule(space);
-	Engine::GetInstance().AddModule(new SoundManager());
+	SoundManager* soundManager = new SoundManager();
+	soundManager->SetMusicVolume(0.25f);
+	soundManager->SetEffectsVolume(0.25f);
+	Engine::GetInstance().AddModule(soundManager);
 	
 	// Game engine goes!
 	//Engine::GetInstance().Start(448, 576, 60);

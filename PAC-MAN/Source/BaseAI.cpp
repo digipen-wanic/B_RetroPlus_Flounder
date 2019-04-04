@@ -108,8 +108,9 @@ namespace Behaviors
 			mode = wave % 2 == 0 ? SCATTER : CHASE;
 			// Reset Speed
 			SetSpeed(normSpeed);
-			// Increment waveTimer by dt
-			waveTimer += dt;
+			// Increment waveTimer by dt if not frozen
+			if (!IsFrozen())
+				waveTimer += dt;
 
 			// Check if the current waveTimer has been reached
 			if (waveTimer >= waveTime[wave])
@@ -322,6 +323,8 @@ namespace Behaviors
 			direction = adjacentTile.direction;
 			return;
 		}
+		else if (mode == SCATTER)
+			target = scatterTarget;
 
 		// Let child class handle targeting.
 		OnTarget(adjacentTiles, emptyCount);

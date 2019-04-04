@@ -108,6 +108,7 @@ private:
 	std::string text;
 
 	// Properties (save to/load from file)
+	float charWidth;
 
 	// The alignment of the text (where the origin of the transform is).
 	Alignment horizontalAlignment;

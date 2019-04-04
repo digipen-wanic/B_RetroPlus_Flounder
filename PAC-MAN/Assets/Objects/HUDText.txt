@@ -1,17 +1,18 @@
-Score
+HUDText
 {
   numComponents : 2
   Transform
   {
-    translation : { 0, 400 }
+    translation : { 0, 0 }
     rotation : 0
-    scale : { 64, 64 }
+    scale : { 40, 40 }
   }
   SpriteText
   {
     frameIndex : 0
     color : { 1 , 1 , 1 , 1 }
-    horizontalAlignment : 0
+    charWidth : 1.25
+    horizontalAlignment : 2
     verticalAlignment : 0
   }
 }

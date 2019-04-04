@@ -64,7 +64,7 @@ namespace Behaviors
 		playerController = GetOwner()->GetComponent<PlayerController>();
 
 		// Play the spawn animation.
-		animation->Play(spawnStart, 1, 1.0f, false);
+		animation->Play(spawnStart, 1, 4.0f, false);
 	}
 
 	// Loads object data from a file.
@@ -202,7 +202,7 @@ namespace Behaviors
 			{
 				// If the state is changed to the spawn state, begin playing the spawn animation.
 			case State::StateSpawn:
-				animation->Play(spawnStart, 1, 1.0f, false);
+				animation->Play(spawnStart, 1, 4.0f, false);
 				break;
 				// If the state is changed to the idle state, begin playing the idle animation.
 			case State::StateIdle:

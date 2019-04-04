@@ -101,11 +101,13 @@ namespace Levels
 		unsigned lives;
 		unsigned oldScore;
 		unsigned oldDots;
+		unsigned highScore;
 		SoundManager* soundManager;
 		std::vector<Vector2D> energizerPositions;
 		std::vector<Vector2D> dotPositions;
 
 		GameObject* scoreText;
+		GameObject* highScoreText;
 		GameObject* pacMan;
 	};
 }

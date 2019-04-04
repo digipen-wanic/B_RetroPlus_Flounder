@@ -34,8 +34,10 @@ SpriteText::SpriteText() : text(), horizontalAlignment(Alignment::CENTER), verti
 {
 }
 
-// Create a new sprite text.
-SpriteText::SpriteText(const char* text) : text(text), horizontalAlignment(Alignment::CENTER), verticalAlignment(Alignment::CENTER)
+// Constructor.
+// Params:
+//   text = The text to display.
+SpriteText::SpriteText(const char* text) : text(text), charWidth(0.75f), horizontalAlignment(Alignment::CENTER), verticalAlignment(Alignment::CENTER)
 {
 }
 
@@ -126,7 +128,7 @@ void SpriteText::Draw()
 		Sprite::Draw(pos + offset.x * right + offset.y * down);
 
 		// Move the sprite position 1 character over on the X axis.
-		pos += 0.375f * Vector2D(right.x * scale.x, right.y * scale.y);
+		pos += charWidth * 0.5f * Vector2D(right.x * scale.x, right.y * scale.y);
 	}
 }
 
@@ -135,6 +137,7 @@ void SpriteText::Draw()
 //   parser = The parser that is writing this object to a file.
 void SpriteText::Serialize(Parser& parser) const
 {
+	parser.WriteVariable("charWidth", charWidth);
 	unsigned uHorizontalAlignment = static_cast<unsigned>(horizontalAlignment);
 	parser.WriteVariable("horizontalAlignment", uHorizontalAlignment);
 	unsigned uVerticalAlignment = static_cast<unsigned>(verticalAlignment);
@@ -148,6 +151,7 @@ void SpriteText::Deserialize(Parser& parser)
 {
 	Sprite::Deserialize(parser);
 
+	parser.ReadVariable("charWidth", charWidth);
 	unsigned uHorizontalAlignment;
 	parser.ReadVariable("horizontalAlignment", uHorizontalAlignment);
 	horizontalAlignment = static_cast<Alignment>(uHorizontalAlignment);
@@ -216,7 +220,7 @@ float SpriteText::GetWidth() const
 		}
 
 		// Increase the current line's width by the width of a single character.
-		width += scale.x * 0.375f;
+		width += charWidth * 0.5f * scale.x;
 
 		// If the current line's width is bigger than the current largest width, overwrite it.
 		maxWidth = max(maxWidth, width);

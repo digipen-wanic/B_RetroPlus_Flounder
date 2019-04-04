@@ -64,7 +64,7 @@ namespace Behaviors
 		baseAI = GetOwner()->GetComponent<BaseAI>();
 
 		// Play the spawn animation.
-		animation->Play(moveUpStart, 1, 1.0f, false);
+		animation->Play(moveUpStart, 1, 4.0f, false);
 	}
 
 	// Loads object data from a file.
@@ -199,7 +199,7 @@ namespace Behaviors
 			{
 				// If the state is changed to the spawn state, begin playing the spawn animation.
 			case State::StateSpawn:
-				animation->Play(moveUpStart, 1, 1.0f, false);
+				animation->Play(moveUpStart, 1, 4.0f, false);
 				break;
 				// If the state is changed to the moving right state, begin playing the moving right animation.
 			case State::StateMoveRight:

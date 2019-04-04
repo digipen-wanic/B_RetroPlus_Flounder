@@ -11,6 +11,7 @@ ControllableRectangle
   {
     frameIndex : 0
     color : { 1 , 1 , 1 , 1 }
+    charWidth : 0.75
     horizontalAlignment : 0
     verticalAlignment : 0
   }

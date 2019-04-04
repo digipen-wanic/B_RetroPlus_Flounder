@@ -60,7 +60,7 @@ namespace Levels
 	// Creates an instance of Level 1.
 	Level1::Level1() : Level("Level1"),
 		columnsMap(8), rowsMap(5), columnsEnergizer(2), rowsEnergizer(1), columnsPacMan(4), rowsPacMan(4), columnsGhost(5), rowsGhost(5),
-		startLives(3), lives(0), oldScore(0), oldDots(0), scoreText(nullptr), pacMan(nullptr),
+		startLives(3), lives(0), oldScore(0), oldDots(0), highScore(0), scoreText(nullptr), pacMan(nullptr),
 		soundManager(nullptr), energizerPositions(), dotPositions()
 	{
 	}
@@ -74,7 +74,7 @@ namespace Levels
 		soundManager->AddEffect("EatDot1.wav");
 		soundManager->AddEffect("EatDot2.wav");
 		soundManager->AddEffect("EatGhost.wav");
-		soundManager->AddEffect("GhostMove.wav");
+		//soundManager->AddEffect("GhostMove.wav");
 		soundManager->AddEffect("MusicIntro.wav");
 		soundManager->AddEffect("ExtraLife.wav");
 		soundManager->AddMusic("GhostDeath.wav");
@@ -94,7 +94,7 @@ namespace Levels
 		resourceManager.GetMesh("Clyde", columnsGhost, rowsGhost);
 
 		// Create a new quad mesh for the sprite.
-		resourceManager.GetSpriteSource("Code New Roman.png", 12, 8);
+		resourceManager.GetSpriteSource("Missile_Command.png", 12, 8);
 		resourceManager.GetMesh("FontAtlas", 12, 8);
 
 		// Load the circle texture and sprite source.
@@ -114,7 +114,7 @@ namespace Levels
 		objectManager.AddArchetype(*objectFactory.CreateObject("Pinky", resourceManager.GetMesh("Pinky"), resourceManager.GetSpriteSource("Pinky.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Inky", resourceManager.GetMesh("Inky"), resourceManager.GetSpriteSource("Inky.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Clyde", resourceManager.GetMesh("Clyde"), resourceManager.GetSpriteSource("Clyde.png")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("Score", resourceManager.GetMesh("FontAtlas"), resourceManager.GetSpriteSource("Code New Roman.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("HUDText", resourceManager.GetMesh("FontAtlas"), resourceManager.GetSpriteSource("Missile_Command.png")));
 
 		// Load the tilemap.
 		dataMap = Tilemap::CreateTilemapFromFile("Assets/Levels/Level1.txt");
@@ -137,6 +137,12 @@ namespace Levels
 		}
 
 		lives = 0;
+
+		std::fstream highScoreFile("Assets/highScore.txt", std::ios::in);
+		if (highScoreFile.good())
+		{
+			highScoreFile >> highScore;
+		}
 	}
 
 	// Initialize the memory associated with Level 1.
@@ -152,10 +158,21 @@ namespace Levels
 
 		SpriteTilemap* spriteTilemap = tilemap->GetComponent<SpriteTilemap>();
 
-		//Set sprite text
-		scoreText = new GameObject(*objectManager.GetArchetypeByName("Score"));
+		// Add various HUD elements.
+		scoreText = new GameObject(*objectManager.GetArchetypeByName("HUDText"));
+		scoreText->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(6.75f, -1.5)));
 		scoreText->GetComponent<SpriteText>()->SetText(std::to_string(oldScore).c_str());
 		objectManager.AddObject(*scoreText);
+
+		highScoreText = new GameObject(*objectManager.GetArchetypeByName("HUDText"));
+		highScoreText->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(16.75f, -1.5)));
+		highScoreText->GetComponent<SpriteText>()->SetText(std::to_string(oldScore).c_str());
+		objectManager.AddObject(*highScoreText);
+
+		GameObject* highScoreLabelText = new GameObject(*objectManager.GetArchetypeByName("HUDText"));
+		highScoreLabelText->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(18.75f, -2.5)));
+		highScoreLabelText->GetComponent<SpriteText>()->SetText("HIGH SCORE");
+		objectManager.AddObject(*highScoreLabelText);
 
 		// PAC-MAN.
 		pacMan = new GameObject(*objectManager.GetArchetypeByName("PAC-MAN"));
@@ -235,7 +252,11 @@ namespace Levels
 	{
 		UNREFERENCED_PARAMETER(dt);
 
-		scoreText->GetComponent<SpriteText>()->SetText(std::to_string(pacMan->GetComponent<Behaviors::PlayerScore>()->GetScore()).c_str());
+		unsigned score = pacMan->GetComponent<Behaviors::PlayerScore>()->GetScore();
+		if (highScore < score)
+			highScore = score;
+		scoreText->GetComponent<SpriteText>()->SetText(std::to_string(score).c_str());
+		highScoreText->GetComponent<SpriteText>()->SetText(std::to_string(highScore).c_str());
 
 		Input& input = Input::GetInstance();
 
@@ -290,6 +311,12 @@ namespace Levels
 
 		// Unload all sounds.
 		soundManager->Shutdown();
+
+		std::fstream highScoreFile("Assets/highScore.txt", std::ios::out);
+		if (highScoreFile.good())
+		{
+			highScoreFile << highScore;
+		}
 	}
 
 	//------------------------------------------------------------------------------
@@ -315,7 +342,7 @@ namespace Levels
 			{
 				for (float y = min.y; y <= max.y; y++)
 				{
-					if (dataMap->GetCellValue(static_cast<unsigned>(x), static_cast<unsigned>(y)) != 0)
+					if (dataMap->GetCellValue(static_cast<unsigned>(x), static_cast<unsigned>(y)) != 0 || (x >= 13.0f && x <= 14.0f && y == 23.0f))
 						continue;
 
 					Vector2D pos = spriteTilemap->TileToWorld(Vector2D(x, y));

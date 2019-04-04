@@ -93,7 +93,7 @@ namespace Levels
 		resourceManager.GetMesh("Pinky", columnsGhost, rowsGhost);
 		resourceManager.GetMesh("Inky", columnsGhost, rowsGhost);
 		resourceManager.GetMesh("Clyde", columnsGhost, rowsGhost);
-		resourceManager.GetMesh("Fruit", 0, 0);
+		resourceManager.GetMesh("Fruit", 1, 1);
 
 		// Create a new quad mesh for the sprite.
 		resourceManager.GetSpriteSource("Missile_Command.png", 12, 8);
@@ -266,6 +266,11 @@ namespace Levels
 		if (fruitAlive == true)
 		{
 			fruitDeathTimer -= dt;
+			if (fruitDeathTimer <= 0)
+			{
+				fruit->Destroy();
+				fruitAlive = false;
+			}
 		}
 		if (pacMan->GetComponent<Behaviors::PlayerScore>()->GetDots() >= 70 && fruitSpawnAmount == 0)
 		{
@@ -282,11 +287,6 @@ namespace Levels
 			objectManager.AddObject(*fruit);
 			fruitSpawnAmount += 1;
 			fruitAlive = true;
-		}
-		if (fruitDeathTimer <= 0 && fruitAlive)
-		{
-			fruit->Destroy();
-			fruitAlive = false;
 		}
 		Input& input = Input::GetInstance();
 

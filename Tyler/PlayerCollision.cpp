@@ -30,6 +30,7 @@
 #include <SpriteTilemap.h>
 #include "BaseAI.h"
 #include "PlayerScore.h"
+#include "PlayerController.h"
 #include "PlayerAnimation.h"
 #include "Energizer.h"
 
@@ -59,7 +60,7 @@ namespace Behaviors
 	//------------------------------------------------------------------------------
 
 	// Constructor
-	PlayerCollision::PlayerCollision() : Component("PlayerCollision"), tilemap(nullptr), spriteTilemap(nullptr), transform(nullptr), oddConsumable(true)
+	PlayerCollision::PlayerCollision() : Component("PlayerCollision"), tilemap(nullptr), spriteTilemap(nullptr), transform(nullptr), ghostStreak(0), oddConsumable(false), energizerSound(nullptr), ghostDeathSound(nullptr)
 	{
 	}
 
@@ -68,6 +69,12 @@ namespace Behaviors
 	{
 		transform = GetOwner()->GetComponent<Transform>();
 		playerScore = GetOwner()->GetComponent<PlayerScore>();
+		playerController = GetOwner()->GetComponent<PlayerController>();
+
+		ghostDeathSound = Engine::GetInstance().GetModule<SoundManager>()->PlaySound("GhostDeath.wav");
+		ghostDeathSound->setPaused(true);
+		energizerSound = Engine::GetInstance().GetModule<SoundManager>()->PlaySound("GhostDeath.wav");
+		energizerSound->setPaused(true);
 	}
 
 	// Clone a component and return a pointer to the cloned component.
@@ -104,22 +111,41 @@ namespace Behaviors
 			// Check if the player and this enemy are on the same tile.
 			if (AlmostEqual(playerTile, enemyTile))
 			{
-				if ((*it)->GetComponent<BaseAI>()->IsFrightened())
+				BaseAI* baseAI = (*it)->GetComponent<BaseAI>();
+				if (!baseAI->IsDead())
 				{
-					// Eat the enemy.
-					playerScore->IncreaseScore(200); // TODO: ADD STREAKS
-					baseAI->SetDead();
-					Engine::GetInstance().GetModule<SoundManager>()->PlaySound("eatGhost.wav");
-				}
-				else
-				{
-					OnDeath();
+					if (baseAI->IsFrightened())
+					{
+						// Eat the enemy.
+						playerScore->IncreaseScore(200); // TODO: ADD STREAKS
+						baseAI->SetDead();
+						Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatGhost.wav");
+					}
+					else
+					{
+						OnDeath();
+					}
 				}
 			}
 		}
 
 		std::vector<GameObject*> gameObjects;
+		objectManager.GetAllObjectsByName("Fruit", gameObjects);
+
+		for (auto it = gameObjects.begin(); it != gameObjects.end(); ++it)
+		{
+			Vector2D fruit = FloorVector2D(spriteTilemap->WorldToTile((*it)->GetComponent<Transform>()->GetTranslation()));
+			if (AlmostEqual(playerTile, fruit))
+			{
+				playerScore->IncreaseScore(100);
+				(*it)->Destroy();
+				Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatFruit.wav");
+			}
+		}
+
+		gameObjects.clear();
 		objectManager.GetAllObjectsByName("Dot", gameObjects);
+
 		for (auto it = gameObjects.begin(); it != gameObjects.end(); ++it)
 		{
 			Vector2D dotTile = FloorVector2D(spriteTilemap->WorldToTile((*it)->GetComponent<Transform>()->GetTranslation()));
@@ -127,21 +153,21 @@ namespace Behaviors
 			// Check if the player and this dot are on the same tile.
 			if (AlmostEqual(playerTile, dotTile))
 			{
-				
 				// Add score and destroy the dot.
 				playerScore->IncreaseScore(10);
 				playerScore->IncreaseDots();
 				(*it)->Destroy();
-				if (oddConsumable == true)
+
+				if (oddConsumable)
 				{
-					Engine::GetInstance().GetModule<SoundManager>()->PlaySound("eatDot1.wav");
-					oddConsumable = false;
+					Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatDot1.wav");
 				}
 				else
 				{
-					Engine::GetInstance().GetModule<SoundManager>()->PlaySound("eatDot2.wav");
-					oddConsumable = true;
+					Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatDot2.wav");
 				}
+
+				oddConsumable = !oddConsumable;
 			}
 		}
 
@@ -164,9 +190,43 @@ namespace Behaviors
 				{
 					(*it2)->GetComponent<BaseAI>()->SetFrightened();
 				}
-				Engine::GetInstance().GetModule<SoundManager>()->PlaySound("ghostMovementFinal.wav");
 			}
 		}
+
+		bool enemyDead = false;
+		bool enemyFrightened = false;
+
+		for (auto it = enemies.begin(); it != enemies.end(); ++it)
+		{
+			BaseAI* baseAI = (*it)->GetComponent<BaseAI>();
+			if (baseAI->IsDead())
+				enemyDead = true;
+			if (baseAI->IsFrightened())
+				enemyFrightened = true;
+		}
+
+		if (enemyDead)
+		{
+			ghostDeathSound->setPaused(false);
+			energizerSound->setPaused(true);
+		}
+		else if (enemyFrightened)
+		{
+			ghostDeathSound->setPaused(true);
+			energizerSound->setPaused(false);
+		}
+		else
+		{
+			ghostDeathSound->setPaused(true);
+			energizerSound->setPaused(true);
+		}
+
+		if (playerController->direction != oldDirection)
+		{
+			oddConsumable = !oddConsumable;
+		}
+
+		oldDirection = playerController->direction;
 	}
 
 	// Sets the tilemap used for the grid.
@@ -208,7 +268,7 @@ namespace Behaviors
 		}
 
 		// Play death sound.
-		Engine::GetInstance().GetModule<SoundManager>()->PlaySound("deathofpacfinal.wav");
+		Engine::GetInstance().GetModule<SoundManager>()->PlaySound("PacManDeath.wav");
 
 		// Play death animation.
 		playerAnimation->OnDeath();

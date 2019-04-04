@@ -72,6 +72,9 @@ namespace Behaviors
 		// Called when the player dies.
 		void OnDeath();
 
+		// Called when the ghost is eaten, freezes the ghost.
+		void OnGhostEaten();
+
 		// Returns whether the death animation is currently playing.
 		bool IsDying() const;
 
@@ -96,6 +99,8 @@ namespace Behaviors
 			StateIdle,
 			StateMove,
 			StateDeath,
+			StateGhostEaten,
+			StateDying,
 
 			STATE_MAX
 		};
@@ -110,6 +115,7 @@ namespace Behaviors
 		unsigned moveLength;
 		unsigned deathStart;
 		unsigned deathLength;
+		unsigned blankStart;
 
 		// Animation state
 		State currentState;
@@ -121,6 +127,7 @@ namespace Behaviors
 		PlayerController* playerController;
 
 		// Other variables.
+		bool ghostEatenQueued;
 		bool deathQueued;
 	};
 }

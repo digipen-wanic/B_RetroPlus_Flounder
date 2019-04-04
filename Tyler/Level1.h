@@ -101,12 +101,18 @@ namespace Levels
 		unsigned lives;
 		unsigned oldScore;
 		unsigned oldDots;
+		unsigned highScore;
+		int fruitSpawnAmount;
+		float fruitDeathTimer;
+		bool fruitAlive;
 		SoundManager* soundManager;
 		std::vector<Vector2D> energizerPositions;
 		std::vector<Vector2D> dotPositions;
 
 		GameObject* scoreText;
+		GameObject* highScoreText;
 		GameObject* pacMan;
+		GameObject* fruit;
 	};
 }
 

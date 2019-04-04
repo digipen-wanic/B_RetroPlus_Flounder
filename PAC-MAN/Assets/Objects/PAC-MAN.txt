@@ -40,5 +40,6 @@ PAC-MAN
     moveLength : 4
     deathStart : 0
     deathLength : 11
+    blankStart : 15
   }
 }

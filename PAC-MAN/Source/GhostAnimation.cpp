@@ -43,7 +43,7 @@ namespace Behaviors
 	// Default constructor
 	GhostAnimation::GhostAnimation() : Component("GhostAnimation"),
 		moveRightStart(0), moveLeftStart(0), moveDownStart(0), moveUpStart(0), moveLength(0),
-		currentState(StateSpawn), nextState(StateSpawn), transform(nullptr), animation(nullptr), baseAI(nullptr), deathQueued(false)
+		currentState(StateSpawn), nextState(StateSpawn), transform(nullptr), animation(nullptr), baseAI(nullptr), ghostEatenQueued(false), deathQueued(false)
 	{
 	}
 
@@ -121,6 +121,12 @@ namespace Behaviors
 		ChangeCurrentState();
 	}
 
+	// Called when the ghost is eaten, freezes the ghost.
+	void GhostAnimation::OnGhostEaten()
+	{
+		ghostEatenQueued = true;
+	}
+
 	//------------------------------------------------------------------------------
 	// Private Functions:
 	//------------------------------------------------------------------------------
@@ -129,18 +135,23 @@ namespace Behaviors
 	void GhostAnimation::ChooseNextState()
 	{
 		// If the spawn animation is still playing, don't do anything.
-		if (currentState == State::StateSpawn)
+		if (currentState == State::StateSpawn || currentState == State::StateGhostEaten)
 		{
-			if (animation->IsDone())
-			{
-				//baseAI->SetFrozen(false);
-			}
-			else
+			if (!animation->IsDone())
 			{
 				baseAI->SetFrozen(true);
 				baseAI->direction = GridMovement::Direction::UP;
 				return;
 			}
+		}
+
+		// If the ghost eaten animation should be playing, play it.
+		if (ghostEatenQueued)
+		{
+			ghostEatenQueued = false;
+			if (!(currentState == State::StateEyesUp || currentState == State::StateEyesLeft || currentState == State::StateEyesDown || currentState == State::StateEyesRight))
+				nextState = State::StateGhostEaten;
+			return;
 		}
 
 		if (baseAI->IsDead())
@@ -240,6 +251,10 @@ namespace Behaviors
 				// If the state is changed to the frightened end state, begin playing the frightened end animation.
 			case State::StateFrightenedEnd:
 				animation->Play(frightenedEndStart, frightenedEndLength, 0.1f, true);
+				break;
+				// When a ghost is eaten, freeze the current frame.
+			case State::StateGhostEaten:
+				animation->Play(animation->GetCurrentFrame(), 1, 0.5f, false);
 				break;
 			}
 		}

@@ -31,6 +31,7 @@
 #include <GameObjectFactory.h>
 #include <Tilemap.h>
 #include <MeshHelper.h>
+#include <Random.h>
 
 // Components
 #include <Transform.h>
@@ -60,8 +61,9 @@ namespace Levels
 	// Creates an instance of Level 1.
 	Level1::Level1() : Level("Level1"),
 		columnsMap(8), rowsMap(5), columnsEnergizer(2), rowsEnergizer(1), columnsPacMan(4), rowsPacMan(4), columnsGhost(5), rowsGhost(5),
-		startLives(3), lives(0), oldScore(0), oldDots(0), highScore(0), scoreText(nullptr), pacMan(nullptr),
-		soundManager(nullptr), energizerPositions(), dotPositions()
+		startLives(3), lives(0), oldScore(0), oldDots(0), highScore(0), fruitSpawnAmount(0), fruitDeathTimer(0), fruitAlive(false),
+		soundManager(nullptr), energizerPositions(), dotPositions(),
+		scoreText(nullptr), pacMan(nullptr), fruit(nullptr)
 	{
 	}
 
@@ -74,10 +76,10 @@ namespace Levels
 		soundManager->AddEffect("EatDot1.wav");
 		soundManager->AddEffect("EatDot2.wav");
 		soundManager->AddEffect("EatGhost.wav");
-		//soundManager->AddEffect("GhostMove.wav");
 		soundManager->AddEffect("MusicIntro.wav");
 		soundManager->AddEffect("ExtraLife.wav");
 		soundManager->AddMusic("GhostDeath.wav");
+		soundManager->AddMusic("Energized.wav");
 
 		GameObjectFactory& objectFactory = GameObjectFactory::GetInstance();
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
@@ -105,6 +107,7 @@ namespace Levels
 		resourceManager.GetSpriteSource("Pinky.png", columnsGhost, rowsGhost);
 		resourceManager.GetSpriteSource("Inky.png", columnsGhost, rowsGhost);
 		resourceManager.GetSpriteSource("Clyde.png", columnsGhost, rowsGhost);
+		resourceManager.GetSpriteSource("Cherry.png");
 
 		// Load the archetypes from their files.
 		objectManager.AddArchetype(*objectFactory.CreateObject("Dot", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("Dot.png")));
@@ -115,6 +118,7 @@ namespace Levels
 		objectManager.AddArchetype(*objectFactory.CreateObject("Inky", resourceManager.GetMesh("Inky"), resourceManager.GetSpriteSource("Inky.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Clyde", resourceManager.GetMesh("Clyde"), resourceManager.GetSpriteSource("Clyde.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("HUDText", resourceManager.GetMesh("FontAtlas"), resourceManager.GetSpriteSource("Missile_Command.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Fruit", resourceManager.GetMesh("Fruit"), resourceManager.GetSpriteSource("Cherry.png")));
 
 		// Load the tilemap.
 		dataMap = Tilemap::CreateTilemapFromFile("Assets/Levels/Level1.txt");
@@ -257,6 +261,36 @@ namespace Levels
 			highScore = score;
 		scoreText->GetComponent<SpriteText>()->SetText(std::to_string(score).c_str());
 		highScoreText->GetComponent<SpriteText>()->SetText(std::to_string(highScore).c_str());
+
+		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
+
+		if (fruitAlive)
+		{
+			fruitDeathTimer -= dt;
+			if (fruitDeathTimer <= 0 && fruit != nullptr)
+			{
+				fruit->Destroy();
+				fruitAlive = false;
+			}
+		}
+
+		if (pacMan->GetComponent<Behaviors::PlayerScore>()->GetDots() >= 70 && fruitSpawnAmount == 0)
+		{
+			fruitDeathTimer = RandomRange(9.0f, 10.0f);
+			fruit = new GameObject(*objectManager.GetArchetypeByName("Fruit"));
+			objectManager.AddObject(*fruit);
+			++fruitSpawnAmount;
+			fruitAlive = true;
+		}
+
+		if (pacMan->GetComponent<Behaviors::PlayerScore>()->GetDots() >= 170 && fruitSpawnAmount == 1)
+		{
+			fruitDeathTimer = RandomRange(9.0f, 10.0f);
+			fruit = new GameObject(*objectManager.GetArchetypeByName("Fruit"));
+			objectManager.AddObject(*fruit);
+			++fruitSpawnAmount;
+			fruitAlive = true;
+		}
 
 		Input& input = Input::GetInstance();
 

@@ -1,0 +1,15 @@
+Fruit
+{
+  numComponents : 2
+  Transform
+  {
+    translation : { 0, -60 }
+    rotation : 0
+    scale : { 40, 40 }
+  }
+  Sprite
+  {
+    frameIndex : 0
+    color : { 1 , 1 , 1 , 1 }
+  }
+}

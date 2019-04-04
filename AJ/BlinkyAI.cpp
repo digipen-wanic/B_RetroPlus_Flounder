@@ -62,7 +62,7 @@ namespace Behaviors
 		// Call BaseAI's FixedUpdate
 		BaseAI::FixedUpdate(dt);
 
-		if (mode == CHASE)
+		if (mode != FRIGHTENED)
 		{
 			float pacmanBaseSpeed = player->GetComponent<PlayerController>()->GetSpeed(0);
 

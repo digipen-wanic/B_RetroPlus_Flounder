@@ -62,7 +62,7 @@ namespace Levels
 	Level1::Level1() : Level("Level1"),
 		columnsMap(8), rowsMap(5), columnsEnergizer(2), rowsEnergizer(1), columnsPacMan(4), rowsPacMan(4), columnsGhost(5), rowsGhost(5),
 		startLives(3), lives(0), oldScore(0), oldDots(0), highScore(0), scoreText(nullptr), pacMan(nullptr), fruitSpawnAmount(0), fruitDeathTimer(0),
-		soundManager(nullptr), energizerPositions(), dotPositions(), fruitAlive(false), fruit(nullptr)
+		soundManager(nullptr), energizerPositions(), dotPositions(), fruitAlive(false), fruit(nullptr), musicTimer(4), musicPlayed(false), musicIntroPlayed(false)
 	{
 	}
 
@@ -79,6 +79,9 @@ namespace Levels
 		soundManager->AddEffect("MusicIntro.wav");
 		soundManager->AddEffect("ExtraLife.wav");
 		soundManager->AddMusic("GhostDeath.wav");
+		soundManager->AddEffect("EatFruit.wav");
+		soundManager->AddEffect("PlusMusicIntro.wav");
+		soundManager->AddMusic("PlusMusicLoop.wav");
 
 		GameObjectFactory& objectFactory = GameObjectFactory::GetInstance();
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
@@ -257,7 +260,20 @@ namespace Levels
 		UNREFERENCED_PARAMETER(dt);
 
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
-
+		
+		musicTimer -= dt;
+		if (musicTimer <= 0 && musicPlayed == false)
+		{
+			soundManager->PlaySound("PlusMusicIntro.wav");
+			musicPlayed = true;
+			musicTimer = 6;
+		}
+		if (musicIntroPlayed == false && musicTimer <= 0)
+		{
+			soundManager->SetMusicVolume(1);
+			soundManager->PlaySound("PlusMusicLoop.wav");
+			musicIntroPlayed = true;
+		}
 		unsigned score = pacMan->GetComponent<Behaviors::PlayerScore>()->GetScore();
 		if (highScore < score)
 			highScore = score;

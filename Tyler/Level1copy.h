@@ -104,7 +104,10 @@ namespace Levels
 		unsigned highScore;
 		int fruitSpawnAmount;
 		float fruitDeathTimer;
+		float musicTimer;
 		bool fruitAlive;
+		bool musicPlayed;
+		bool musicIntroPlayed;
 		SoundManager* soundManager;
 		std::vector<Vector2D> energizerPositions;
 		std::vector<Vector2D> dotPositions;

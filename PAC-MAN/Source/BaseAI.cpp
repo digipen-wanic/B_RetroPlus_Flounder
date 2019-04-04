@@ -87,6 +87,18 @@ namespace Behaviors
 			}
 		}
 
+		if (hasMoved)
+		{
+			if (ghostAnimation->currentState == GhostAnimation::State::StateGhostEaten)
+				SetFrozen(true);
+			else
+				SetFrozen(false);
+		}
+
+		// Speed up when going back to the ghost house as eyes.
+		if (isDead)
+			SetSpeed(frightSpeed * 2.0f);
+
 		// Check if current mode isn't Frightened or the last wave
 		if (frightTimer <= 0.0f || wave == 7)
 		{
@@ -95,7 +107,7 @@ namespace Behaviors
 
 			mode = wave % 2 == 0 ? SCATTER : CHASE;
 			// Reset Speed
-			GetOwner()->GetComponent<GridMovement>()->SetSpeed(normSpeed);
+			SetSpeed(normSpeed);
 			// Increment waveTimer by dt
 			waveTimer += dt;
 
@@ -206,7 +218,7 @@ namespace Behaviors
 	{
 		mode = FRIGHTENED;
 		frightTimer = frightenTime;
-		GetOwner()->GetComponent<GridMovement>()->SetSpeed(frightSpeed);
+		SetSpeed(frightSpeed);
 		forceReverse = true;
 	}
 
@@ -265,6 +277,7 @@ namespace Behaviors
 			if (AlmostEqual(GetNewTile(), target))
 			{
 				isDead = false;
+				frightTimer = 0.0f;
 			}
 
 			if (isDead)

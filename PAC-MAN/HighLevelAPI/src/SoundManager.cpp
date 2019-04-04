@@ -28,7 +28,7 @@ namespace
 	void FMOD_Assert(FMOD_RESULT result)
 	{
 		// Check if the result indicates a failure.
-		if (result != FMOD_OK)
+		if (result != FMOD_OK && result != FMOD_ERR_INVALID_HANDLE && result != FMOD_ERR_CHANNEL_STOLEN)
 		{
 			// Print out the error code and the associated error message.
 			std::cout << "FMOD error! (" << result << ") " << FMOD_ErrorString(result) << std::endl;

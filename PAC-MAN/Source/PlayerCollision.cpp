@@ -29,6 +29,7 @@
 #include <Transform.h>
 #include <SpriteTilemap.h>
 #include "BaseAI.h"
+#include "GhostAnimation.h"
 #include "PlayerScore.h"
 #include "PlayerController.h"
 #include "PlayerAnimation.h"
@@ -73,7 +74,7 @@ namespace Behaviors
 
 		ghostDeathSound = Engine::GetInstance().GetModule<SoundManager>()->PlaySound("GhostDeath.wav");
 		ghostDeathSound->setPaused(true);
-		energizerSound = Engine::GetInstance().GetModule<SoundManager>()->PlaySound("GhostDeath.wav");
+		energizerSound = Engine::GetInstance().GetModule<SoundManager>()->PlaySound("Energized.wav");
 		energizerSound->setPaused(true);
 	}
 
@@ -120,6 +121,15 @@ namespace Behaviors
 						playerScore->IncreaseScore(200); // TODO: ADD STREAKS
 						baseAI->SetDead();
 						Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatGhost.wav");
+
+						// Let all ghosts know that a ghost was eaten.
+						for (auto it2 = enemies.begin(); it2 != enemies.end(); ++it2)
+						{
+							(*it2)->GetComponent<GhostAnimation>()->OnGhostEaten();
+						}
+
+						// Let the player know that a ghost was eaten.
+						GetOwner()->GetComponent<PlayerAnimation>()->OnGhostEaten();
 					}
 					else
 					{
@@ -130,6 +140,20 @@ namespace Behaviors
 		}
 
 		std::vector<GameObject*> gameObjects;
+		objectManager.GetAllObjectsByName("Fruit", gameObjects);
+
+		for (auto it = gameObjects.begin(); it != gameObjects.end(); ++it)
+		{
+			Vector2D fruit = FloorVector2D(spriteTilemap->WorldToTile((*it)->GetComponent<Transform>()->GetTranslation()));
+			if (AlmostEqual(playerTile, fruit))
+			{
+				playerScore->IncreaseScore(100);
+				(*it)->Destroy();
+				Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatFruit.wav");
+			}
+		}
+
+		gameObjects.clear();
 		objectManager.GetAllObjectsByName("Dot", gameObjects);
 
 		for (auto it = gameObjects.begin(); it != gameObjects.end(); ++it)
@@ -250,6 +274,7 @@ namespace Behaviors
 		// Freeze ghosts.
 		for (auto it = enemies.begin(); it != enemies.end(); ++it)
 		{
+			(*it)->GetComponent<GhostAnimation>()->OnGhostEaten(); // we're just gonna pretend that a ghost got eaten to freeze the ghost for half a second.
 			(*it)->GetComponent<GridMovement>()->SetFrozen(true);
 		}
 

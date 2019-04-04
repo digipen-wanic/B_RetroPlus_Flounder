@@ -69,6 +69,9 @@ namespace Behaviors
 		//   dt = The (fixed) change in time since the last step.
 		void Update(float dt) override;
 
+		// Called when the ghost is eaten, freezes the ghost.
+		void OnGhostEaten();
+
 	private:
 		//------------------------------------------------------------------------------
 		// Private Functions:
@@ -97,6 +100,7 @@ namespace Behaviors
 			StateEyesUp,
 			StateFrightened,
 			StateFrightenedEnd,
+			StateGhostEaten,
 
 			STATE_MAX
 		};
@@ -130,6 +134,7 @@ namespace Behaviors
 		BaseAI* baseAI;
 
 		// Other variables.
+		bool ghostEatenQueued;
 		bool deathQueued;
 
 		friend class BaseAI;

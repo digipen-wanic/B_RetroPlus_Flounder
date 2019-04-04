@@ -1,0 +1,15 @@
+Menu
+{
+  numComponents : 2
+  Transform
+  {
+    translation : { 0, 0 }
+    rotation : 0
+    scale : { 672, 672 }
+  }
+  Sprite
+  {
+    frameIndex : 0
+    color : { 1 , 1 , 1 , 1 }
+  }
+}

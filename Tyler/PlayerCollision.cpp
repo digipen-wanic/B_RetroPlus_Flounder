@@ -139,6 +139,7 @@ namespace Behaviors
 			{
 				playerScore->IncreaseScore(100);
 				(*it)->Destroy();
+				Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatFruit.wav");
 			}
 		}
 

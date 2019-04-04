@@ -3,7 +3,7 @@ Fruit
   numComponents : 2
   Transform
   {
-    translation : { 0, -10 }
+    translation : { 0, -60 }
     rotation : 0
     scale : { 40, 40 }
   }

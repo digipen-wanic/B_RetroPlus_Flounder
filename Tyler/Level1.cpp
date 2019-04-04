@@ -266,7 +266,7 @@ namespace Levels
 		if (fruitAlive == true)
 		{
 			fruitDeathTimer -= dt;
-			if (fruitDeathTimer <= 0)
+			if (fruitDeathTimer <= 0 && fruit != nullptr)
 			{
 				fruit->Destroy();
 				fruitAlive = false;

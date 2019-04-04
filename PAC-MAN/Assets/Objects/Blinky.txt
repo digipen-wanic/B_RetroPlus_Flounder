@@ -15,6 +15,7 @@ Blinky
   Behaviors::BlinkyAI
   {
     speed : 8.25
+    frightSpeed : 5.5
     scatterTarget : { 25, -2 }
     overriddenTilesCount : 4
     overriddenTiles : 
@@ -43,5 +44,13 @@ Blinky
     moveDownStart : 6
     moveUpStart : 9
     moveLength : 3
+    eyesRightStart : 12
+    eyesLeftStart : 13
+    eyesDownStart : 14
+    eyesUpStart : 15
+    frightenedStart : 16
+    frightenedLength : 2
+    frightenedEndStart : 18
+    frightenedEndLength : 2
   }
 }

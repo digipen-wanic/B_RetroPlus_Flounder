@@ -97,7 +97,10 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prevInstance, _In
 
 	// Add additional modules to engine
 	Engine::GetInstance().AddModule(space);
-	Engine::GetInstance().AddModule(new SoundManager());
+	SoundManager* soundManager = new SoundManager();
+	soundManager->SetMusicVolume(0.25f);
+	soundManager->SetEffectsVolume(0.25f);
+	Engine::GetInstance().AddModule(soundManager);
 	
 	// Game engine goes!
 	//Engine::GetInstance().Start(448, 576, 60);

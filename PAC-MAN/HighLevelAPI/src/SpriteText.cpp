@@ -29,8 +29,15 @@
 // Public Functions:
 //------------------------------------------------------------------------------
 
-// Create a new sprite text.
-SpriteText::SpriteText(const char* text) : text(text), horizontalAlignment(Alignment::CENTER), verticalAlignment(Alignment::CENTER)
+// Default constructor.
+SpriteText::SpriteText() : text(), horizontalAlignment(Alignment::CENTER), verticalAlignment(Alignment::CENTER)
+{
+}
+
+// Constructor.
+// Params:
+//   text = The text to display.
+SpriteText::SpriteText(const char* text) : text(text), charWidth(0.75f), horizontalAlignment(Alignment::CENTER), verticalAlignment(Alignment::CENTER)
 {
 }
 
@@ -44,7 +51,7 @@ Component* SpriteText::Clone() const
 void SpriteText::Draw()
 {
 	// If there is no map, there is nothing to draw.
-	if (text == nullptr || *text == '\0' || mesh == nullptr || spriteSource == nullptr)
+	if (text.c_str() == nullptr || *text.data() == '\0' || mesh == nullptr || spriteSource == nullptr)
 		return;
 
 	Vector2D translation = transform->GetTranslation();
@@ -98,17 +105,17 @@ void SpriteText::Draw()
 	Graphics::GetInstance().SetSpriteBlendColor(color);
 
 	int newlines = 0;
-	for (const char* iter = text; *iter; ++iter)
+	for (auto it = text.begin(); it != text.end(); ++it)
 	{
 		// When a newline is encountered, move the sprite back on the X axis and move down 1 character on the Y axis (accounts for scale & rotation).
-		if (*iter == '\n')
+		if (*it == '\n')
 		{
 			pos = 0.1875f * Vector2D(right.x * scale.x, right.y * scale.y) + (0.25f + (++newlines * 0.5f)) * Vector2D(down.x * scale.x, down.y * scale.y);
 			continue;
 		}
 
 		// Calculate the frame in the spritesheet.
-		int frame = *iter - 32;
+		int frame = *it - 32;
 
 		// Skip characters outside of the printable ASCII charset.
 		if (frame < 0 || frame >= static_cast<int>(spriteSource->GetNumCols() * spriteSource->GetNumRows()))
@@ -121,7 +128,7 @@ void SpriteText::Draw()
 		Sprite::Draw(pos + offset.x * right + offset.y * down);
 
 		// Move the sprite position 1 character over on the X axis.
-		pos += 0.375f * Vector2D(right.x * scale.x, right.y * scale.y);
+		pos += charWidth * 0.5f * Vector2D(right.x * scale.x, right.y * scale.y);
 	}
 }
 
@@ -130,6 +137,7 @@ void SpriteText::Draw()
 //   parser = The parser that is writing this object to a file.
 void SpriteText::Serialize(Parser& parser) const
 {
+	parser.WriteVariable("charWidth", charWidth);
 	unsigned uHorizontalAlignment = static_cast<unsigned>(horizontalAlignment);
 	parser.WriteVariable("horizontalAlignment", uHorizontalAlignment);
 	unsigned uVerticalAlignment = static_cast<unsigned>(verticalAlignment);
@@ -143,6 +151,7 @@ void SpriteText::Deserialize(Parser& parser)
 {
 	Sprite::Deserialize(parser);
 
+	parser.ReadVariable("charWidth", charWidth);
 	unsigned uHorizontalAlignment;
 	parser.ReadVariable("horizontalAlignment", uHorizontalAlignment);
 	horizontalAlignment = static_cast<Alignment>(uHorizontalAlignment);
@@ -160,7 +169,7 @@ void SpriteText::SetText(const char* text_)
 }
 
 // Get the current string being desplayed.
-const char* SpriteText::GetText() const
+const std::string& SpriteText::GetText() const
 {
 	return text;
 }
@@ -201,17 +210,17 @@ float SpriteText::GetWidth() const
 	// The largest width found.
 	float maxWidth = width;
 
-	for (const char* iter = text; *iter; ++iter)
+	for (auto it = text.begin(); it != text.end(); ++it)
 	{
 		// When a newline is encountered, reset the current line's width to 0.
-		if (*iter == '\n')
+		if (*it == '\n')
 		{
 			width = 0.0f;
 			continue;
 		}
 
 		// Increase the current line's width by the width of a single character.
-		width += scale.x * 0.375f;
+		width += charWidth * 0.5f * scale.x;
 
 		// If the current line's width is bigger than the current largest width, overwrite it.
 		maxWidth = max(maxWidth, width);
@@ -229,9 +238,9 @@ float SpriteText::GetHeight() const
 
 	// Count how many newlines are in the text.
 	int newlines = 0;
-	for (const char* iter = text; *iter; ++iter)
+	for (auto it = text.begin(); it != text.end(); ++it)
 	{
-		if (*iter == '\n')
+		if (*it == '\n')
 		{
 			++newlines;
 		}

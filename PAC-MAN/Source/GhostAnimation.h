@@ -91,6 +91,12 @@ namespace Behaviors
 			StateMoveLeft,
 			StateMoveDown,
 			StateMoveUp,
+			StateEyesRight,
+			StateEyesLeft,
+			StateEyesDown,
+			StateEyesUp,
+			StateFrightened,
+			StateFrightenedEnd,
 
 			STATE_MAX
 		};
@@ -105,6 +111,14 @@ namespace Behaviors
 		unsigned moveDownStart;
 		unsigned moveUpStart;
 		unsigned moveLength;
+		unsigned eyesRightStart;
+		unsigned eyesLeftStart;
+		unsigned eyesDownStart;
+		unsigned eyesUpStart;
+		unsigned frightenedStart;
+		unsigned frightenedLength;
+		unsigned frightenedEndStart;
+		unsigned frightenedEndLength;
 
 		// Animation state
 		State currentState;

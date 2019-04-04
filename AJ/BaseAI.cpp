@@ -68,6 +68,8 @@ namespace Behaviors
 		GridMovement::Initialize();
 		SetFrozen(true);
 
+		target = scatterTarget;
+
 		ghostAnimation = GetOwner()->GetComponent<GhostAnimation>();
 
 		player = GetOwner()->GetSpace()->GetObjectManager().GetObjectByName("PAC-MAN");
@@ -84,14 +86,19 @@ namespace Behaviors
 			{
 				SetFrozen(false);
 				hasMoved = true;
+				// Set mode to exit to
+				mode = wave % 2 == 0 ? SCATTER : CHASE;
 			}
 		}
 
 		// Check if current mode isn't Frightened or the last wave
-		if (frightTimer >= 0.0f || wave == 7)
+		if (frightTimer <= 0.0f || wave == 7)
 		{
 			// Set frightTimer to 0
 			frightTimer = 0.0f;
+			// Set mode when exiting Frightend mode
+			if (mode == FRIGHTENED)
+				mode = wave % 2 == 0 ? SCATTER : CHASE;
 			// Reset Speed
 			GetOwner()->GetComponent<GridMovement>()->SetSpeed(normSpeed);
 			// Increment waveTimer by dt
@@ -101,7 +108,7 @@ namespace Behaviors
 			if (waveTimer >= waveTime[wave])
 			{
 				// Switch between Chase and Scatter mode
-				mode == CHASE ? mode = SCATTER : mode = CHASE;
+				mode = mode == CHASE ? SCATTER : CHASE;
 				// Set forceReverse to true
 				forceReverse = true;
 				// Reset waveTimer
@@ -126,7 +133,6 @@ namespace Behaviors
 	{
 		GridMovement::Serialize(parser);
 
-		parser.WriteVariable("normSpeed", normSpeed);
 		parser.WriteVariable("frightSpeed", frightSpeed);
 		parser.WriteVariable("scatterTarget", scatterTarget);
 
@@ -156,7 +162,7 @@ namespace Behaviors
 	{
 		GridMovement::Deserialize(parser);
 
-		parser.ReadVariable("normSpeed", normSpeed);
+		normSpeed = GetSpeed();
 		parser.ReadVariable("frightSpeed", frightSpeed);
 		parser.ReadVariable("scatterTarget", scatterTarget);
 
@@ -206,6 +212,7 @@ namespace Behaviors
 		mode = FRIGHTENED;
 		frightTimer = frightenTime;
 		GetOwner()->GetComponent<GridMovement>()->SetSpeed(frightSpeed);
+		forceReverse = true;
 	}
 
 	// Returns whether the ghost is in the frightened state.

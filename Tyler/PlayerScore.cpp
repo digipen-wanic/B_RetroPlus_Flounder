@@ -16,48 +16,66 @@
 #include "stdafx.h"
 #include "PlayerScore.h"
 
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// Public Structures:
+//------------------------------------------------------------------------------
+
 namespace Behaviors
 {
-	//constructor
+	//------------------------------------------------------------------------------
+	// Public Functions:
+	//------------------------------------------------------------------------------
+
+	// Constructor.
 	PlayerScore::PlayerScore()
 		: Component("PlayerScore"), score(0), dots(0)
 	{
 	}
 
-	// Initialize this component (happens at object creation).
-	void PlayerScore::Initialize()
-	{
-		score = 0;
-	}
-
 	// Clone a component and return a pointer to the cloned component.
 	// Returns:
 	//   A pointer to a dynamically allocated clone of the component.
-	Component * PlayerScore::Clone() const
+	Component* PlayerScore::Clone() const
 	{
 		return new PlayerScore(*this);
 	}
 
-	//Increases Score by given amount
-	//Params:
-	//unsigned int that increases score
+	// Increases score by the given amount.
+	// Params:
+	//   amount = The amount to increase the score by.
 	void PlayerScore::IncreaseScore(unsigned increaseAmount)
 	{
 		score += increaseAmount;
 	}
 
-	//Gets score
-	//Return:
-	//Unsigned int which is score
-	unsigned int PlayerScore::GetScore(void)
+	// Sets the score.
+	void PlayerScore::SetScore(unsigned score_)
+	{
+		score = score_;
+	}
+
+	// Gets the score.
+	unsigned PlayerScore::GetScore() const
 	{
 		return score;
 	}
 
-	//Gets amount of dots
-	//Return:
-	//unsigned int that is the amount of dots left
-	unsigned PlayerScore::GetAmountDots(void)
+	// Increases dots by 1.
+	void PlayerScore::IncreaseDots()
+	{
+		++dots;
+	}
+
+	// Sets the number of dots.
+	void PlayerScore::SetDots(unsigned dots_)
+	{
+		dots = dots_;
+	}
+
+	// Gets the number of dots.
+	unsigned PlayerScore::GetDots() const
 	{
 		return dots;
 	}

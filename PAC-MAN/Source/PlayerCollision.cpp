@@ -30,6 +30,7 @@
 #include <SpriteTilemap.h>
 #include "BaseAI.h"
 #include "PlayerScore.h"
+#include "PlayerController.h"
 #include "PlayerAnimation.h"
 #include "Energizer.h"
 
@@ -68,6 +69,7 @@ namespace Behaviors
 	{
 		transform = GetOwner()->GetComponent<Transform>();
 		playerScore = GetOwner()->GetComponent<PlayerScore>();
+		playerController = GetOwner()->GetComponent<PlayerController>();
 
 		ghostDeathSound = Engine::GetInstance().GetModule<SoundManager>()->PlaySound("GhostDeath.wav");
 		ghostDeathSound->setPaused(true);
@@ -141,16 +143,17 @@ namespace Behaviors
 				playerScore->IncreaseScore(10);
 				playerScore->IncreaseDots();
 				(*it)->Destroy();
+
 				if (oddConsumable)
 				{
 					Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatDot1.wav");
-					oddConsumable = false;
 				}
 				else
 				{
 					Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatDot2.wav");
-					oddConsumable = true;
 				}
+
+				oddConsumable = !oddConsumable;
 			}
 		}
 
@@ -203,6 +206,13 @@ namespace Behaviors
 			ghostDeathSound->setPaused(true);
 			energizerSound->setPaused(true);
 		}
+
+		if (playerController->direction != oldDirection)
+		{
+			oddConsumable = !oddConsumable;
+		}
+
+		oldDirection = playerController->direction;
 	}
 
 	// Sets the tilemap used for the grid.

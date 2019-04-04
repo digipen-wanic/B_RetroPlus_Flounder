@@ -45,8 +45,13 @@ public:
 	// Public Functions:
 	//------------------------------------------------------------------------------
 
-	// Create a new sprite text.
-	SpriteText(const char* text = "");
+	// Default constructor.
+	SpriteText();
+
+	// Constructor.
+	// Params:
+	//   text = The text to display.
+	SpriteText(const char* text);
 
 	// Clone the sprite, returning a dynamically allocated copy.
 	Component* Clone() const override;
@@ -70,7 +75,7 @@ public:
 	void SetText(const char* text);
 
 	// Get the current string being desplayed.
-	const char* GetText() const;
+	const std::string& GetText() const;
 
 	// Gets the current horizontal alignment.
 	Alignment GetHorizontalAlignment() const;
@@ -100,9 +105,10 @@ private:
 	//------------------------------------------------------------------------------
 
 	// The text this component should draw.
-	const char* text;
+	std::string text;
 
 	// Properties (save to/load from file)
+	float charWidth;
 
 	// The alignment of the text (where the origin of the transform is).
 	Alignment horizontalAlignment;

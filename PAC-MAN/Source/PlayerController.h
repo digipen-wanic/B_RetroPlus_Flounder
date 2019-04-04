@@ -33,6 +33,7 @@ namespace Behaviors
 	// Forward Declarations:
 	//------------------------------------------------------------------------------
 
+	class PlayerCollision;
 	class PlayerAnimation;
 
 	class PlayerController : public GridMovement
@@ -109,6 +110,7 @@ namespace Behaviors
 		float FrightendSpeed;
 		float FrightDotSpeed;
 
+		friend class PlayerCollision;
 		friend class PlayerAnimation;
 	};
 }

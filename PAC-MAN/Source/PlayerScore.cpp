@@ -34,12 +34,6 @@ namespace Behaviors
 	{
 	}
 
-	// Initialize this component (happens at object creation).
-	void PlayerScore::Initialize()
-	{
-		score = 0;
-	}
-
 	// Clone a component and return a pointer to the cloned component.
 	// Returns:
 	//   A pointer to a dynamically allocated clone of the component.

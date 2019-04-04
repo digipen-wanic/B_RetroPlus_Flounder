@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	Level1.h
+// File Name:	Level2.h
 // Author(s):	David Cohen (david.cohen)
 // Project:		BetaFramework
 // Course:		WANIC VGP2 2018-2019
@@ -40,31 +40,31 @@ class SoundManager;
 
 namespace Levels
 {
-	class Level1 : public Level
+	class Level2 : public Level
 	{
 	public:
 		//------------------------------------------------------------------------------
 		// Public Functions:
 		//------------------------------------------------------------------------------
 
-		// Creates an instance of Level 1.
-		Level1();
+		// Creates an instance of Level 2.
+		Level2();
 
-		// Load the resources associated with Level 1.
+		// Load the resources associated with Level 2.
 		void Load() override;
 
-		// Initialize the memory associated with Level 1.
+		// Initialize the memory associated with Level 2.
 		void Initialize() override;
 
-		// Update Level 1.
+		// Update Level 2.
 		// Params:
 		//	 dt = Change in time (in seconds) since the last game loop.
 		void Update(float dt) override;
 
-		// Destroy objects associated with level 1.
+		// Destroy objects associated with level 2.
 		void Shutdown() override;
 
-		// Unload the resources associated with Level 1.
+		// Unload the resources associated with Level 2.
 		void Unload() override;
 
 	private:
@@ -101,14 +101,9 @@ namespace Levels
 		unsigned lives;
 		unsigned oldScore;
 		unsigned oldDots;
-		unsigned highScore;
 		SoundManager* soundManager;
 		std::vector<Vector2D> energizerPositions;
 		std::vector<Vector2D> dotPositions;
-
-		GameObject* scoreText;
-		GameObject* highScoreText;
-		GameObject* pacMan;
 	};
 }
 

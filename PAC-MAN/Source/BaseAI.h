@@ -161,11 +161,17 @@ namespace Behaviors
 		GhostAnimation* ghostAnimation;
 
 		// Other variables
+		float normSpeed;
+		float frightSpeed;
 		bool hasMoved;
 		unsigned dotsLeftToLeave;
 		bool forceReverse;
 		bool isDead;
 		unsigned wave;
+		float waveTime[8];
+		float waveTimer;
+		float frightenTime;
+		float frightTimer;
 		std::vector<OverriddenTile> overriddenTiles;
 		std::vector<OverriddenTile> overriddenExclusionTiles;
 

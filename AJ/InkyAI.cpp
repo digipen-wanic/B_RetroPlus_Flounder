@@ -72,11 +72,15 @@ namespace Behaviors
 		UNREFERENCED_PARAMETER(adjacentTiles);
 		UNREFERENCED_PARAMETER(emptyCount);
 
-		// Get two tiles infornt of PAC-MAN
-		Vector2D pacmanPlus2 = player->GetComponent<GridMovement>()->GetDirectionVector(2);
-		// Get Vector from Blinky to two tiles infront of PAC-MAN
-		Vector2D blinkyPP2Vec = pacmanPlus2 - blinky->GetComponent<Transform>()->GetTranslation();
-		// Set target to twice the vector blinkyPP2Vec
-		target = 2 * blinkyPP2Vec;
+		if (mode == CHASE)
+		{
+			// Get two tiles infornt of PAC-MAN
+			Vector2D pacmanPlus2 = GetSpriteTilemap()->WorldToTile(player->GetComponent<Transform>()->GetTranslation()) + player->GetComponent<GridMovement>()->GetDirectionVector(2);
+			// Get Vector from Blinky to two tiles infront of PAC-MAN
+			Vector2D blinkyPos = GetSpriteTilemap()->WorldToTile(blinky->GetComponent<Transform>()->GetTranslation());
+			Vector2D blinkyPP2Vec = pacmanPlus2 - blinkyPos;
+			// Set target to twice the vector blinkyPP2Vec
+			target = blinkyPos + 2 * blinkyPP2Vec;
+		}
 	}
 }

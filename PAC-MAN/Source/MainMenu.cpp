@@ -36,6 +36,7 @@
 
 // Levels
 #include "Level1.h"
+#include "Level2.h"
 
 //------------------------------------------------------------------------------
 
@@ -63,39 +64,20 @@ namespace Levels
 
 		// Create a new quad mesh for the sprite.
 		resourceManager.GetMesh("Quad");
-		resourceManager.GetSpriteSource("Code New Roman.png", 12, 8);
-		resourceManager.GetMesh("FontAtlas", 12, 8);
+		resourceManager.GetSpriteSource("GhostIntro.png");
 
 		// Load the archetypes from their files.
-		objectManager.AddArchetype(*objectFactory.CreateObject("Rectangle", resourceManager.GetMesh("Quad")));
-		objectManager.AddArchetype(*objectFactory.CreateObject("ControllableRectangle", resourceManager.GetMesh("FontAtlas"), resourceManager.GetSpriteSource("Code New Roman.png")));
+		objectManager.AddArchetype(*objectFactory.CreateObject("Menu", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("GhostIntro.png")));
 	}
 
 	// Initialize the memory associated with Main Menu.
 	void MainMenu::Initialize()
 	{
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
-
-		// Add various physics objects to the scene.
-
-		// Rectangles.
-		GameObject* rectangle = new GameObject(*objectManager.GetArchetypeByName("Rectangle"));
-		rectangle->GetComponent<Transform>()->SetTranslation(Vector2D(-200.0f, 250.0f));
-		rectangle->GetComponent<Transform>()->SetRotation(-M_PI_F / 8.0f);
-		rectangle->GetComponent<Physics>()->SetVelocity(Vector2D(50.0f, -75.0f));
-		rectangle->GetComponent<Physics>()->SetAngularVelocity(M_PI_F / 2.0f);
-		objectManager.AddObject(*rectangle);
-
-		rectangle = new GameObject(*objectManager.GetArchetypeByName("Rectangle"));
-		rectangle->GetComponent<Transform>()->SetTranslation(Vector2D(50.0f, -150.0f));
-		rectangle->GetComponent<Transform>()->SetRotation(M_PI_F / 8.0f);
-		rectangle->GetComponent<Physics>()->SetVelocity(Vector2D(0.0f, 0.0f));
-		objectManager.AddObject(*rectangle);
-
-		// Controllable rectangles.
-		GameObject* controllableRectangle = new GameObject(*objectManager.GetArchetypeByName("ControllableRectangle"));
-		controllableRectangle->GetComponent<SpriteText>()->SetText("ok\nnerd");
-		objectManager.AddObject(*controllableRectangle);
+		
+		// Background
+		GameObject* menu = new GameObject(*objectManager.GetArchetypeByName("Menu"));
+		objectManager.AddObject(*menu);
 	}
 
 	// Update Main Menu.
@@ -108,13 +90,17 @@ namespace Levels
 		Input& input = Input::GetInstance();
 
 		// Handle level switching.
-		if (input.CheckTriggered('1'))
+		if (input.CheckTriggered('0'))
 		{
 			GetSpace()->RestartLevel();
 		}
-		else if (input.CheckTriggered('2'))
+		else if (input.CheckTriggered('1'))
 		{
 			GetSpace()->SetLevel<Level1>();
+		}
+		else if (input.CheckTriggered('2'))
+		{
+			GetSpace()->SetLevel<Level2>();
 		}
 	}
 

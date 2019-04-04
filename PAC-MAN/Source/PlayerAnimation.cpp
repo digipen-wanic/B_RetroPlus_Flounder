@@ -18,6 +18,8 @@
 #include "PlayerAnimation.h"
 
 // Systems
+#include <Engine.h>
+#include <SoundManager.h>
 #include <GameObject.h>
 #include <Space.h>
 #include <Parser.h>
@@ -193,6 +195,9 @@ namespace Behaviors
 				{
 					(*it)->Destroy();
 				}
+
+				// Play death sound.
+				Engine::GetInstance().GetModule<SoundManager>()->PlaySound("PacManDeath.wav");
 			}
 
 			return;
@@ -258,7 +263,7 @@ namespace Behaviors
 				break;
 				// If the state is changed to the dying state, begin playing the dying animation.
 			case State::StateDeath:
-				animation->Play(deathStart, deathLength, 0.1f, false);
+				animation->Play(deathStart, deathLength, 0.125f, false);
 				break;
 				// When a ghost is eaten, display a blank frame.
 			case State::StateGhostEaten:

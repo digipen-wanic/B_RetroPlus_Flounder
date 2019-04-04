@@ -278,9 +278,6 @@ namespace Behaviors
 			(*it)->GetComponent<GridMovement>()->SetFrozen(true);
 		}
 
-		// Play death sound.
-		Engine::GetInstance().GetModule<SoundManager>()->PlaySound("PacManDeath.wav");
-
 		// Play death animation.
 		playerAnimation->OnDeath();
 	}

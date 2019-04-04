@@ -75,11 +75,13 @@ namespace Levels
 		soundManager->AddEffect("PacManDeath.wav");
 		soundManager->AddEffect("EatDot1.wav");
 		soundManager->AddEffect("EatDot2.wav");
+		soundManager->AddEffect("EatFruit.wav");
 		soundManager->AddEffect("EatGhost.wav");
 		soundManager->AddEffect("MusicIntro.wav");
 		soundManager->AddEffect("ExtraLife.wav");
 		soundManager->AddMusic("GhostDeath.wav");
 		soundManager->AddMusic("Energized.wav");
+		soundManager->AddMusic("GhostMove.wav");
 
 		GameObjectFactory& objectFactory = GameObjectFactory::GetInstance();
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
@@ -155,6 +157,7 @@ namespace Levels
 		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
 
 		soundManager->PlaySound("MusicIntro.wav");
+		soundManager->PlaySound("GhostMove.wav");
 
 		// Tilemap.
 		GameObject* tilemap = new GameObject(*objectManager.GetArchetypeByName("Tilemap"));

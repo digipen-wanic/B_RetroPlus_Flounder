@@ -23,7 +23,7 @@
 #include <SoundManager.h>
 
 // Initial game state
-#include "Level1.h"
+#include "MainMenu.h"
 
 // Game object factory
 #include <GameObjectFactory.h>
@@ -92,8 +92,8 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prevInstance, _In
 	// Create a new space called "GameSpace"
 	Space* space = new Space("GameSpace");
 
-	// Set initial level to the second level.
-	space->SetLevel<Levels::Level1>();
+	// Set initial level to the main menu.
+	space->SetLevel<Levels::MainMenu>();
 
 	// Add additional modules to engine
 	Engine::GetInstance().AddModule(space);

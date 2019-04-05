@@ -63,10 +63,8 @@ namespace Levels
 	// Creates an instance of Level 2.
 	Level2::Level2() : Level("Level2"),
 		columnsMap(8), rowsMap(5), columnsEnergizer(4), columnsDot(2), rowsDot(1), rowsEnergizer(1), columnsPacMan(4), rowsPacMan(4), columnsGhost(5), rowsGhost(5),
-		musicTimer(0.0f), musicPlayed(false), musicIntroPlayed(false), readyTimer(0.0f),
+		musicTimer(0.0f), musicPlayed(false), musicIntroPlayed(false), readyTimer(0.0f), winTimer(0.0f),
 		gameOver(false), startLives(3), lives(0), oldScore(0), oldDots(0), highScore(0),
-		/*blinkyWave(0), blinkyWaveTimer(0.0f), pinkyWave(0), pinkyWaveTimer(0.0f),
-		inkyWave(0), inkyWaveTimer(0.0f), clydeWave(0), clydeWaveTimer(0.0f),*/
 		kingGhostWave(0), kingGhostWaveTimer(0.0f),
 		fruitSpawnAmount(0), fruitDeathTimer(0), fruitAlive(false),
 		soundManager(nullptr), energizerPositions(), dotPositions(),
@@ -103,10 +101,6 @@ namespace Levels
 		resourceManager.GetMesh("Dot", columnsDot, rowsDot);
 		resourceManager.GetMesh("Energizer", columnsEnergizer, rowsEnergizer);
 		resourceManager.GetMesh("PacMan", columnsPacMan, rowsPacMan);
-		//resourceManager.GetMesh("Blinky", columnsGhost, rowsGhost);
-		//resourceManager.GetMesh("Pinky", columnsGhost, rowsGhost);
-		//resourceManager.GetMesh("Inky", columnsGhost, rowsGhost);
-		//resourceManager.GetMesh("Clyde", columnsGhost, rowsGhost);
 		resourceManager.GetMesh("KingGhost", columnsGhost, rowsGhost);
 
 		// Create a new quad mesh for the sprite.
@@ -117,10 +111,6 @@ namespace Levels
 		resourceManager.GetSpriteSource("++Dot.png", columnsDot, rowsDot);
 		resourceManager.GetSpriteSource("++Energizer.png", columnsEnergizer, rowsEnergizer);
 		resourceManager.GetSpriteSource("++PacMan.png", columnsPacMan, rowsPacMan);
-		//resourceManager.GetSpriteSource("Blinky.png", columnsGhost, rowsGhost);
-		//resourceManager.GetSpriteSource("Pinky.png", columnsGhost, rowsGhost);
-		//resourceManager.GetSpriteSource("Inky.png", columnsGhost, rowsGhost);
-		//resourceManager.GetSpriteSource("Clyde.png", columnsGhost, rowsGhost);
 		resourceManager.GetSpriteSource("++KingGhost.png", columnsGhost, rowsGhost);
 		resourceManager.GetSpriteSource("++Cherry.png");
 		resourceManager.GetSpriteSource("Bonus100.png");
@@ -134,10 +124,6 @@ namespace Levels
 		objectManager.AddArchetype(*objectFactory.CreateObject("Dot", resourceManager.GetMesh("Dot"), resourceManager.GetSpriteSource("++Dot.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Energizer", resourceManager.GetMesh("Energizer"), resourceManager.GetSpriteSource("++Energizer.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("PAC-MAN", resourceManager.GetMesh("PacMan"), resourceManager.GetSpriteSource("++PacMan.png")));
-		//objectManager.AddArchetype(*objectFactory.CreateObject("Blinky", resourceManager.GetMesh("Blinky"), resourceManager.GetSpriteSource("Blinky.png")));
-		//objectManager.AddArchetype(*objectFactory.CreateObject("Pinky", resourceManager.GetMesh("Pinky"), resourceManager.GetSpriteSource("Pinky.png")));
-		//objectManager.AddArchetype(*objectFactory.CreateObject("Inky", resourceManager.GetMesh("Inky"), resourceManager.GetSpriteSource("Inky.png")));
-		//objectManager.AddArchetype(*objectFactory.CreateObject("Clyde", resourceManager.GetMesh("Clyde"), resourceManager.GetSpriteSource("Clyde.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("KingGhost", resourceManager.GetMesh("KingGhost"), resourceManager.GetSpriteSource("++KingGhost.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("HUDText", resourceManager.GetMesh("FontAtlas"), resourceManager.GetSpriteSource("Missile_Command.png")));
 		objectManager.AddArchetype(*objectFactory.CreateObject("Fruit", resourceManager.GetMesh("Quad"), resourceManager.GetSpriteSource("++Cherry.png")));
@@ -265,31 +251,6 @@ namespace Levels
 
 		if (!gameOver)
 		{
-			// Ghosts.
-			/*GameObject* blinky = new GameObject(*objectManager.GetArchetypeByName("Blinky"));
-			blinky->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-			blinky->GetComponent<Behaviors::BaseAI>()->SetWaveProgress(blinkyWave, blinkyWaveTimer);
-			blinky->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 11.0f)));
-			objectManager.AddObject(*blinky);
-
-			GameObject* pinky = new GameObject(*objectManager.GetArchetypeByName("Pinky"));
-			pinky->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-			pinky->GetComponent<Behaviors::BaseAI>()->SetWaveProgress(pinkyWave, pinkyWaveTimer);
-			pinky->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(13.5f, 14.0f)));
-			objectManager.AddObject(*pinky);
-
-			GameObject* inky = new GameObject(*objectManager.GetArchetypeByName("Inky"));
-			inky->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-			inky->GetComponent<Behaviors::BaseAI>()->SetWaveProgress(inkyWave, inkyWaveTimer);
-			inky->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(11.5f, 14.0f)));
-			objectManager.AddObject(*inky);
-
-			GameObject* clyde = new GameObject(*objectManager.GetArchetypeByName("Clyde"));
-			clyde->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
-			clyde->GetComponent<Behaviors::BaseAI>()->SetWaveProgress(clydeWave, clydeWaveTimer);
-			clyde->GetComponent<Transform>()->SetTranslation(spriteTilemap->TileToWorld(Vector2D(15.5f, 14.0f)));
-			objectManager.AddObject(*clyde);*/
-
 			GameObject* kingGhost = new GameObject(*objectManager.GetArchetypeByName("KingGhost"));
 			kingGhost->GetComponent<Behaviors::GridMovement>()->SetTilemap(dataMap, tilemap->GetComponent<SpriteTilemap>());
 			kingGhost->GetComponent<Behaviors::BaseAI>()->SetWaveProgress(kingGhostWave, kingGhostWaveTimer);
@@ -300,10 +261,6 @@ namespace Levels
 			objectManager.AddObject(*pacMan);
 
 			// Re-initialize all ghosts so they can find the player object since it was added after them.
-			/*blinky->Initialize();
-			pinky->Initialize();
-			inky->Initialize();
-			clyde->Initialize();*/
 			kingGhost->Initialize();
 
 			--lives;
@@ -322,6 +279,8 @@ namespace Levels
 	void Level2::Update(float dt)
 	{
 		UNREFERENCED_PARAMETER(dt);
+
+		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
 
 		musicTimer -= dt;
 		if (musicTimer <= 0 && !musicPlayed)
@@ -367,6 +326,25 @@ namespace Levels
 			readyText->GetComponent<SpriteText>()->SetAlpha(1.0f);
 		}
 
+		// Handle winning if there are no more dots.
+		if (!gameOver)
+		{
+			if (objectManager.GetObjectCount("Dot") == 0)
+			{
+				readyText->GetComponent<SpriteText>()->SetText("YOU WIN!");
+				readyText->GetComponent<SpriteText>()->SetAlpha(1.0f);
+				readyText->GetComponent<SpriteText>()->SetColor(Colors::Green);
+
+				winTimer += dt;
+			}
+
+			if (winTimer >= 3.0f)
+			{
+				GetSpace()->SetLevel<Levels::MainMenu>();
+				return;
+			}
+		}
+
 		// Handle life icons
 		for (unsigned i = 0; i < startLives - 1; i++)
 		{
@@ -378,8 +356,6 @@ namespace Levels
 
 		if (!gameOver)
 		{
-			GameObjectManager& objectManager = GetSpace()->GetObjectManager();
-
 			// Handle fruit spawning
 			if (fruitAlive)
 			{
@@ -409,6 +385,47 @@ namespace Levels
 				objectManager.AddObject(*fruit);
 				++fruitSpawnAmount;
 				fruitAlive = true;
+			}
+		}
+
+		Input& input = Input::GetInstance();
+
+		// Game cheats
+		if (!gameOver)
+		{
+			// Destroy all dots (P)
+			if (input.CheckTriggered('P'))
+			{
+				std::vector<GameObject*> dots;
+				objectManager.GetAllObjectsByName("Dot", dots);
+				for (auto it = dots.begin(); it != dots.end(); ++it)
+				{
+					(*it)->Destroy();
+				}
+			}
+
+			// Make all ghosts frightened (O)
+			if (input.CheckTriggered('O'))
+			{
+				std::vector<GameObject*> enemies;
+
+				// Gather enemies.
+				objectManager.GetAllObjectsByName("Blinky", enemies);
+				objectManager.GetAllObjectsByName("Pinky", enemies);
+				objectManager.GetAllObjectsByName("Inky", enemies);
+				objectManager.GetAllObjectsByName("Clyde", enemies);
+				objectManager.GetAllObjectsByName("KingGhost", enemies);
+
+				for (auto it = enemies.begin(); it != enemies.end(); ++it)
+				{
+					(*it)->GetComponent<Behaviors::BaseAI>()->SetFrightened();
+				}
+			}
+
+			// Go back to main menu (I)
+			if (input.CheckTriggered('I'))
+			{
+				GetSpace()->SetLevel<Levels::MainMenu>();
 			}
 		}
 	}

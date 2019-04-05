@@ -106,6 +106,7 @@ namespace Levels
 		// Misc timers
 		float readyTimer;
 		bool startedAmbience;
+		float winTimer;
 
 		// Variables to persist between restarts
 		bool gameOver;

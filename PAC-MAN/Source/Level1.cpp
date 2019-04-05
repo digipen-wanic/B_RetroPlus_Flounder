@@ -63,7 +63,7 @@ namespace Levels
 	// Creates an instance of Level 1.
 	Level1::Level1() : Level("Level1"),
 		columnsMap(8), rowsMap(5), columnsEnergizer(2), rowsEnergizer(1), columnsPacMan(4), rowsPacMan(4), columnsGhost(5), rowsGhost(5),
-		readyTimer(0.0f), startedAmbience(false),
+		readyTimer(0.0f), startedAmbience(false), winTimer(0.0f),
 		gameOver(false), startLives(3), lives(0), oldScore(0), oldDots(0), highScore(0),
 		blinkyWave(0), blinkyWaveTimer(0.0f), pinkyWave(0), pinkyWaveTimer(0.0f),
 		inkyWave(0), inkyWaveTimer(0.0f), clydeWave(0), clydeWaveTimer(0.0f),
@@ -316,6 +316,8 @@ namespace Levels
 	{
 		UNREFERENCED_PARAMETER(dt);
 
+		GameObjectManager& objectManager = GetSpace()->GetObjectManager();
+
 		// Update score & high score in HUD
 		if (!gameOver)
 		{
@@ -355,6 +357,25 @@ namespace Levels
 			readyText->GetComponent<SpriteText>()->SetAlpha(1.0f);
 		}
 
+		// Handle winning if there are no more dots.
+		if (!gameOver)
+		{
+			if (objectManager.GetObjectCount("Dot") == 0)
+			{
+				readyText->GetComponent<SpriteText>()->SetText("YOU WIN!");
+				readyText->GetComponent<SpriteText>()->SetAlpha(1.0f);
+				readyText->GetComponent<SpriteText>()->SetColor(Colors::Green);
+
+				winTimer += dt;
+			}
+
+			if (winTimer >= 3.0f)
+			{
+				GetSpace()->SetLevel<Levels::MainMenu>();
+				return;
+			}
+		}
+
 		if (!gameOver)
 		{
 			// Mute ambience if the player is dying.
@@ -375,8 +396,6 @@ namespace Levels
 
 		if (!gameOver)
 		{
-			GameObjectManager& objectManager = GetSpace()->GetObjectManager();
-
 			// Handle fruit spawning
 			if (fruitAlive)
 			{
@@ -406,6 +425,47 @@ namespace Levels
 				objectManager.AddObject(*fruit);
 				++fruitSpawnAmount;
 				fruitAlive = true;
+			}
+		}
+
+		Input& input = Input::GetInstance();
+
+		// Game cheats
+		if (!gameOver)
+		{
+			// Destroy all dots (P)
+			if (input.CheckTriggered('P'))
+			{
+				std::vector<GameObject*> dots;
+				objectManager.GetAllObjectsByName("Dot", dots);
+				for (auto it = dots.begin(); it != dots.end(); ++it)
+				{
+					(*it)->Destroy();
+				}
+			}
+
+			// Make all ghosts frightened (O)
+			if (input.CheckTriggered('O'))
+			{
+				std::vector<GameObject*> enemies;
+
+				// Gather enemies.
+				objectManager.GetAllObjectsByName("Blinky", enemies);
+				objectManager.GetAllObjectsByName("Pinky", enemies);
+				objectManager.GetAllObjectsByName("Inky", enemies);
+				objectManager.GetAllObjectsByName("Clyde", enemies);
+				objectManager.GetAllObjectsByName("KingGhost", enemies);
+
+				for (auto it = enemies.begin(); it != enemies.end(); ++it)
+				{
+					(*it)->GetComponent<Behaviors::BaseAI>()->SetFrightened();
+				}
+			}
+
+			// Go back to main menu (I)
+			if (input.CheckTriggered('I'))
+			{
+				GetSpace()->SetLevel<Levels::MainMenu>();
 			}
 		}
 	}

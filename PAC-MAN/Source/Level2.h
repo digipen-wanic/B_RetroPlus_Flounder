@@ -112,6 +112,7 @@ namespace Levels
 		bool musicPlayed;
 		bool musicIntroPlayed;
 		float readyTimer;
+		float winTimer;
 
 		// Variables to persist between restarts
 		bool gameOver;
@@ -120,14 +121,6 @@ namespace Levels
 		unsigned oldScore;
 		unsigned oldDots;
 		unsigned highScore;
-		/*unsigned blinkyWave;
-		float blinkyWaveTimer;
-		unsigned pinkyWave;
-		float pinkyWaveTimer;
-		unsigned inkyWave;
-		float inkyWaveTimer;
-		unsigned clydeWave;
-		float clydeWaveTimer;*/
 		unsigned kingGhostWave;
 		float kingGhostWaveTimer;
 

@@ -55,10 +55,11 @@ public:
 	// Shutdown the sound manager.
 	void Shutdown(void);
 
-	// Creates a non-looping FMOD sound.
+	// Creates an FMOD sound.
 	// Params:
 	//	 filename = Name of the sound file (WAV).
-	void AddEffect(const std::string& filename);
+	//   looping = Whether the sound should loop or not.
+	void AddEffect(const std::string& filename, bool looping = false);
 
 	// Creates an FMOD stream for a music file.
 	// Params:

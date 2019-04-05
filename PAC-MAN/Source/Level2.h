@@ -1,7 +1,7 @@
 //------------------------------------------------------------------------------
 //
 // File Name:	Level2.h
-// Author(s):	David Cohen (david.cohen)
+// Author(s):	A.J. Bussman (anthony.bussman)
 // Project:		BetaFramework
 // Course:		WANIC VGP2 2018-2019
 //
@@ -34,6 +34,11 @@ class GameObject;
 class Tilemap;
 class SoundManager;
 
+namespace FMOD
+{
+	class Channel;
+}
+
 //------------------------------------------------------------------------------
 // Public Structures:
 //------------------------------------------------------------------------------
@@ -61,7 +66,7 @@ namespace Levels
 		//	 dt = Change in time (in seconds) since the last game loop.
 		void Update(float dt) override;
 
-		// Destroy objects associated with level 2.
+		// Destroy objects associated with Level 2.
 		void Shutdown() override;
 
 		// Unload the resources associated with Level 2.
@@ -84,6 +89,10 @@ namespace Levels
 		unsigned columnsMap;
 		unsigned rowsMap;
 
+		// Dot
+		unsigned columnsDot;
+		unsigned rowsDot;
+
 		// Energizer
 		unsigned columnsEnergizer;
 		unsigned rowsEnergizer;
@@ -97,13 +106,50 @@ namespace Levels
 		unsigned rowsGhost;
 
 		// Other variables.
+
+		// Misc timers
+		float musicTimer;
+		bool musicPlayed;
+		bool musicIntroPlayed;
+		float readyTimer;
+
+		// Variables to persist between restarts
+		bool gameOver;
 		unsigned startLives;
 		unsigned lives;
 		unsigned oldScore;
 		unsigned oldDots;
+		unsigned highScore;
+		/*unsigned blinkyWave;
+		float blinkyWaveTimer;
+		unsigned pinkyWave;
+		float pinkyWaveTimer;
+		unsigned inkyWave;
+		float inkyWaveTimer;
+		unsigned clydeWave;
+		float clydeWaveTimer;*/
+		unsigned kingGhostWave;
+		float kingGhostWaveTimer;
+
+		// Fruit spawn timers
+		int fruitSpawnAmount;
+		float fruitDeathTimer;
+		bool fruitAlive;
+
+		// Sound manager
 		SoundManager* soundManager;
+
+		// Persistent locations of energizers & dots
 		std::vector<Vector2D> energizerPositions;
 		std::vector<Vector2D> dotPositions;
+
+		// Game objects
+		GameObject* readyText;
+		GameObject* scoreText;
+		GameObject* highScoreText;
+		GameObject* pacMan;
+		GameObject* fruit;
+		GameObject* lifeIcons[2];
 	};
 }
 

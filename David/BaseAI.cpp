@@ -48,9 +48,18 @@ namespace Behaviors
 	// Params:
 	//   dotsLeftToLeave = How many dots the player must eat before the ghost moves.
 	BaseAI::BaseAI(unsigned dotsLeftToLeave) : player(nullptr), target(), scatterTarget(), mode(CHASE), ghostAnimation(nullptr),
-		hasMoved(false), dotsLeftToLeave(dotsLeftToLeave), forceReverse(false), isDead(false), wave(1),
+		hasMoved(false), dotsLeftToLeave(dotsLeftToLeave), forceReverse(false), isDead(false), wave(0), waveTimer(0.0f), frightenTime(6.0f), frightTimer(0.0f),
 		overriddenTiles(), overriddenExclusionTiles()
 	{
+		// Set waveTime Timers
+		waveTime[0] = 7.0f;
+		waveTime[1] = 20.0f;
+		waveTime[2] = 7.0f;
+		waveTime[3] = 20.0f;
+		waveTime[4] = 5.0f;
+		waveTime[5] = 20.0f;
+		waveTime[6] = 5.0f;
+		waveTime[7] = -1.0f; // Indefinite time
 	}
 
 	// Initialize this component (happens at object creation).
@@ -78,6 +87,50 @@ namespace Behaviors
 			}
 		}
 
+		if (hasMoved)
+		{
+			if (ghostAnimation->currentState == GhostAnimation::State::StateFrozen && !isDead)
+				SetFrozen(true);
+			else
+				SetFrozen(false);
+		}
+
+		// Speed up when going back to the ghost house as eyes.
+		if (isDead)
+			SetSpeed(frightSpeed * 2.5f);
+
+		// Check if current mode isn't Frightened or the last wave
+		if (frightTimer <= 0.0f || wave == 7)
+		{
+			// Set frightTimer to 0
+			frightTimer = 0.0f;
+
+			mode = wave % 2 == 0 ? SCATTER : CHASE;
+			// Reset Speed
+			SetSpeed(normSpeed);
+			// Increment waveTimer by dt if not frozen
+			if (!IsFrozen())
+				waveTimer += dt;
+
+			// Check if the current waveTimer has been reached
+			if (waveTimer >= waveTime[wave])
+			{
+				// Switch between Chase and Scatter mode
+				mode = mode == CHASE ? SCATTER : CHASE;
+				// Set forceReverse to true
+				forceReverse = true;
+				// Reset waveTimer
+				waveTimer = 0.0f;
+				// Increment wave
+				++wave;
+			}
+		}
+		else 
+		{
+			// Decrement frightTimer 
+			frightTimer -= dt; 
+		}
+
 		GridMovement::FixedUpdate(dt);
 	}
 
@@ -88,6 +141,7 @@ namespace Behaviors
 	{
 		GridMovement::Serialize(parser);
 
+		parser.WriteVariable("frightSpeed", frightSpeed);
 		parser.WriteVariable("scatterTarget", scatterTarget);
 
 		parser.WriteVariable("overriddenTilesCount", overriddenTiles.size());
@@ -116,6 +170,8 @@ namespace Behaviors
 	{
 		GridMovement::Deserialize(parser);
 
+		normSpeed = GetSpeed();
+		parser.ReadVariable("frightSpeed", frightSpeed);
 		parser.ReadVariable("scatterTarget", scatterTarget);
 
 		size_t overriddenTilesCount;
@@ -162,6 +218,9 @@ namespace Behaviors
 	void BaseAI::SetFrightened()
 	{
 		mode = FRIGHTENED;
+		frightTimer = frightenTime;
+		SetSpeed(frightSpeed);
+		forceReverse = true;
 	}
 
 	// Returns whether the ghost is in the frightened state.
@@ -200,6 +259,26 @@ namespace Behaviors
 		overriddenExclusionTiles.push_back({ tile, excludedDirection });
 	}
 
+	// Sets the current wave progress.
+	// Params:
+	//   wave = Which wave the AI is in.
+	//   waveTimer = The time into the wave.
+	void BaseAI::SetWaveProgress(unsigned wave_, float waveTimer_)
+	{
+		wave = wave_;
+		waveTimer = waveTimer_;
+	}
+
+	// Gets the current wave progress.
+	// Params:
+	//   wave = Which wave the AI is in.
+	//   waveTimer = The time into the wave.
+	void BaseAI::GetWaveProgress(unsigned& wave_, float& waveTimer_)
+	{
+		wave_ = wave;
+		waveTimer_ = waveTimer;
+	}
+
 	//------------------------------------------------------------------------------
 	// Protected Functions:
 	//------------------------------------------------------------------------------
@@ -218,7 +297,12 @@ namespace Behaviors
 
 			if (AlmostEqual(GetNewTile(), target))
 			{
+				// SUPER SCUFFED CHECK FOR WHETHER THIS IS BLINKY BECAUSE APPARENTLY BLINKY DOESN'T HAVE A COOLDOWN FOR LEAVING THE GHOST HOUSE
+				// IT'S 2 AM AS I WRITE THIS AND AJ IS ASLEEP AND I DON'T KNOW PAC-MAN THAT WELL AAAAA
+				if (GetOwner()->GetName() != "Blinky")
+					ghostAnimation->FreezeBlank(2.0f);
 				isDead = false;
+				frightTimer = 0.0f;
 			}
 
 			if (isDead)
@@ -263,6 +347,8 @@ namespace Behaviors
 			direction = adjacentTile.direction;
 			return;
 		}
+		else if (mode == SCATTER)
+			target = scatterTarget;
 
 		// Let child class handle targeting.
 		OnTarget(adjacentTiles, emptyCount);

@@ -89,7 +89,7 @@ namespace Behaviors
 
 		if (hasMoved)
 		{
-			if (ghostAnimation->currentState == GhostAnimation::State::StateGhostEaten)
+			if (ghostAnimation->currentState == GhostAnimation::State::StateFrozen && !isDead)
 				SetFrozen(true);
 			else
 				SetFrozen(false);
@@ -97,7 +97,7 @@ namespace Behaviors
 
 		// Speed up when going back to the ghost house as eyes.
 		if (isDead)
-			SetSpeed(frightSpeed * 2.0f);
+			SetSpeed(frightSpeed * 2.5f);
 
 		// Check if current mode isn't Frightened or the last wave
 		if (frightTimer <= 0.0f || wave == 7)
@@ -259,6 +259,26 @@ namespace Behaviors
 		overriddenExclusionTiles.push_back({ tile, excludedDirection });
 	}
 
+	// Sets the current wave progress.
+	// Params:
+	//   wave = Which wave the AI is in.
+	//   waveTimer = The time into the wave.
+	void BaseAI::SetWaveProgress(unsigned wave_, float waveTimer_)
+	{
+		wave = wave_;
+		waveTimer = waveTimer_;
+	}
+
+	// Gets the current wave progress.
+	// Params:
+	//   wave = Which wave the AI is in.
+	//   waveTimer = The time into the wave.
+	void BaseAI::GetWaveProgress(unsigned& wave_, float& waveTimer_)
+	{
+		wave_ = wave;
+		waveTimer_ = waveTimer;
+	}
+
 	//------------------------------------------------------------------------------
 	// Protected Functions:
 	//------------------------------------------------------------------------------
@@ -277,6 +297,10 @@ namespace Behaviors
 
 			if (AlmostEqual(GetNewTile(), target))
 			{
+				// SUPER SCUFFED CHECK FOR WHETHER THIS IS BLINKY BECAUSE APPARENTLY BLINKY DOESN'T HAVE A COOLDOWN FOR LEAVING THE GHOST HOUSE
+				// IT'S 2 AM AS I WRITE THIS AND AJ IS ASLEEP AND I DON'T KNOW PAC-MAN THAT WELL AAAAA
+				if (GetOwner()->GetName() != "Blinky")
+					ghostAnimation->FreezeBlank(2.0f);
 				isDead = false;
 				frightTimer = 0.0f;
 			}

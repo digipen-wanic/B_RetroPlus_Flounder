@@ -1,30 +1,61 @@
 KingGhost
 {
-  numComponents : 4
+  numComponents : 5
   Transform
   {
     translation : { 0, 0 }
     rotation : 0
-    scale : { 16, 16 }
+    scale : { 40, 40 }
   }
   Sprite
   {
     frameIndex : 0
     color : { 1 , 1 , 1 , 1 }
   }
+  Behaviors::PlayerGhostController
+  {
+    speed : 8.25
+    frightSpeed : 5.5
+    scatterTarget : { 2, -2 }
+    overriddenTilesCount : 4
+    overriddenTiles : 
+    {
+      { { 13, 13 }, 0 }
+      { { 14, 13 }, 0 }
+      { { 13, 14 }, 0 }
+      { { 14, 14 }, 0 }
+    }
+    overriddenExclusionTilesCount : 4
+    overriddenExclusionTiles : 
+    {
+        { { 12, 11}, 0 }
+        { { 15, 11 }, 0 }
+        { { 12, 23 }, 0 }
+        { { 15, 23 }, 0 }
+    }
+    upKey : 38
+    leftKey : 37
+    downKey : 40
+    rightKey : 39
+  }
   Animation
   {
   }
-  Behaviors::PlayerController
+  Behaviors::GhostAnimation
   {
-    speed : 8.25
-    upKey : 38
-    leftKey : 40
-    downKey : 39
-    rightKey : 39
-    NormalSpeed : 8.8
-    NormDotSpeed : 7.81
-    FrightenedSpeed : 9.9
-    FrightDotSpeed : 8.69
+    moveRightStart : 0
+    moveLeftStart : 3
+    moveDownStart : 6
+    moveUpStart : 9
+    moveLength : 3
+    eyesRightStart : 12
+    eyesLeftStart : 13
+    eyesDownStart : 14
+    eyesUpStart : 15
+    frightenedStart : 16
+    frightenedLength : 2
+    frightenedEndStart : 18
+    frightenedEndLength : 2
+    blankStart : 23
   }
 }

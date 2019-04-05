@@ -72,7 +72,7 @@ namespace Behaviors
 		playerScore = GetOwner()->GetComponent<PlayerScore>();
 		playerController = GetOwner()->GetComponent<PlayerController>();
 
-		ghostDeathSound = Engine::GetInstance().GetModule<SoundManager>()->PlaySound("GhostDeath.wav");
+		ghostDeathSound = Engine::GetInstance().GetModule<SoundManager>()->PlaySound("GhostRunningToHouse.wav");
 		ghostDeathSound->setPaused(true);
 		energizerSound = Engine::GetInstance().GetModule<SoundManager>()->PlaySound("Energized.wav");
 		energizerSound->setPaused(true);
@@ -104,6 +104,7 @@ namespace Behaviors
 		objectManager.GetAllObjectsByName("Pinky", enemies);
 		objectManager.GetAllObjectsByName("Inky", enemies);
 		objectManager.GetAllObjectsByName("Clyde", enemies);
+		objectManager.GetAllObjectsByName("KingGhost", enemies);
 
 		for (auto it = enemies.begin(); it != enemies.end(); ++it)
 		{
@@ -118,18 +119,45 @@ namespace Behaviors
 					if (baseAI->IsFrightened())
 					{
 						// Eat the enemy.
-						playerScore->IncreaseScore(200); // TODO: ADD STREAKS
+
+						// Calculate the score to be added based on the current streak.
+						int score = 0;
+						switch (ghostStreak)
+						{
+						case 0:
+							score = 200;
+							break;
+						case 1:
+							score = 400;
+							break;
+						case 2:
+							score = 800;
+							break;
+						default:
+							score = 1600;
+							break;
+						}
+
+						GameObject* scoreObject = new GameObject(*objectManager.GetArchetypeByName("Bonus" + std::to_string(score)));
+						scoreObject->GetComponent<Transform>()->SetTranslation(transform->GetTranslation());
+						objectManager.AddObject(*scoreObject);
+
+						playerScore->IncreaseScore(score);
 						baseAI->SetDead();
 						Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatGhost.wav");
 
 						// Let all ghosts know that a ghost was eaten.
 						for (auto it2 = enemies.begin(); it2 != enemies.end(); ++it2)
 						{
-							(*it2)->GetComponent<GhostAnimation>()->OnGhostEaten();
+							(*it2)->GetComponent<GhostAnimation>()->FreezeCurrent(0.5f);
 						}
+
+						(*it)->GetComponent<GhostAnimation>()->FreezeBlank(0.5f);
 
 						// Let the player know that a ghost was eaten.
 						GetOwner()->GetComponent<PlayerAnimation>()->OnGhostEaten();
+
+						++ghostStreak;
 					}
 					else
 					{
@@ -150,6 +178,10 @@ namespace Behaviors
 				playerScore->IncreaseScore(100);
 				(*it)->Destroy();
 				Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatFruit.wav");
+
+				GameObject* scoreObject = new GameObject(*objectManager.GetArchetypeByName("Bonus100"));
+				scoreObject->GetComponent<Transform>()->SetTranslation(transform->GetTranslation());
+				objectManager.AddObject(*scoreObject);
 			}
 		}
 
@@ -195,6 +227,9 @@ namespace Behaviors
 				playerScore->IncreaseScore(50);
 				(*it)->Destroy();
 
+				// Reset the ghost streak.
+				ghostStreak = 0;
+
 				// Set all enemies to the frightened state.
 				for (auto it2 = enemies.begin(); it2 != enemies.end(); ++it2)
 				{
@@ -226,6 +261,12 @@ namespace Behaviors
 			energizerSound->setPaused(false);
 		}
 		else
+		{
+			ghostDeathSound->setPaused(true);
+			energizerSound->setPaused(true);
+		}
+
+		if (GetOwner()->GetComponent<PlayerAnimation>()->IsDying())
 		{
 			ghostDeathSound->setPaused(true);
 			energizerSound->setPaused(true);
@@ -267,6 +308,7 @@ namespace Behaviors
 		objectManager.GetAllObjectsByName("Pinky", enemies);
 		objectManager.GetAllObjectsByName("Inky", enemies);
 		objectManager.GetAllObjectsByName("Clyde", enemies);
+		objectManager.GetAllObjectsByName("KingGhost", enemies);
 
 		// Freeze player.
 		GetOwner()->GetComponent<GridMovement>()->SetFrozen(true);
@@ -274,8 +316,7 @@ namespace Behaviors
 		// Freeze ghosts.
 		for (auto it = enemies.begin(); it != enemies.end(); ++it)
 		{
-			(*it)->GetComponent<GhostAnimation>()->OnGhostEaten(); // we're just gonna pretend that a ghost got eaten to freeze the ghost for half a second.
-			(*it)->GetComponent<GridMovement>()->SetFrozen(true);
+			(*it)->GetComponent<GhostAnimation>()->FreezeCurrent(0.5f);
 		}
 
 		// Play death animation.

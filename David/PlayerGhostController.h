@@ -1,25 +1,20 @@
 //------------------------------------------------------------------------------
 //
-// File Name:	PlayerController.h
-// Author(s):	Tyler Miller (miller.t), A.J. Bussman (anthony.bussman)
+// File Name:	PlayerGhostController.h
+// Author(s):	David Cohen (david.cohen)
 // Project:		PAC-MAN
 // Course:		WANIC VGP2 2018-2019
 //
-// Copyright © 2019 DigiPen (USA) Corporation.
+// Copyright © 2018 DigiPen (USA) Corporation.
 //
 //------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// Include Files:
-//------------------------------------------------------------------------------
-
 #pragma once
 
 //------------------------------------------------------------------------------
 // Include Files:
 //------------------------------------------------------------------------------
 
-#include "GridMovement.h"
+#include "BaseAI.h"
 
 //------------------------------------------------------------------------------
 
@@ -29,14 +24,8 @@
 
 namespace Behaviors
 {
-	//------------------------------------------------------------------------------
-	// Forward Declarations:
-	//------------------------------------------------------------------------------
 
-	class PlayerCollision;
-	class PlayerAnimation;
-
-	class PlayerController : public GridMovement
+	class PlayerGhostController : public BaseAI
 	{
 	public:
 		//------------------------------------------------------------------------------
@@ -44,7 +33,7 @@ namespace Behaviors
 		//------------------------------------------------------------------------------
 
 		// Default constructor.
-		PlayerController();
+		PlayerGhostController();
 
 		// Clone a component and return a pointer to the cloned component.
 		// Returns:
@@ -69,14 +58,7 @@ namespace Behaviors
 		//   right = Virtual keycode for the right keybind.
 		void SetKeyBinds(unsigned up, unsigned left, unsigned down, unsigned right);
 
-		// Returns the desired speed variable
-		// Params:
-		//	 speedIndex = which speed variable is desired
-		//   0 = NormalSpeed, 1 = NormDotSpeed, 2 = FrightenedSpeed, 3 = FrightDotSpeed
-		float GetSpeed(unsigned speedIndex);
-
 	protected:
-
 		//------------------------------------------------------------------------------
 		// Protected Functions:
 		//------------------------------------------------------------------------------
@@ -87,11 +69,11 @@ namespace Behaviors
 		//   emptyCount = How many empty tiles were found.
 		virtual void OnTileMove(AdjacentTile adjacentTiles[4], size_t emptyCount) override;
 
-		// Called when met with an intersection after finishing moving to the next tile.
+		// Called when the AI should choose a target.
 		// Params:
 		//   adjacentTiles = An array of adjacent empty tiles.
 		//   emptyCount = How many empty tiles were found.
-		virtual void OnIntersection(AdjacentTile adjacentTiles[4], size_t emptyCount)override;
+		virtual void OnTarget(AdjacentTile adjacentTiles[4], size_t emptyCount) override;
 
 	private:
 		//------------------------------------------------------------------------------
@@ -106,16 +88,7 @@ namespace Behaviors
 		unsigned downKey;
 		unsigned rightKey;
 
-		// Speeds for PAC-MAN in different modes
-		float NormalSpeed;
-		float NormDotSpeed;
-		float FrightendSpeed;
-		float FrightDotSpeed;
-
-		friend class PlayerCollision;
-		friend class PlayerAnimation;
+		// Other variables
+		Direction oldDirection;
 	};
 }
-
-//------------------------------------------------------------------------------
-

@@ -69,6 +69,16 @@ namespace Behaviors
 		//   dt = The (fixed) change in time since the last step.
 		void Update(float dt) override;
 
+		// Freezes the animation on a blank frame.
+		// Params:
+		//   time = How long the animation should stay frozen.
+		void FreezeBlank(float time);
+
+		// Freezes the animation on the current frame.
+		// Params:
+		//   time = How long the animation should stay frozen.
+		void FreezeCurrent(float time);
+
 	private:
 		//------------------------------------------------------------------------------
 		// Private Functions:
@@ -91,6 +101,13 @@ namespace Behaviors
 			StateMoveLeft,
 			StateMoveDown,
 			StateMoveUp,
+			StateEyesRight,
+			StateEyesLeft,
+			StateEyesDown,
+			StateEyesUp,
+			StateFrightened,
+			StateFrightenedEnd,
+			StateFrozen,
 
 			STATE_MAX
 		};
@@ -105,6 +122,15 @@ namespace Behaviors
 		unsigned moveDownStart;
 		unsigned moveUpStart;
 		unsigned moveLength;
+		unsigned eyesRightStart;
+		unsigned eyesLeftStart;
+		unsigned eyesDownStart;
+		unsigned eyesUpStart;
+		unsigned frightenedStart;
+		unsigned frightenedLength;
+		unsigned frightenedEndStart;
+		unsigned frightenedEndLength;
+		unsigned blankStart;
 
 		// Animation state
 		State currentState;
@@ -117,6 +143,9 @@ namespace Behaviors
 
 		// Other variables.
 		bool deathQueued;
+		bool frozenQueued;
+		bool frozenBlank;
+		float frozenTime;
 
 		friend class BaseAI;
 	};

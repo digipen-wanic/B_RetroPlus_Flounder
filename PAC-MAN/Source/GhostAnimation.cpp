@@ -43,7 +43,10 @@ namespace Behaviors
 	// Default constructor
 	GhostAnimation::GhostAnimation() : Component("GhostAnimation"),
 		moveRightStart(0), moveLeftStart(0), moveDownStart(0), moveUpStart(0), moveLength(0),
-		currentState(StateSpawn), nextState(StateSpawn), transform(nullptr), animation(nullptr), baseAI(nullptr), ghostEatenQueued(false), deathQueued(false)
+		eyesRightStart(0), eyesLeftStart(0), eyesDownStart(0), eyesUpStart(0),
+		frightenedStart(0), frightenedLength(0), frightenedEndStart(0), frightenedEndLength(0), blankStart(0),
+		currentState(StateSpawn), nextState(StateSpawn), transform(nullptr), animation(nullptr), baseAI(nullptr), deathQueued(false),
+		frozenQueued(false), frozenBlank(false), frozenTime(0.0f)
 	{
 	}
 
@@ -85,6 +88,7 @@ namespace Behaviors
 		parser.ReadVariable("frightenedLength", frightenedLength);
 		parser.ReadVariable("frightenedEndStart", frightenedEndStart);
 		parser.ReadVariable("frightenedEndLength", frightenedEndLength);
+		parser.ReadVariable("blankStart", blankStart);
 	}
 
 	// Saves object data to a file.
@@ -105,6 +109,7 @@ namespace Behaviors
 		parser.WriteVariable("frightenedLength", frightenedLength);
 		parser.WriteVariable("frightenedEndStart", frightenedEndStart);
 		parser.WriteVariable("frightenedEndLength", frightenedEndLength);
+		parser.WriteVariable("blankStart", blankStart);
 	}
 
 	// Fixed update function for this component.
@@ -121,10 +126,24 @@ namespace Behaviors
 		ChangeCurrentState();
 	}
 
-	// Called when the ghost is eaten, freezes the ghost.
-	void GhostAnimation::OnGhostEaten()
+	// Freezes the animation on a blank frame.
+	// Params:
+	//   time = How long the animation should stay frozen.
+	void GhostAnimation::FreezeBlank(float time)
 	{
-		ghostEatenQueued = true;
+		frozenQueued = true;
+		frozenBlank = true;
+		frozenTime = time;
+	}
+
+	// Freezes the animation on the current frame.
+	// Params:
+	//   time = How long the animation should stay frozen.
+	void GhostAnimation::FreezeCurrent(float time)
+	{
+		frozenQueued = true;
+		frozenBlank = false;
+		frozenTime = time;
 	}
 
 	//------------------------------------------------------------------------------
@@ -135,7 +154,7 @@ namespace Behaviors
 	void GhostAnimation::ChooseNextState()
 	{
 		// If the spawn animation is still playing, don't do anything.
-		if (currentState == State::StateSpawn || currentState == State::StateGhostEaten)
+		if (currentState == State::StateSpawn)
 		{
 			if (!animation->IsDone())
 			{
@@ -145,14 +164,15 @@ namespace Behaviors
 			}
 		}
 
-		// If the ghost eaten animation should be playing, play it.
-		if (ghostEatenQueued)
+		if (frozenQueued)
 		{
-			ghostEatenQueued = false;
-			if (!(currentState == State::StateEyesUp || currentState == State::StateEyesLeft || currentState == State::StateEyesDown || currentState == State::StateEyesRight))
-				nextState = State::StateGhostEaten;
+			frozenQueued = false;
+			nextState = State::StateFrozen;
 			return;
 		}
+
+		if (currentState == State::StateFrozen && !animation->IsDone())
+			return;
 
 		if (baseAI->IsDead())
 		{
@@ -252,9 +272,9 @@ namespace Behaviors
 			case State::StateFrightenedEnd:
 				animation->Play(frightenedEndStart, frightenedEndLength, 0.1f, true);
 				break;
-				// When a ghost is eaten, freeze the current frame.
-			case State::StateGhostEaten:
-				animation->Play(animation->GetCurrentFrame(), 1, 0.5f, false);
+				// This state is used in various circumstances for when the animation needs to be frozen.
+			case State::StateFrozen:
+				animation->Play(frozenBlank ? blankStart : animation->GetCurrentFrame(), 1, frozenTime, false);
 				break;
 			}
 		}

@@ -69,8 +69,15 @@ namespace Behaviors
 		//   dt = The (fixed) change in time since the last step.
 		void Update(float dt) override;
 
-		// Called when the ghost is eaten, freezes the ghost.
-		void OnGhostEaten();
+		// Freezes the animation on a blank frame.
+		// Params:
+		//   time = How long the animation should stay frozen.
+		void FreezeBlank(float time);
+
+		// Freezes the animation on the current frame.
+		// Params:
+		//   time = How long the animation should stay frozen.
+		void FreezeCurrent(float time);
 
 	private:
 		//------------------------------------------------------------------------------
@@ -100,7 +107,7 @@ namespace Behaviors
 			StateEyesUp,
 			StateFrightened,
 			StateFrightenedEnd,
-			StateGhostEaten,
+			StateFrozen,
 
 			STATE_MAX
 		};
@@ -123,6 +130,7 @@ namespace Behaviors
 		unsigned frightenedLength;
 		unsigned frightenedEndStart;
 		unsigned frightenedEndLength;
+		unsigned blankStart;
 
 		// Animation state
 		State currentState;
@@ -134,8 +142,10 @@ namespace Behaviors
 		BaseAI* baseAI;
 
 		// Other variables.
-		bool ghostEatenQueued;
 		bool deathQueued;
+		bool frozenQueued;
+		bool frozenBlank;
+		float frozenTime;
 
 		friend class BaseAI;
 	};

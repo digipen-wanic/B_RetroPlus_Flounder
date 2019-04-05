@@ -95,12 +95,13 @@ void SoundManager::Shutdown(void)
 	numBanks = 0;
 }
 
-// Creates a non-looping FMOD sound.
+// Creates an FMOD sound.
 // Params:
 //	 filename = Name of the sound file (WAV).
-void SoundManager::AddEffect(const std::string& filename)
+//   looping = Whether the sound should loop or not.
+void SoundManager::AddEffect(const std::string& filename, bool looping)
 {
-	AddSound(filename, FMOD_DEFAULT | FMOD_LOOP_OFF);
+	AddSound(filename, FMOD_DEFAULT | (looping ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF));
 }
 
 // Creates an FMOD stream for a music file.

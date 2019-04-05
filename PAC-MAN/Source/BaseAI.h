@@ -84,6 +84,18 @@ namespace Behaviors
 		//   excludedDirection = The direction the AI cannot move in when encountering the specified tile.
 		void AddOverrideExclusionTile(Vector2D tile, Direction excludedDirection);
 
+		// Sets the current wave progress.
+		// Params:
+		//   wave = Which wave the AI is in.
+		//   waveTimer = The time into the wave.
+		void SetWaveProgress(unsigned wave, float waveTimer);
+
+		// Gets the current wave progress.
+		// Params:
+		//   wave = Which wave the AI is in.
+		//   waveTimer = The time into the wave.
+		void GetWaveProgress(unsigned& wave, float& waveTimer);
+
 	protected:
 		//------------------------------------------------------------------------------
 		// Protected Enums:

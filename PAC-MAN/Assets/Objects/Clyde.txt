@@ -54,5 +54,6 @@ Clyde
     frightenedLength : 2
     frightenedEndStart : 18
     frightenedEndLength : 2
+    blankStart : 23
   }
 }

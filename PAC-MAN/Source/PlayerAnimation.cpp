@@ -29,6 +29,7 @@
 #include <Physics.h>
 #include <Transform.h>
 #include "PlayerController.h"
+#include "GhostAnimation.h"
 
 //------------------------------------------------------------------------------
 
@@ -190,10 +191,12 @@ namespace Behaviors
 				objectManager.GetAllObjectsByName("Pinky", enemies);
 				objectManager.GetAllObjectsByName("Inky", enemies);
 				objectManager.GetAllObjectsByName("Clyde", enemies);
+				objectManager.GetAllObjectsByName("KingGhost", enemies);
 
+				// Turn all ghosts invisible.
 				for (auto it = enemies.begin(); it != enemies.end(); ++it)
 				{
-					(*it)->Destroy();
+					(*it)->GetComponent<GhostAnimation>()->FreezeBlank(100.0f);
 				}
 
 				// Play death sound.

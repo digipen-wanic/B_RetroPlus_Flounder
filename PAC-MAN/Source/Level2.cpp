@@ -326,14 +326,14 @@ namespace Levels
 		musicTimer -= dt;
 		if (musicTimer <= 0 && !musicPlayed)
 		{
-			soundManager->PlaySound("PlusMusicIntro.wav");
+			soundManager->PlaySound("PlusMusicIntro.wav")->setVolume(10.f);
 			musicPlayed = true;
 			musicTimer = 6;
 		}
 		if (!musicIntroPlayed && musicTimer <= 0)
 		{
 			soundManager->SetMusicVolume(1);
-			soundManager->PlaySound("PlusMusicLoop.wav");
+			soundManager->PlaySound("PlusMusicLoop.wav")->setVolume(5.f);
 			musicIntroPlayed = true;
 		}
 

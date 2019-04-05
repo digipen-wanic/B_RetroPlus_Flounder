@@ -17,6 +17,8 @@
 
 #include "Component.h" // base class
 
+#include "PlayerController.h"
+
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -30,6 +32,11 @@ class SpriteTilemap;
 namespace Behaviors
 {
 	class PlayerScore;
+}
+
+namespace FMOD
+{
+	class Channel;
 }
 
 //------------------------------------------------------------------------------
@@ -82,9 +89,14 @@ namespace Behaviors
 		// Components
 		Transform* transform;
 		PlayerScore* playerScore;
+		PlayerController* playerController;
 
 		// Other variables
+		GridMovement::Direction oldDirection;
 		int ghostStreak;
+		bool oddConsumable;
+		FMOD::Channel* energizerSound;
+		FMOD::Channel* ghostDeathSound;
 	};
 }
 

@@ -29,7 +29,9 @@
 #include <Transform.h>
 #include <SpriteTilemap.h>
 #include "BaseAI.h"
+#include "GhostAnimation.h"
 #include "PlayerScore.h"
+#include "PlayerController.h"
 #include "PlayerAnimation.h"
 #include "Energizer.h"
 
@@ -59,7 +61,7 @@ namespace Behaviors
 	//------------------------------------------------------------------------------
 
 	// Constructor
-	PlayerCollision::PlayerCollision() : Component("PlayerCollision"), tilemap(nullptr), spriteTilemap(nullptr), transform(nullptr)
+	PlayerCollision::PlayerCollision() : Component("PlayerCollision"), tilemap(nullptr), spriteTilemap(nullptr), transform(nullptr), ghostStreak(0), oddConsumable(false), energizerSound(nullptr), ghostDeathSound(nullptr)
 	{
 	}
 
@@ -68,6 +70,12 @@ namespace Behaviors
 	{
 		transform = GetOwner()->GetComponent<Transform>();
 		playerScore = GetOwner()->GetComponent<PlayerScore>();
+		playerController = GetOwner()->GetComponent<PlayerController>();
+
+		ghostDeathSound = Engine::GetInstance().GetModule<SoundManager>()->PlaySound("GhostRunningToHouse.wav");
+		ghostDeathSound->setPaused(true);
+		energizerSound = Engine::GetInstance().GetModule<SoundManager>()->PlaySound("Energized.wav");
+		energizerSound->setPaused(true);
 	}
 
 	// Clone a component and return a pointer to the cloned component.
@@ -96,6 +104,7 @@ namespace Behaviors
 		objectManager.GetAllObjectsByName("Pinky", enemies);
 		objectManager.GetAllObjectsByName("Inky", enemies);
 		objectManager.GetAllObjectsByName("Clyde", enemies);
+		objectManager.GetAllObjectsByName("KingGhost", enemies);
 
 		for (auto it = enemies.begin(); it != enemies.end(); ++it)
 		{
@@ -105,20 +114,78 @@ namespace Behaviors
 			if (AlmostEqual(playerTile, enemyTile))
 			{
 				BaseAI* baseAI = (*it)->GetComponent<BaseAI>();
-				if (baseAI->IsFrightened())
+				if (!baseAI->IsDead())
 				{
-					// Eat the enemy.
-					playerScore->IncreaseScore(200); // TODO: ADD STREAKS
-					baseAI->SetDead();
-				} 
-				else
-				{
-					OnDeath();
+					if (baseAI->IsFrightened())
+					{
+						// Eat the enemy.
+
+						// Calculate the score to be added based on the current streak.
+						int score = 0;
+						switch (ghostStreak)
+						{
+						case 0:
+							score = 200;
+							break;
+						case 1:
+							score = 400;
+							break;
+						case 2:
+							score = 800;
+							break;
+						default:
+							score = 1600;
+							break;
+						}
+
+						GameObject* scoreObject = new GameObject(*objectManager.GetArchetypeByName("Bonus" + std::to_string(score)));
+						scoreObject->GetComponent<Transform>()->SetTranslation(transform->GetTranslation());
+						objectManager.AddObject(*scoreObject);
+
+						playerScore->IncreaseScore(score);
+						baseAI->SetDead();
+						Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatGhost.wav");
+
+						// Let all ghosts know that a ghost was eaten.
+						for (auto it2 = enemies.begin(); it2 != enemies.end(); ++it2)
+						{
+							(*it2)->GetComponent<GhostAnimation>()->FreezeCurrent(0.5f);
+						}
+
+						(*it)->GetComponent<GhostAnimation>()->FreezeBlank(0.5f);
+
+						// Let the player know that a ghost was eaten.
+						GetOwner()->GetComponent<PlayerAnimation>()->OnGhostEaten();
+
+						++ghostStreak;
+					}
+					else
+					{
+						OnDeath();
+					}
 				}
 			}
 		}
 
 		std::vector<GameObject*> gameObjects;
+		objectManager.GetAllObjectsByName("Fruit", gameObjects);
+
+		for (auto it = gameObjects.begin(); it != gameObjects.end(); ++it)
+		{
+			Vector2D fruit = FloorVector2D(spriteTilemap->WorldToTile((*it)->GetComponent<Transform>()->GetTranslation()));
+			if (AlmostEqual(playerTile, fruit))
+			{
+				playerScore->IncreaseScore(100);
+				(*it)->Destroy();
+				Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatFruit.wav");
+
+				GameObject* scoreObject = new GameObject(*objectManager.GetArchetypeByName("Bonus100"));
+				scoreObject->GetComponent<Transform>()->SetTranslation(transform->GetTranslation());
+				objectManager.AddObject(*scoreObject);
+			}
+		}
+
+		gameObjects.clear();
 		objectManager.GetAllObjectsByName("Dot", gameObjects);
 
 		for (auto it = gameObjects.begin(); it != gameObjects.end(); ++it)
@@ -132,6 +199,19 @@ namespace Behaviors
 				playerScore->IncreaseScore(10);
 				playerScore->IncreaseDots();
 				(*it)->Destroy();
+
+				if (oddConsumable)
+				{
+					Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatDot1.wav");
+				}
+				else
+				{
+					Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatDot2.wav");
+				}
+
+				playerController->AteDot();
+
+				oddConsumable = !oddConsumable;
 			}
 		}
 
@@ -148,6 +228,10 @@ namespace Behaviors
 				// Add score and destroy the energizer.
 				playerScore->IncreaseScore(50);
 				(*it)->Destroy();
+				playerController->AteEnergizer();
+
+				// Reset the ghost streak.
+				ghostStreak = 0;
 
 				// Set all enemies to the frightened state.
 				for (auto it2 = enemies.begin(); it2 != enemies.end(); ++it2)
@@ -156,6 +240,47 @@ namespace Behaviors
 				}
 			}
 		}
+
+		bool enemyDead = false;
+		bool enemyFrightened = false;
+
+		for (auto it = enemies.begin(); it != enemies.end(); ++it)
+		{
+			BaseAI* baseAI = (*it)->GetComponent<BaseAI>();
+			if (baseAI->IsDead())
+				enemyDead = true;
+			if (baseAI->IsFrightened())
+				enemyFrightened = true;
+		}
+
+		if (enemyDead)
+		{
+			ghostDeathSound->setPaused(false);
+			energizerSound->setPaused(true);
+		}
+		else if (enemyFrightened)
+		{
+			ghostDeathSound->setPaused(true);
+			energizerSound->setPaused(false);
+		}
+		else
+		{
+			ghostDeathSound->setPaused(true);
+			energizerSound->setPaused(true);
+		}
+
+		if (GetOwner()->GetComponent<PlayerAnimation>()->IsDying())
+		{
+			ghostDeathSound->setPaused(true);
+			energizerSound->setPaused(true);
+		}
+
+		if (playerController->direction != oldDirection)
+		{
+			oddConsumable = !oddConsumable;
+		}
+
+		oldDirection = playerController->direction;
 	}
 
 	// Sets the tilemap used for the grid.
@@ -186,6 +311,7 @@ namespace Behaviors
 		objectManager.GetAllObjectsByName("Pinky", enemies);
 		objectManager.GetAllObjectsByName("Inky", enemies);
 		objectManager.GetAllObjectsByName("Clyde", enemies);
+		objectManager.GetAllObjectsByName("KingGhost", enemies);
 
 		// Freeze player.
 		GetOwner()->GetComponent<GridMovement>()->SetFrozen(true);
@@ -193,11 +319,8 @@ namespace Behaviors
 		// Freeze ghosts.
 		for (auto it = enemies.begin(); it != enemies.end(); ++it)
 		{
-			(*it)->GetComponent<GridMovement>()->SetFrozen(true);
+			(*it)->GetComponent<GhostAnimation>()->FreezeCurrent(0.5f);
 		}
-
-		// Play death sound.
-		Engine::GetInstance().GetModule<SoundManager>()->PlaySound("deathofpacfinal.wav");
 
 		// Play death animation.
 		playerAnimation->OnDeath();

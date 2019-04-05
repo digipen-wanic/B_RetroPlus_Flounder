@@ -18,6 +18,8 @@
 #include "PlayerAnimation.h"
 
 // Systems
+#include <Engine.h>
+#include <SoundManager.h>
 #include <GameObject.h>
 #include <Space.h>
 #include <Parser.h>
@@ -27,6 +29,7 @@
 #include <Physics.h>
 #include <Transform.h>
 #include "PlayerController.h"
+#include "GhostAnimation.h"
 
 //------------------------------------------------------------------------------
 
@@ -43,7 +46,7 @@ namespace Behaviors
 	// Default constructor
 	PlayerAnimation::PlayerAnimation() : Component("PlayerAnimation"),
 		spawnStart(0), moveStart(0), moveLength(0), deathStart(0), deathLength(0),
-		currentState(StateSpawn), nextState(StateSpawn), transform(nullptr), animation(nullptr), playerController(nullptr), deathQueued(false)
+		currentState(StateSpawn), nextState(StateSpawn), transform(nullptr), animation(nullptr), playerController(nullptr), ghostEatenQueued(false), deathQueued(false)
 	{
 	}
 
@@ -64,7 +67,7 @@ namespace Behaviors
 		playerController = GetOwner()->GetComponent<PlayerController>();
 
 		// Play the spawn animation.
-		animation->Play(spawnStart, 1, 1.0f, false);
+		animation->Play(spawnStart, 1, 4.0f, false);
 	}
 
 	// Loads object data from a file.
@@ -77,6 +80,7 @@ namespace Behaviors
 		parser.ReadVariable("moveLength", moveLength);
 		parser.ReadVariable("deathStart", deathStart);
 		parser.ReadVariable("deathLength", deathLength);
+		parser.ReadVariable("blankStart", blankStart);
 	}
 
 	// Saves object data to a file.
@@ -89,6 +93,7 @@ namespace Behaviors
 		parser.WriteVariable("moveLength", moveLength);
 		parser.WriteVariable("deathStart", deathStart);
 		parser.WriteVariable("deathLength", deathLength);
+		parser.WriteVariable("blankStart", blankStart);
 	}
 
 	// Fixed update function for this component.
@@ -104,7 +109,7 @@ namespace Behaviors
 		// Update the current state if necessary.
 		ChangeCurrentState();
 
-		if (currentState == State::StateMove || currentState == State::StateIdle)
+		if (currentState == State::StateMove || currentState == State::StateIdle || currentState == State::StateGhostEaten || currentState == State::StateDying)
 		{
 			switch (playerController->direction)
 			{
@@ -134,10 +139,16 @@ namespace Behaviors
 		deathQueued = true;
 	}
 
+	// Called when the ghost is eaten, freezes the ghost.
+	void PlayerAnimation::OnGhostEaten()
+	{
+		ghostEatenQueued = true;
+	}
+
 	// Returns whether the death animation is currently playing.
 	bool PlayerAnimation::IsDying() const
 	{
-		return currentState == State::StateDeath;
+		return deathQueued || currentState == State::StateDying || currentState == State::StateDeath;
 	}
 
 	//------------------------------------------------------------------------------
@@ -147,8 +158,46 @@ namespace Behaviors
 	// Choose the correct state based on velocity.
 	void PlayerAnimation::ChooseNextState()
 	{
+		if (currentState == State::StateDying || currentState == State::StateDeath)
+		{
+			if (animation->IsDone())
+			{
+				if (currentState == State::StateDying)
+				{
+					nextState = State::StateDeath;
+
+					std::vector<GameObject*> enemies;
+
+					GameObjectManager& objectManager = GetOwner()->GetSpace()->GetObjectManager();
+
+					// Gather enemies.
+					objectManager.GetAllObjectsByName("Blinky", enemies);
+					objectManager.GetAllObjectsByName("Pinky", enemies);
+					objectManager.GetAllObjectsByName("Inky", enemies);
+					objectManager.GetAllObjectsByName("Clyde", enemies);
+					objectManager.GetAllObjectsByName("KingGhost", enemies);
+
+					// Turn all ghosts invisible.
+					for (auto it = enemies.begin(); it != enemies.end(); ++it)
+					{
+						(*it)->GetComponent<GhostAnimation>()->FreezeBlank(100.0f);
+					}
+
+					// Play death sound.
+					Engine::GetInstance().GetModule<SoundManager>()->PlaySound("PacManDeath.wav");
+				}
+				else if (currentState == State::StateDeath)
+				{
+					// Restart level when animation is done.
+					GetOwner()->GetSpace()->RestartLevel();
+				}
+			}
+
+			return;
+		}
+
 		// If the spawn animation is still playing, don't do anything.
-		if (currentState == State::StateSpawn)
+		if (currentState == State::StateSpawn || currentState == State::StateGhostEaten)
 		{
 			if (animation->IsDone())
 			{
@@ -157,16 +206,27 @@ namespace Behaviors
 			else
 			{
 				playerController->SetFrozen(true);
-				playerController->direction = GridMovement::Direction::LEFT;
+
+				// Start the player moving left.
+				if (currentState == State::StateSpawn)
+					playerController->direction = GridMovement::Direction::LEFT;
 				return;
 			}
+		}
+
+		// If the ghost eaten animation should be playing, play it.
+		if (ghostEatenQueued)
+		{
+			ghostEatenQueued = false;
+			nextState = State::StateGhostEaten;
+			return;
 		}
 
 		// If the death animation should be playing, play it.
 		if (deathQueued)
 		{
-			nextState = State::StateDeath;
 			deathQueued = false;
+			nextState = State::StateDying;
 			return;
 		}
 
@@ -202,7 +262,7 @@ namespace Behaviors
 			{
 				// If the state is changed to the spawn state, begin playing the spawn animation.
 			case State::StateSpawn:
-				animation->Play(spawnStart, 1, 1.0f, false);
+				animation->Play(spawnStart, 1, 4.0f, false);
 				break;
 				// If the state is changed to the idle state, begin playing the idle animation.
 			case State::StateIdle:
@@ -214,7 +274,15 @@ namespace Behaviors
 				break;
 				// If the state is changed to the dying state, begin playing the dying animation.
 			case State::StateDeath:
-				animation->Play(deathStart, deathLength, 0.1f, false);
+				animation->Play(deathStart, deathLength, 0.125f, false);
+				break;
+				// When a ghost is eaten, display a blank frame.
+			case State::StateGhostEaten:
+				animation->Play(blankStart, 1, 0.5f, false);
+				break;
+				// When the player is dying, freeze the current frame.
+			case State::StateDying:
+				animation->Play(animation->GetCurrentFrame(), 1, 0.5f, false);
 				break;
 			}
 		}

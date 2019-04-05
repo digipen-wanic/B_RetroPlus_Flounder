@@ -209,6 +209,8 @@ namespace Behaviors
 					Engine::GetInstance().GetModule<SoundManager>()->PlaySound("EatDot2.wav");
 				}
 
+				playerController->AteDot();
+
 				oddConsumable = !oddConsumable;
 			}
 		}
@@ -226,6 +228,7 @@ namespace Behaviors
 				// Add score and destroy the energizer.
 				playerScore->IncreaseScore(50);
 				(*it)->Destroy();
+				playerController->AteEnergizer();
 
 				// Reset the ghost streak.
 				ghostStreak = 0;

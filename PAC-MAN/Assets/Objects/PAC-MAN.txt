@@ -22,10 +22,10 @@ PAC-MAN
     leftKey : 65
     downKey : 83
     rightKey : 68
-    NormalSpeed : 8.8
-    NormDotSpeed : 7.81
-    FrightenedSpeed : 9.9
-    FrightDotSpeed : 8.69
+    normalSpeed : 8.8
+    normDotSpeed : 7.81
+    frightenedSpeed : 9.9
+    frightDotSpeed : 8.69
   }
   Behaviors::PlayerScore
   {

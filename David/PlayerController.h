@@ -33,6 +33,7 @@ namespace Behaviors
 	// Forward Declarations:
 	//------------------------------------------------------------------------------
 
+	class PlayerCollision;
 	class PlayerAnimation;
 
 	class PlayerController : public GridMovement
@@ -60,6 +61,11 @@ namespace Behaviors
 		//   parser = The parser that is reading this object's data from a file.
 		void Deserialize(Parser& parser) override;
 
+		// Updates components using a fixed timestep (usually just physics)
+		// Params:
+		//     dt = A fixed change in time, usually 1/60th of a second.
+		void FixedUpdate(float dt);
+
 		// Set the keys for player.
 		// Params:
 		//   up = Virtual keycode for the up keybind.
@@ -71,8 +77,14 @@ namespace Behaviors
 		// Returns the desired speed variable
 		// Params:
 		//	 speedIndex = which speed variable is desired
-		//   0 = NormalSpeed, 1 = NormDotSpeed, 2 = FrightenedSpeed, 3 = FrightDotSpeed
+		//   0 = normalSpeed, 1 = normDotSpeed, 2 = FrightenedSpeed, 3 = frightDotSpeed
 		float GetSpeed(unsigned speedIndex);
+
+		// Called when the player eats a dot.
+		void AteDot();
+
+		// Called when the player eats an energizer.
+		void AteEnergizer();
 
 	protected:
 
@@ -97,17 +109,24 @@ namespace Behaviors
 		// Private Variables:
 		//------------------------------------------------------------------------------
 
-		// Properties what types of Keys
+		// Properties
+
+		// Keybinds
 		unsigned upKey;
 		unsigned leftKey;
 		unsigned downKey;
 		unsigned rightKey;
 
-		float NormalSpeed;
-		float NormDotSpeed;
-		float FrightendSpeed;
-		float FrightDotSpeed;
+		// Speeds for PAC-MAN in different modes
+		float normalSpeed;
+		float normDotSpeed;
+		float frightenedSpeed;
+		float frightDotSpeed;
 
+		bool ateDot;
+		float energizerTimer;
+
+		friend class PlayerCollision;
 		friend class PlayerAnimation;
 	};
 }

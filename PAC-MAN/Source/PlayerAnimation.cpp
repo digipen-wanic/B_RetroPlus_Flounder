@@ -158,6 +158,44 @@ namespace Behaviors
 	// Choose the correct state based on velocity.
 	void PlayerAnimation::ChooseNextState()
 	{
+		if (currentState == State::StateDying || currentState == State::StateDeath)
+		{
+			if (animation->IsDone())
+			{
+				if (currentState == State::StateDying)
+				{
+					nextState = State::StateDeath;
+
+					std::vector<GameObject*> enemies;
+
+					GameObjectManager& objectManager = GetOwner()->GetSpace()->GetObjectManager();
+
+					// Gather enemies.
+					objectManager.GetAllObjectsByName("Blinky", enemies);
+					objectManager.GetAllObjectsByName("Pinky", enemies);
+					objectManager.GetAllObjectsByName("Inky", enemies);
+					objectManager.GetAllObjectsByName("Clyde", enemies);
+					objectManager.GetAllObjectsByName("KingGhost", enemies);
+
+					// Turn all ghosts invisible.
+					for (auto it = enemies.begin(); it != enemies.end(); ++it)
+					{
+						(*it)->GetComponent<GhostAnimation>()->FreezeBlank(100.0f);
+					}
+
+					// Play death sound.
+					Engine::GetInstance().GetModule<SoundManager>()->PlaySound("PacManDeath.wav");
+				}
+				else if (currentState == State::StateDeath)
+				{
+					// Restart level when animation is done.
+					GetOwner()->GetSpace()->RestartLevel();
+				}
+			}
+
+			return;
+		}
+
 		// If the spawn animation is still playing, don't do anything.
 		if (currentState == State::StateSpawn || currentState == State::StateGhostEaten)
 		{
@@ -174,36 +212,6 @@ namespace Behaviors
 					playerController->direction = GridMovement::Direction::LEFT;
 				return;
 			}
-		}
-
-		if (currentState == State::StateDying)
-		{
-			if (animation->IsDone())
-			{
-				nextState = State::StateDeath;
-
-				std::vector<GameObject*> enemies;
-
-				GameObjectManager& objectManager = GetOwner()->GetSpace()->GetObjectManager();
-
-				// Gather enemies.
-				objectManager.GetAllObjectsByName("Blinky", enemies);
-				objectManager.GetAllObjectsByName("Pinky", enemies);
-				objectManager.GetAllObjectsByName("Inky", enemies);
-				objectManager.GetAllObjectsByName("Clyde", enemies);
-				objectManager.GetAllObjectsByName("KingGhost", enemies);
-
-				// Turn all ghosts invisible.
-				for (auto it = enemies.begin(); it != enemies.end(); ++it)
-				{
-					(*it)->GetComponent<GhostAnimation>()->FreezeBlank(100.0f);
-				}
-
-				// Play death sound.
-				Engine::GetInstance().GetModule<SoundManager>()->PlaySound("PacManDeath.wav");
-			}
-
-			return;
 		}
 
 		// If the ghost eaten animation should be playing, play it.
